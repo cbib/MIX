@@ -1,0 +1,96 @@
+Hayssams-MacBook-Pro:gage hayssam$ sh getCorrectnessStats.sh ../Rhodobacter_Assembly/rho_genome.fasta ../Mix-1.1/outRhodo_APSPBB_no_removal/Mix_results_A125_C0/Mix_assembly.fasta ../Mix-1.1/outRhodo_APSPBB_no_removal/Mix_results_A125_C0/Mix_assembly.fasta
+Contig Stats
+Total units: 187
+Reference: 4603060
+BasesInFasta: 4720499
+Min: 201
+Max: 400670
+N10: 376585 COUNT: 2
+N25: 238631 COUNT: 4
+N50: 136158 COUNT: 10
+N75: 98639 COUNT: 20
+E-size:173692.47
+
+1: PREPARING DATA
+2,3: RUNNING mummer AND CREATING CLUSTERS
+# reading input file "Mix_assembly.fasta.ntref" of length 4603067
+# construct suffix tree for sequence of length 4603067
+# (maximum reference length is 536870908)
+# (maximum query length is 4294967295)
+# process 46030 characters per dot
+#....................................................................................................
+# CONSTRUCTIONTIME /Users/hayssam/Documents/MIX/MUMmer3.23/mummer Mix_assembly.fasta.ntref 2.96
+# reading input file "/Users/hayssam/Documents/MIX/gage/../Mix-1.1/outRhodo_APSPBB_no_removal/Mix_results_A125_C0/Mix_assembly.fasta" of length 4739713
+# matching query-file "/Users/hayssam/Documents/MIX/gage/../Mix-1.1/outRhodo_APSPBB_no_removal/Mix_results_A125_C0/Mix_assembly.fasta"
+# against subject-file "Mix_assembly.fasta.ntref"
+# COMPLETETIME /Users/hayssam/Documents/MIX/MUMmer3.23/mummer Mix_assembly.fasta.ntref 8.63
+# SPACE /Users/hayssam/Documents/MIX/MUMmer3.23/mummer Mix_assembly.fasta.ntref 8.99
+4: FINISHING DATA
+Filtering alignments
+Extracting alignment coordinates
+Analyzing SNPs
+Extracting alignment breakpoints
+Generating report file
+Genome Size: 4603060
+Assembly Size: 4739392
+-n Chaff bases:
+18493
+Missing Reference Bases: 221206(4.81%)
+Missing Assembly Bases: 841(0.02%)
+Missing Assembly Contigs: 2(0.62%)
+-n Duplicated Reference Bases:
+341736
+-n Compressed Reference Bases:
+18572
+-n Bad Trim:
+211
+Avg Idy: 99.97
+SNPs: 583
+Indels < 5bp: 165
+Indels >= 5: 351
+Inversions: 0
+Relocation: 3
+Translocation: 6
+
+Corrected Contig Stats
+Total units: 504
+Reference: 4603060
+BasesInFasta: 4409831
+Min: 201
+Max: 88469
+N10: 45758 COUNT: 8
+N25: 26389 COUNT: 28
+N50: 15392 COUNT: 84
+N75: 7889 COUNT: 188
+E-size:20760.09
+
+1: PREPARING DATA
+2,3: RUNNING mummer AND CREATING CLUSTERS
+# reading input file "Mix_assembly.fasta.ntref" of length 4603067
+# construct suffix tree for sequence of length 4603067
+# (maximum reference length is 536870908)
+# (maximum query length is 4294967295)
+# process 46030 characters per dot
+#....................................................................................................
+# CONSTRUCTIONTIME /Users/hayssam/Documents/MIX/MUMmer3.23/mummer Mix_assembly.fasta.ntref 3.14
+# reading input file "/Users/hayssam/Documents/MIX/gage/tmp_scf.fasta" of length 4739713
+# matching query-file "/Users/hayssam/Documents/MIX/gage/tmp_scf.fasta"
+# against subject-file "Mix_assembly.fasta.ntref"
+# COMPLETETIME /Users/hayssam/Documents/MIX/MUMmer3.23/mummer Mix_assembly.fasta.ntref 8.82
+# SPACE /Users/hayssam/Documents/MIX/MUMmer3.23/mummer Mix_assembly.fasta.ntref 9.07
+4: FINISHING DATA
+Scaffold Stats
+Total units: 187
+Reference: 4603060
+BasesInFasta: 4720499
+Min: 201
+Max: 400670
+N10: 376585 COUNT: 2
+N25: 238631 COUNT: 4
+N50: 136158 COUNT: 10
+N75: 98639 COUNT: 20
+E-size:173692.47
+
+Corrected Scaffold Stats
+0,0,0,0,NaN,1,400670,10,136158
+Hayssams-MacBook-Pro:gage hayssam$

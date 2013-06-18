@@ -1,0 +1,128 @@
+QUAST started: bin/quast-2.1/quast.py -o result_statistics/b_cereus_quast -R datasets/reference/Bacillus_cereus/Bacillus_cereus_ref.fa result_assemblies/b_cereus_AB_SP_mix.fasta result_assemblies/b_cereus_AB_MS_mix.fasta result_assemblies/b_cereus_MS_SP_mix.fasta result_assemblies/b_cereus_AB_MS_SP_mix.fasta datasets/GAGE-B/B_cereus_MiSeq/abyss_ctg.fasta datasets/GAGE-B/B_cereus_MiSeq/soap_ctg.fasta datasets/GAGE-B/B_cereus_MiSeq/msrca_ctg.fasta 
+Version: 2.1 Build: 15.02.2013_18:08
+
+System information:
+  OS: Darwin-12.3.0-x86_64-i386-32bit
+  Python version: 2.7.3
+  CPUs number: 4
+
+Started: 2013-06-18 19:45:38
+
+Logging to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/quast.log
+
+== NOTE: Maximum number of threads was set to 4 (use --threads option to set it manually) ==
+Processing contig files and reference ...
+  result_assemblies/b_cereus_AB_SP_mix.fasta ==> b_cereus_AB_SP_mix
+  result_assemblies/b_cereus_AB_MS_mix.fasta ==> b_cereus_AB_MS_mix
+  result_assemblies/b_cereus_MS_SP_mix.fasta ==> b_cereus_MS_SP_mix
+  result_assemblies/b_cereus_AB_MS_SP_mix.fasta ==> b_cereus_AB_MS_SP_mix
+  datasets/GAGE-B/B_cereus_MiSeq/abyss_ctg.fasta ==> abyss_ctg
+  datasets/GAGE-B/B_cereus_MiSeq/soap_ctg.fasta ==> soap_ctg
+  datasets/GAGE-B/B_cereus_MiSeq/msrca_ctg.fasta ==> msrca_ctg
+  Done.
+
+2013-06-18 19:45:42
+Running Basic statistics processor...
+  Reference genome:
+    Bacillus_cereus_ref, Reference length = 5432652, Reference GC % = 35.50
+  Contigs files: 
+    1  b_cereus_AB_SP_mix
+    2  b_cereus_AB_MS_mix
+    3  b_cereus_MS_SP_mix
+    4  b_cereus_AB_MS_SP_mix
+    5  abyss_ctg
+    6  soap_ctg
+    7  msrca_ctg
+  Calculating N50 and L50...
+    1  b_cereus_AB_SP_mix, N50 = 380728, L50 = 5, Total length = 5476358, GC % = 35.33, # N's per 100 kbp =  7.14
+    2  b_cereus_AB_MS_mix, N50 = 429164, L50 = 4, Total length = 5231731, GC % = 35.37, # N's per 100 kbp =  9.88
+    3  b_cereus_MS_SP_mix, N50 = 487570, L50 = 4, Total length = 5402180, GC % = 35.36, # N's per 100 kbp =  0.00
+    4  b_cereus_AB_MS_SP_mix, N50 = 574929, L50 = 3, Total length = 5443254, GC % = 35.32, # N's per 100 kbp =  10.71
+    5  abyss_ctg, N50 = 130570, L50 = 12, Total length = 5380960, GC % = 35.30, # N's per 100 kbp =  102.42
+    6  soap_ctg, N50 = 246346, L50 = 6, Total length = 5341631, GC % = 35.28, # N's per 100 kbp =  0.00
+    7  msrca_ctg, N50 = 246697, L50 = 6, Total length = 5432639, GC % = 35.39, # N's per 100 kbp =  0.00
+  Drawing cumulative plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/basic_stats/cumulative_plot.pdf
+  Drawing GC content plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/basic_stats/GC_content_plot.pdf
+  Drawing Nx plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/basic_stats/Nx_plot.pdf
+  Drawing NGx plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/basic_stats/NGx_plot.pdf
+  Done.
+
+2013-06-18 19:45:47
+Running Contigs analyzer...
+  1  b_cereus_AB_SP_mix
+  2  b_cereus_AB_MS_mix
+  1  Logging to files /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/contigs_reports/contigs_report_b_cereus_AB_SP_mix.stdout and contigs_report_b_cereus_AB_SP_mix.stderr...
+  2  Logging to files /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/contigs_reports/contigs_report_b_cereus_AB_MS_mix.stdout and contigs_report_b_cereus_AB_MS_mix.stderr...
+  1  Running Nucmer... 
+  4  b_cereus_AB_MS_SP_mix
+  2  Running Nucmer... 
+  4  Logging to files /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/contigs_reports/contigs_report_b_cereus_AB_MS_SP_mix.stdout and contigs_report_b_cereus_AB_MS_SP_mix.stderr...
+  4  Running Nucmer... 
+  3  b_cereus_MS_SP_mix
+  3  Logging to files /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/contigs_reports/contigs_report_b_cereus_MS_SP_mix.stdout and contigs_report_b_cereus_MS_SP_mix.stderr...
+  3  Running Nucmer... 
+  2  Analysis is finished.
+  5  abyss_ctg
+  5  Logging to files /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/contigs_reports/contigs_report_abyss_ctg.stdout and contigs_report_abyss_ctg.stderr...
+  5  Running Nucmer... 
+  3  Analysis is finished.
+  6  soap_ctg
+  6  Logging to files /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/contigs_reports/contigs_report_soap_ctg.stdout and contigs_report_soap_ctg.stderr...
+  6  Running Nucmer... 
+  1  Analysis is finished.
+  7  msrca_ctg
+  7  Logging to files /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/contigs_reports/contigs_report_msrca_ctg.stdout and contigs_report_msrca_ctg.stderr...
+  7  Running Nucmer... 
+  4  Analysis is finished.
+  5  Analysis is finished.
+  6  Analysis is finished.
+  7  Analysis is finished.
+  Creating total report...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/contigs_reports/misassemblies_report.txt, misassemblies_report.tsv, and misassemblies_report.tex
+  Creating total report...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/contigs_reports/unaligned_report.txt, unaligned_report.tsv, and unaligned_report.tex
+  Done.
+
+2013-06-18 19:46:46
+Running NA-NGA tool...
+  Calculating NA50 and NGA50...
+    1  b_cereus_AB_SP_mix, Largest alignment = 700529, NA50 = 380728, NGA50 = 380728, LA50 = 5, LGA50 = 5
+    2  b_cereus_AB_MS_mix, Largest alignment = 766822, NA50 = 246697, NGA50 = 246697, LA50 = 6, LGA50 = 6
+    3  b_cereus_MS_SP_mix, Largest alignment = 1157128, NA50 = 487570, NGA50 = 487570, LA50 = 4, LGA50 = 4
+    4  b_cereus_AB_MS_SP_mix, Largest alignment = 1157128, NA50 = 485913, NGA50 = 485913, LA50 = 4, LGA50 = 4
+    5  abyss_ctg, Largest alignment = 430487, NA50 = 130570, NGA50 = 130570, LA50 = 12, LGA50 = 12
+    6  soap_ctg, Largest alignment = 606357, NA50 = 246346, NGA50 = 246346, LA50 = 6, LGA50 = 6
+    7  msrca_ctg, Largest alignment = 766822, NA50 = 246697, NGA50 = 246697, LA50 = 6, LGA50 = 6
+  Drawing cumulative plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/aligned_stats/cumulative_plot.pdf
+  Drawing NAx plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/aligned_stats/NAx_plot.pdf
+  Drawing NGAx plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/aligned_stats/NGAx_plot.pdf
+  Done.
+
+2013-06-18 19:46:48
+== NOTE: Annotated genes file was not provided! Use -G option to specify it! ==
+== NOTE: Annotated operons file was not provided! Use -O option to specify it! ==
+  Drawing Genome fraction, % histogram...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/genome_stats/genome_fraction_histogram.pdf
+
+== NOTE: Gene Finding module was skipped. Use --gene-finding option to enable it. ==
+
+2013-06-18 19:47:06
+Summarizing...
+  Creating total report...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/report.txt, report.tsv, and report.tex
+  Transposed version of total report...
+      saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/transposed_report.txt, transposed_report.tsv, and transposed_report.tex
+  All pdf files are merged to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/plots.pdf
+Done.
+
+Log saved to /Users/hayssam/temp/MIX/result_statistics/b_cereus_quast/quast.log
+
+Finished: 2013-06-18 19:47:06
+Elapsed time: 0:01:28.239778

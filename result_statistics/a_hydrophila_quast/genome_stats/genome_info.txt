@@ -1,0 +1,21 @@
+reference chromosomes:
+	gi_117617447_ref_NC_008570.1__Aeromonas_hydrophila_subsp._hydrophila_ATCC_7966_chromosome__complete_genome (4744448 bp)
+
+total genome size: 4744448
+
+gap min size: 50
+partial gene/operon min size: 100
+
+genes loaded: 4286
+
+
+  assembly              | genome fraction (%) | duplication ratio | gaps        | genes     | partial   | operons   | partial   |
+                        |                     |                   | number      |           | genes     |           | operons   |
+================================================================================================================================
+  a_hydrophila_AB_SP_mix  | 14.721417539        | 5.12334884387     | 112         | 601       | 64        | None      | None      |
+  a_hydrophila_AB_MS_mix  | 13.7267391275       | 5.11536595328     | 105         | 566       | 62        | None      | None      |
+  a_hydrophila_MS_SP_mix  | 14.0364063427       | 4.67685111495     | 110         | 580       | 64        | None      | None      |
+  a_hydrophila_AB_MS_SP_mix  | 14.0153290752       | 4.67296037296     | 109         | 578       | 64        | None      | None      |
+  abyss_ctg             | 14.8870848621       | 4.0806416446      | 114         | 601       | 67        | None      | None      |
+  soap_ctg              | 14.7730989991       | 3.82735246868     | 111         | 602       | 64        | None      | None      |
+  msrca_ctg             | 13.6858913829       | 5.11385141379     | 108         | 564       | 66        | None      | None      |

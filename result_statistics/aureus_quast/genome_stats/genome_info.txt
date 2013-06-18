@@ -1,0 +1,23 @@
+reference chromosomes:
+	gi_161508266_ref_NC_010079.1__Staphylococcus_aureus_subsp._aureus_USA300_TCH1516_chromosome__complete_genome (2872915 bp)
+	gi_225631039_ref_NC_012417.1__Staphylococcus_aureus_subsp._aureus_USA300_TCH1516_plasmid_pUSA01-HOU__complete_sequence (3125 bp)
+	gi_161510924_ref_NC_010063.1__Staphylococcus_aureus_subsp._aureus_USA300_TCH1516_plasmid_pUSA300HOUMR__complete_sequence (27041 bp)
+
+total genome size: 2903081
+
+gap min size: 50
+partial gene/operon min size: 100
+
+genes loaded: 2845
+
+
+  assembly              | genome fraction (%) | duplication ratio | gaps        | genes     | partial   | operons   | partial   |
+                        |                     |                   | number      |           | genes     |           | operons   |
+================================================================================================================================
+  aureus_AP_SP_mix      | 98.7781257223       | 1.04380339161     | 53          | 2738      | 40        | None      | None      |
+  aureus_BB_SP_mix      | 97.2041427711       | 1.02462370412     | 62          | 2690      | 46        | None      | None      |
+  bambus2.genome.ctg    | 97.3939755728       | 1.03449108836     | 115         | 2641      | 90        | None      | None      |
+  SOAP.genome.ctg       | 98.3865761927       | 1.02000985911     | 62          | 2725      | 48        | None      | None      |
+  aureus_AP_BB_mix      | 96.4894882368       | 1.02672456632     | 37          | 2663      | 37        | None      | None      |
+  AP.genome.ctg         | 98.8274181809       | 1.01432744054     | 40          | 2728      | 42        | None      | None      |
+  aureus_AP_BB_SP_mix   | 98.5748589171       | 1.05247775105     | 52          | 2729      | 42        | None      | None      |

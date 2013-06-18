@@ -1,0 +1,132 @@
+QUAST started: bin/quast-2.1/quast.py -o result_statistics/aureus_quast -R datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.fa -G datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.gff result_assemblies/aureus_AP_SP_mix.fasta result_assemblies/aureus_BB_SP_mix.fasta datasets/GAGE/Staphylococcus_aureus/Bambus2/bambus2.genome.ctg.fasta datasets/GAGE/Staphylococcus_aureus/SOAPdenovo/SOAP.genome.ctg.fasta result_assemblies/aureus_AP_BB_mix.fasta datasets/GAGE/Staphylococcus_aureus/Allpaths-LG/AP.genome.ctg.fasta result_assemblies/aureus_AP_BB_SP_mix.fasta 
+Version: 2.1 Build: 15.02.2013_18:08
+
+System information:
+  OS: Darwin-12.3.0-x86_64-i386-32bit
+  Python version: 2.7.3
+  CPUs number: 4
+
+Started: 2013-06-18 20:36:15
+
+Logging to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/quast.log
+
+== NOTE: Output directory already exists! Existing Nucmer alignments can be used! ==
+== NOTE: Maximum number of threads was set to 4 (use --threads option to set it manually) ==
+Processing contig files and reference ...
+  result_assemblies/aureus_AP_SP_mix.fasta ==> aureus_AP_SP_mix
+  result_assemblies/aureus_BB_SP_mix.fasta ==> aureus_BB_SP_mix
+  datasets/GAGE/Staphylococcus_aureus/Bambus2/bambus2.genome.ctg.fasta ==> bambus2.genome.ctg
+  datasets/GAGE/Staphylococcus_aureus/SOAPdenovo/SOAP.genome.ctg.fasta ==> SOAP.genome.ctg
+  result_assemblies/aureus_AP_BB_mix.fasta ==> aureus_AP_BB_mix
+  datasets/GAGE/Staphylococcus_aureus/Allpaths-LG/AP.genome.ctg.fasta ==> AP.genome.ctg
+  result_assemblies/aureus_AP_BB_SP_mix.fasta ==> aureus_AP_BB_SP_mix
+  Done.
+
+2013-06-18 20:36:18
+Running Basic statistics processor...
+  Reference genome:
+    Staphylococcus_aureus_ref, Reference length = 2903081, Reference GC % = 32.73
+  Contigs files: 
+    1  aureus_AP_SP_mix
+    2  aureus_BB_SP_mix
+    3  bambus2.genome.ctg
+    4  SOAP.genome.ctg
+    5  aureus_AP_BB_mix
+    6  AP.genome.ctg
+    7  aureus_AP_BB_SP_mix
+  Calculating N50 and L50...
+    1  aureus_AP_SP_mix, N50 = 288184, L50 = 5, Total length = 2950220, GC % = 32.61, # N's per 100 kbp =  0.68
+    2  aureus_BB_SP_mix, N50 = 288184, L50 = 4, Total length = 2854404, GC % = 32.58, # N's per 100 kbp =  0.07
+    3  bambus2.genome.ctg, N50 = 50192, L50 = 15, Total length = 2832623, GC % = 32.55, # N's per 100 kbp =  0.35
+    4  SOAP.genome.ctg, N50 = 288184, L50 = 4, Total length = 2897432, GC % = 32.57, # N's per 100 kbp =  0.07
+    5  aureus_AP_BB_mix, N50 = 101091, L50 = 9, Total length = 2835269, GC % = 32.66, # N's per 100 kbp =  1.45
+    6  AP.genome.ctg, N50 = 96740, L50 = 10, Total length = 2869581, GC % = 32.65, # N's per 100 kbp =  1.50
+    7  aureus_AP_BB_SP_mix, N50 = 288184, L50 = 5, Total length = 2948935, GC % = 32.61, # N's per 100 kbp =  0.68
+  Drawing cumulative plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/basic_stats/cumulative_plot.pdf
+  Drawing GC content plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/basic_stats/GC_content_plot.pdf
+  Drawing Nx plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/basic_stats/Nx_plot.pdf
+  Drawing NGx plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/basic_stats/NGx_plot.pdf
+  Done.
+
+2013-06-18 20:36:22
+Running Contigs analyzer...
+  1  aureus_AP_SP_mix
+  2  aureus_BB_SP_mix
+  1  Logging to files /Users/hayssam/temp/MIX/result_statistics/aureus_quast/contigs_reports/contigs_report_aureus_AP_SP_mix.stdout and contigs_report_aureus_AP_SP_mix.stderr...
+  2  Logging to files /Users/hayssam/temp/MIX/result_statistics/aureus_quast/contigs_reports/contigs_report_aureus_BB_SP_mix.stdout and contigs_report_aureus_BB_SP_mix.stderr...
+  4  SOAP.genome.ctg
+  3  bambus2.genome.ctg
+  4  Logging to files /Users/hayssam/temp/MIX/result_statistics/aureus_quast/contigs_reports/contigs_report_SOAP.genome.ctg.stdout and contigs_report_SOAP.genome.ctg.stderr...
+  3  Logging to files /Users/hayssam/temp/MIX/result_statistics/aureus_quast/contigs_reports/contigs_report_bambus2.genome.ctg.stdout and contigs_report_bambus2.genome.ctg.stderr...
+  1  Using existing Nucmer alignments... 
+  2  Using existing Nucmer alignments... 
+  4  Using existing Nucmer alignments... 
+  3  Using existing Nucmer alignments... 
+  4  Analysis is finished.
+  5  aureus_AP_BB_mix
+  5  Logging to files /Users/hayssam/temp/MIX/result_statistics/aureus_quast/contigs_reports/contigs_report_aureus_AP_BB_mix.stdout and contigs_report_aureus_AP_BB_mix.stderr...
+  5  Using existing Nucmer alignments... 
+  3  Analysis is finished.
+  6  AP.genome.ctg
+  6  Logging to files /Users/hayssam/temp/MIX/result_statistics/aureus_quast/contigs_reports/contigs_report_AP.genome.ctg.stdout and contigs_report_AP.genome.ctg.stderr...
+  6  Using existing Nucmer alignments... 
+  2  Analysis is finished.
+  7  aureus_AP_BB_SP_mix
+  7  Logging to files /Users/hayssam/temp/MIX/result_statistics/aureus_quast/contigs_reports/contigs_report_aureus_AP_BB_SP_mix.stdout and contigs_report_aureus_AP_BB_SP_mix.stderr...
+  7  Using existing Nucmer alignments... 
+  1  Analysis is finished.
+  5  Analysis is finished.
+  6  Analysis is finished.
+  7  Analysis is finished.
+  Creating total report...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/contigs_reports/misassemblies_report.txt, misassemblies_report.tsv, and misassemblies_report.tex
+  Creating total report...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/contigs_reports/unaligned_report.txt, unaligned_report.tsv, and unaligned_report.tex
+  Done.
+
+2013-06-18 20:36:33
+Running NA-NGA tool...
+  Calculating NA50 and NGA50...
+    1  aureus_AP_SP_mix, Largest alignment = 432463, NA50 = 217394, NGA50 = 217394, LA50 = 5, LGA50 = 5
+    2  aureus_BB_SP_mix, Largest alignment = 432569, NA50 = 178770, NGA50 = 178770, LA50 = 5, LGA50 = 5
+    3  bambus2.genome.ctg, Largest alignment = 158329, NA50 = 50192, NGA50 = 50192, LA50 = 15, LGA50 = 15
+    4  SOAP.genome.ctg, Largest alignment = 432463, NA50 = 172569, NGA50 = 172569, LA50 = 6, LGA50 = 6
+    5  aureus_AP_BB_mix, Largest alignment = 234488, NA50 = 101091, NGA50 = 101091, LA50 = 9, LGA50 = 9
+    6  AP.genome.ctg, Largest alignment = 234488, NA50 = 96740, NGA50 = 96740, LA50 = 10, LGA50 = 10
+    7  aureus_AP_BB_SP_mix, Largest alignment = 432463, NA50 = 217395, NGA50 = 217395, LA50 = 5, LGA50 = 5
+  Drawing cumulative plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/aligned_stats/cumulative_plot.pdf
+  Drawing NAx plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/aligned_stats/NAx_plot.pdf
+  Drawing NGAx plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/aligned_stats/NGAx_plot.pdf
+  Done.
+
+2013-06-18 20:36:35
+== NOTE: Annotated operons file was not provided! Use -O option to specify it! ==
+  Drawing genes cumulative plot...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/genome_stats/genes_cumulative_plot.pdf
+  Drawing # complete genes histogram...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/genome_stats/complete_genes_histogram.pdf
+  Drawing Genome fraction, % histogram...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/genome_stats/genome_fraction_histogram.pdf
+
+== NOTE: Gene Finding module was skipped. Use --gene-finding option to enable it. ==
+
+2013-06-18 20:36:46
+Summarizing...
+  Creating total report...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/report.txt, report.tsv, and report.tex
+  Transposed version of total report...
+      saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/transposed_report.txt, transposed_report.tsv, and transposed_report.tex
+  All pdf files are merged to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/plots.pdf
+Done.
+
+Log saved to /Users/hayssam/temp/MIX/result_statistics/aureus_quast/quast.log
+
+Finished: 2013-06-18 20:36:46
+Elapsed time: 0:00:31.000509

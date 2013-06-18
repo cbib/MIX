@@ -1,0 +1,96 @@
+Hayssams-MacBook-Pro:gage hayssam$ sh getCorrectnessStats.sh ../Rhodobacter_Assembly/rho_genome.fasta ../Rhodobacter_Assembly/SOAPdenovo/genome.ctg.fasta ../Rhodobacter_Assembly/SOAPdenovo/genome.ctg.fasta
+Contig Stats
+Total units: 202
+Reference: 4603060
+BasesInFasta: 4595674
+Min: 201
+Max: 376585
+N10: 340150 COUNT: 2
+N25: 238631 COUNT: 4
+N50: 131681 COUNT: 11
+N75: 72443 COUNT: 22
+E-size:157152.61
+
+1: PREPARING DATA
+2,3: RUNNING mummer AND CREATING CLUSTERS
+# reading input file "genome.ctg.fasta.ntref" of length 4603067
+# construct suffix tree for sequence of length 4603067
+# (maximum reference length is 536870908)
+# (maximum query length is 4294967295)
+# process 46030 characters per dot
+#....................................................................................................
+# CONSTRUCTIONTIME /Users/hayssam/Documents/MIX/MUMmer3.23/mummer genome.ctg.fasta.ntref 3.08
+# reading input file "/Users/hayssam/Documents/MIX/gage/../Rhodobacter_Assembly/SOAPdenovo/genome.ctg.fasta" of length 4616946
+# matching query-file "/Users/hayssam/Documents/MIX/gage/../Rhodobacter_Assembly/SOAPdenovo/genome.ctg.fasta"
+# against subject-file "genome.ctg.fasta.ntref"
+# COMPLETETIME /Users/hayssam/Documents/MIX/MUMmer3.23/mummer genome.ctg.fasta.ntref 9.00
+# SPACE /Users/hayssam/Documents/MIX/MUMmer3.23/mummer genome.ctg.fasta.ntref 8.87
+4: FINISHING DATA
+Filtering alignments
+Extracting alignment coordinates
+Analyzing SNPs
+Extracting alignment breakpoints
+Generating report file
+Genome Size: 4603060
+Assembly Size: 4616597
+-n Chaff bases:
+20523
+Missing Reference Bases: 35002(0.76%)
+Missing Assembly Bases: 630(0.01%)
+Missing Assembly Contigs: 2(0.57%)
+-n Duplicated Reference Bases:
+61095
+-n Compressed Reference Bases:
+22352
+-n Bad Trim:
+121
+Avg Idy: 99.97
+SNPs: 533
+Indels < 5bp: 155
+Indels >= 5: 404
+Inversions: 0
+Relocation: 4
+Translocation: 4
+
+Corrected Contig Stats
+Total units: 569
+Reference: 4603060
+BasesInFasta: 4560544
+Min: 201
+Max: 88469
+N10: 37507 COUNT: 10
+N25: 24381 COUNT: 34
+N50: 14340 COUNT: 95
+N75: 7898 COUNT: 203
+E-size:18552.65
+
+1: PREPARING DATA
+2,3: RUNNING mummer AND CREATING CLUSTERS
+# reading input file "genome.ctg.fasta.ntref" of length 4603067
+# construct suffix tree for sequence of length 4603067
+# (maximum reference length is 536870908)
+# (maximum query length is 4294967295)
+# process 46030 characters per dot
+#....................................................................................................
+# CONSTRUCTIONTIME /Users/hayssam/Documents/MIX/MUMmer3.23/mummer genome.ctg.fasta.ntref 3.01
+# reading input file "/Users/hayssam/Documents/MIX/gage/tmp_scf.fasta" of length 4616946
+# matching query-file "/Users/hayssam/Documents/MIX/gage/tmp_scf.fasta"
+# against subject-file "genome.ctg.fasta.ntref"
+# COMPLETETIME /Users/hayssam/Documents/MIX/MUMmer3.23/mummer genome.ctg.fasta.ntref 8.48
+# SPACE /Users/hayssam/Documents/MIX/MUMmer3.23/mummer genome.ctg.fasta.ntref 8.94
+4: FINISHING DATA
+Scaffold Stats
+Total units: 202
+Reference: 4603060
+BasesInFasta: 4595674
+Min: 201
+Max: 376585
+N10: 340150 COUNT: 2
+N25: 238631 COUNT: 4
+N50: 131681 COUNT: 11
+N75: 72443 COUNT: 22
+E-size:157152.61
+
+Corrected Scaffold Stats
+0,0,0,0,NaN,1,376585,11,131681
+Hayssams-MacBook-Pro:gage hayssam$
