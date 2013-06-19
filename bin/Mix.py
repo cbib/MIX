@@ -594,6 +594,8 @@ def processing (all_alignments,alignments, contigs_file, output_base, contig_thr
 	#print_stats(paths, selected_single_contigs, contigs)
 
 def save_statistics_to_files(initial_assembly_graph,assembly_graph,all_alignments,selected_alignements,all_paths, selected_paths, all_contigs,included_contigs, selected_contigs,selected_single_contigs,single_contigs,output_dir):
+	if len(alignments)<1:
+		return
 	global aln_threshold,contig_threshold
 	nx.write_gml(initial_assembly_graph.GRAPH,output_dir+"/initial_assembly_graph.gml")
 	nx.write_gml(assembly_graph.GRAPH,output_dir+"/reduced_assembly_graph.gml")

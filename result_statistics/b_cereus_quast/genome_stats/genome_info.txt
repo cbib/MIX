@@ -7,15 +7,16 @@ total genome size: 5432652
 gap min size: 50
 partial gene/operon min size: 100
 
+genes loaded: 6014
 
 
   assembly              | genome fraction (%) | duplication ratio | gaps        | genes     | partial   | operons   | partial   |
                         |                     |                   | number      |           | genes     |           | operons   |
 ================================================================================================================================
-  b_cereus_AB_SP_mix    | 97.9220645828       | 1.03281028391     | 38          | None      | None      | None      | None      |
-  b_cereus_AB_MS_mix    | 93.6425156627       | 1.03251703467     | 25          | None      | None      | None      | None      |
-  b_cereus_MS_SP_mix    | 98.927834877        | 1.00809745451     | 19          | None      | None      | None      | None      |
-  b_cereus_AB_MS_SP_mix  | 95.2007049228       | 1.05617910398     | 25          | None      | None      | None      | None      |
-  abyss_ctg             | 98.4057325962       | 1.01011851574     | 76          | None      | None      | None      | None      |
-  soap_ctg              | 98.0469391376       | 1.00310388584     | 46          | None      | None      | None      | None      |
-  msrca_ctg             | 99.0079246747       | 1.01134611795     | 18          | None      | None      | None      | None      |
+  b_cereus_AB_SP_mix    | 97.9220645828       | 1.03281028391     | 38          | 5815      | 47        | None      | None      |
+  b_cereus_AB_MS_mix    | 93.6425156627       | 1.03251703467     | 25          | 5634      | 39        | None      | None      |
+  b_cereus_MS_SP_mix    | 98.927834877        | 1.00809745451     | 19          | 5930      | 39        | None      | None      |
+  b_cereus_AB_MS_SP_mix  | 95.2007049228       | 1.05617910398     | 25          | 5716      | 38        | None      | None      |
+  abyss_ctg             | 98.4057325962       | 1.01011851574     | 76          | 5811      | 72        | None      | None      |
+  soap_ctg              | 98.0469391376       | 1.00310388584     | 46          | 5822      | 53        | None      | None      |
+  msrca_ctg             | 99.0079246747       | 1.01134611795     | 18          | 5961      | 38        | None      | None      |

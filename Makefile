@@ -13,6 +13,10 @@ temp_assemblies/rhodo_BB_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Bambus2
 temp_assemblies/rhodo_AP_BB_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/Bambus2/bambus2.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta
 
 
+
+
+
+
 temp_assemblies/aureus_AP_SP.fasta: datasets/GAGE/Staphylococcus_aureus/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Staphylococcus_aureus/SOAPdenovo/SOAP.genome.ctg.fasta
 temp_assemblies/aureus_AP_BB.fasta: datasets/GAGE/Staphylococcus_aureus/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Staphylococcus_aureus/Bambus2/bambus2.genome.ctg.fasta
 temp_assemblies/aureus_BB_SP.fasta: datasets/GAGE/Staphylococcus_aureus/Bambus2/bambus2.genome.ctg.fasta datasets/GAGE/Staphylococcus_aureus/SOAPdenovo/SOAP.genome.ctg.fasta
@@ -28,6 +32,33 @@ temp_assemblies/a_hydrophila_AB_SP.fasta: datasets/GAGE-B/A_hydrophila_HiSeq/aby
 temp_assemblies/a_hydrophila_AB_MS.fasta: datasets/GAGE-B/A_hydrophila_HiSeq/abyss_ctg.fasta datasets/GAGE-B/A_hydrophila_HiSeq/msrca_ctg.fasta
 temp_assemblies/a_hydrophila_MS_SP.fasta: datasets/GAGE-B/A_hydrophila_HiSeq/msrca_ctg.fasta datasets/GAGE-B/A_hydrophila_HiSeq/soap_ctg.fasta
 temp_assemblies/a_hydrophila_AB_MS_SP.fasta: datasets/GAGE-B/A_hydrophila_HiSeq/abyss_ctg.fasta datasets/GAGE-B/A_hydrophila_HiSeq/msrca_ctg.fasta datasets/GAGE-B/A_hydrophila_HiSeq/soap_ctg.fasta
+
+# Rules for GAGE-B
+temp_assemblies/V_cholerae_AB_SP.fasta: datasets/GAGE-B/V_cholerae_HiSeq/abyss_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/soap_ctg.fasta
+temp_assemblies/V_cholerae_AB_MS.fasta: datasets/GAGE-B/V_cholerae_HiSeq/abyss_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/msrca_ctg.fasta
+temp_assemblies/V_cholerae_MS_SP.fasta: datasets/GAGE-B/V_cholerae_HiSeq/msrca_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/soap_ctg.fasta
+temp_assemblies/V_cholerae_AB_MS_SP.fasta: datasets/GAGE-B/V_cholerae_HiSeq/abyss_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/msrca_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/soap_ctg.fasta
+
+
+temp_assemblies/M_abscessus_AB_SP.fasta: datasets/GAGE-B/M_abscessus_HiSeq/abyss_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/soap_ctg.fasta
+temp_assemblies/M_abscessus_AB_MS.fasta: datasets/GAGE-B/M_abscessus_HiSeq/abyss_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/msrca_ctg.fasta
+temp_assemblies/M_abscessus_MS_SP.fasta: datasets/GAGE-B/M_abscessus_HiSeq/msrca_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/soap_ctg.fasta
+temp_assemblies/M_abscessus_AB_MS_SP.fasta: datasets/GAGE-B/M_abscessus_HiSeq/abyss_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/msrca_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/soap_ctg.fasta
+
+temp_assemblies/X_axonopodis_AB_SP.fasta: datasets/GAGE-B/X_axonopodis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/soap_ctg.fasta
+temp_assemblies/X_axonopodis_AB_MS.fasta: datasets/GAGE-B/X_axonopodis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/msrca_ctg.fasta
+temp_assemblies/X_axonopodis_MS_SP.fasta: datasets/GAGE-B/X_axonopodis_HiSeq/msrca_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/soap_ctg.fasta
+temp_assemblies/X_axonopodis_AB_MS_SP.fasta: datasets/GAGE-B/X_axonopodis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/msrca_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/soap_ctg.fasta
+
+
+
+# Generic GAGE-B rules 
+
+temp_assemblies/B_fragilis_AB_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta
+temp_assemblies/B_fragilis_AB_MS.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta
+temp_assemblies/B_fragilis_MS_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta
+temp_assemblies/B_fragilis_AB_MS_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta
+
 
 
 pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/ipython -i --
@@ -78,6 +109,48 @@ datasets/GAGE-B/A_hydrophila_HiSeq/abyss_ctg.fasta \
 datasets/GAGE-B/A_hydrophila_HiSeq/soap_ctg.fasta \
 datasets/GAGE-B/A_hydrophila_HiSeq/msrca_ctg.fasta
 	$(pyinterp) bin/quast-2.1/quast.py -o $@ -R datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.fa  -G datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.gff $^ 
+
+result_statistics/V_cholerae_quast: \
+result_assemblies/V_cholerae_AB_SP_mix.fasta \
+result_assemblies/V_cholerae_AB_MS_mix.fasta \
+result_assemblies/V_cholerae_MS_SP_mix.fasta \
+result_assemblies/V_cholerae_AB_MS_SP_mix.fasta \
+datasets/GAGE-B/V_cholerae_HiSeq/abyss_ctg.fasta \
+datasets/GAGE-B/V_cholerae_HiSeq/soap_ctg.fasta \
+datasets/GAGE-B/V_cholerae_HiSeq/msrca_ctg.fasta
+	$(pyinterp) bin/quast-2.1/quast.py -o $@ -R datasets/reference/Vibrio_cholerae/Vibrio_cholerae_ref.fa  -G datasets/reference/Vibrio_cholerae/Vibrio_cholerae_ref.gff $^ 
+
+result_statistics/M_abscessus_quast: \
+result_assemblies/M_abscessus_AB_SP_mix.fasta \
+result_assemblies/M_abscessus_AB_MS_mix.fasta \
+result_assemblies/M_abscessus_MS_SP_mix.fasta \
+result_assemblies/M_abscessus_AB_MS_SP_mix.fasta \
+datasets/GAGE-B/M_abscessus_HiSeq/abyss_ctg.fasta \
+datasets/GAGE-B/M_abscessus_HiSeq/soap_ctg.fasta \
+datasets/GAGE-B/M_abscessus_HiSeq/msrca_ctg.fasta
+	$(pyinterp) bin/quast-2.1/quast.py -o $@ -R datasets/reference/Mycobacterium_abscessus/Mycobacterium_abscessus_ref.fa  -G datasets/reference/Mycobacterium_abscessus/Mycobacterium_abscessus_ref.gff $^ 
+
+
+result_statistics/X_axonopodis_quast: \
+result_assemblies/X_axonopodis_AB_SP_mix.fasta \
+result_assemblies/X_axonopodis_AB_MS_mix.fasta \
+result_assemblies/X_axonopodis_MS_SP_mix.fasta \
+result_assemblies/X_axonopodis_AB_MS_SP_mix.fasta \
+datasets/GAGE-B/X_axonopodis_HiSeq/abyss_ctg.fasta \
+datasets/GAGE-B/X_axonopodis_HiSeq/soap_ctg.fasta \
+datasets/GAGE-B/X_axonopodis_HiSeq/msrca_ctg.fasta
+	$(pyinterp) bin/quast-2.1/quast.py -o $@ -R datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.fa  -G datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.gff $^ 
+
+
+result_statistics/B_fragilis_quast: \
+result_assemblies/B_fragilis_AB_SP_mix.fasta \
+result_assemblies/B_fragilis_AB_MS_mix.fasta \
+result_assemblies/B_fragilis_MS_SP_mix.fasta \
+result_assemblies/B_fragilis_AB_MS_SP_mix.fasta \
+datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta \
+datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta \
+datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta
+	$(pyinterp) bin/quast-2.1/quast.py -o $@ -R datasets/reference/Bacteroides_fragilis/Bacteroides_fragilis_ref.fa  -G datasets/reference/Bacteroides_fragilis/Bacteroides_fragilis_ref.gff $^ 
 
 
 
