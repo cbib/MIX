@@ -1,7 +1,9 @@
 ####
 # Example usage 
 # make rhodo_AP_SP_mix.fasta will generate the Mixed assembly from the assemblies of AllPaths and SOAP. 
-####
+# make rhodo_quast will generate QUAST reports for a selection of Rhodbacter assemblies
+###
+
 
 
 #IMPORTANT: Indicate here how to match the concatenated Fastas with the assemblers result
