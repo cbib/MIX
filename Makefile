@@ -7,7 +7,7 @@
 pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/ipython -i --
 pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/python
 pyinterp:=python
-MUMmer:=bin/MUMmer3.23
+MUMmer:=$(shell pwd)/bin/MUMmer
 MIXPARAMS:=-A 500 -C 0
 MIXPARAMSFOLDER:=A500_C0
 export PATH := $(MUMmer):$(PATH)
@@ -187,7 +187,7 @@ temp_assemblies/%.fasta: bin/preprocessing.py
 # Given a fasta file, generate a coords file with the coordinates of the alignments
 temp_assemblies/%.coords: temp_assemblies/%.fasta
 	$(eval TAG:= $(basename $(@F))) 
-	cd temp_assemblies; $(MUMmer)/nucmer -p $(TAG) --maxmatch -l 30 -banded $(TAG).fasta $(TAG).fasta 2>/dev/null; $(MUMmer)/show-coords -l -c $(TAG).delta > $(TAG).coords
+	cd temp_assemblies; nucmer -p $(TAG) --maxmatch -l 30 -banded $(TAG).fasta $(TAG).fasta 2>/dev/null; show-coords -l -c $(TAG).delta > $(TAG).coords
 #	rm temp_assemblies/$(TAG).delta
 
 # Given a fasta file and a coord file of alignments, run Mix and move the resulting assembly to the result folder

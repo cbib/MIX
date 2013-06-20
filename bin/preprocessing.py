@@ -25,7 +25,6 @@ def main():
 	(options, args) = parser.parse_args()
 	out_adr = options.out
 	output_file = open(out_adr, "w")
-	print sys.argv
 	if sys.argv[1]=="-o":
 		for i in range (3, len(sys.argv), 1) : 
 			process_contig_renaming(sys.argv[i], i-2, output_file)
