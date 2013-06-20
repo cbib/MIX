@@ -4,7 +4,13 @@
 # make rhodo_quast will generate QUAST reports for a selection of Rhodbacter assemblies
 ###
 
-
+pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/ipython -i --
+pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/python
+pyinterp:=python
+MUMmer:=bin/MUMmer3.23
+MIXPARAMS:=-A 500 -C 0
+MIXPARAMSFOLDER:=A500_C0
+export PATH := $(MUMmer):$(PATH)
 
 #IMPORTANT: Indicate here how to match the concatenated Fastas with the assemblers result
 # Indicate the dependancies for the concatenated files
@@ -63,12 +69,6 @@ temp_assemblies/B_fragilis_AB_MS_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abys
 
 
 
-pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/ipython -i --
-pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/python
-MUMmer:= /Users/hayssam/temp/MIX/bin/MUMmer3.23
-MIXPARAMS:=-A 500 -C 0
-MIXPARAMSFOLDER:=A500_C0
-export PATH := $(MUMmer):$(PATH)
 
 #VPATH = src:temp_assemblies:result_assemblies
 
