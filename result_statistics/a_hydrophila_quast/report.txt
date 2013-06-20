@@ -18,13 +18,13 @@ NG75                       166323                  301891                  30189
 # misassemblies            49                      50                      51                      50                         34             37             50           
 # local misassemblies      33                      29                      25                      25                         26             25             29           
 # unaligned contigs        5 + 10 part             0 + 9 part              0 + 10 part             0 + 10 part                12 + 20 part   6 + 15 part    2 + 12 part  
-Unaligned contigs length   1306693                 1652937                 1790700                 1798391                    2070476        2201858        1592134      
-Genome fraction (%)        14.721                  13.727                  14.036                  14.015                     14.887         14.773         13.686       
-Duplication ratio          5.123                   5.115                   4.677                   4.673                      4.081          3.827          5.114        
+Unaligned contigs length   1306559                 1653112                 1790669                 1798360                    2070476        2201724        1592165      
+Genome fraction (%)        14.724                  13.723                  14.037                  14.016                     14.887         14.776         13.685       
+Duplication ratio          5.123                   5.116                   4.677                   4.673                      4.081          3.827          5.114        
 # N's per 100 kbp          1.84                    0.00                    0.00                    0.00                       1.83           0.00           0.00         
 # mismatches per 100 kbp   4179.94                 4169.65                 4181.49                 4187.96                    4137.56        4162.84        4175.35      
 # indels per 100 kbp       187.83                  177.16                  187.86                  186.54                     207.70         190.03         177.68       
-# genes                    601 + 64 part           566 + 62 part           580 + 64 part           578 + 64 part              601 + 67 part  602 + 64 part  564 + 66 part
+# genes                    603 + 63 part           564 + 63 part           580 + 64 part           578 + 64 part              601 + 67 part  604 + 63 part  564 + 66 part
 Largest alignment          52419                   52419                   52419                   52419                      52419          52419          52419        
 NA50                       None                    None                    None                    None                       None           None           None         
 NGA50                      None                    None                    None                    None                       None           None           None         
