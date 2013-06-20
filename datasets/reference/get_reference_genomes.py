@@ -9,7 +9,9 @@ import logging
 
 from Queue import *
 import threading
+
 n_parallel_connections=8
+
 genomes_to_download=[
 # NCBI Directory URL 																	# Local name
 ["genomes/Bacteria/Aeromonas_hydrophila_ATCC_7966_uid58617"						,"Aeromonas_hydrophila"],
