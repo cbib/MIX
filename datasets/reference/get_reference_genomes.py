@@ -9,7 +9,7 @@ import logging
 
 from Queue import *
 import threading
-n_parallel_connections=4
+n_parallel_connections=1
 genomes_to_download=[
 # NCBI Directory URL 																	# Local name
 ["genomes/Bacteria/Aeromonas_hydrophila_ATCC_7966_uid58617"						,"Aeromonas_hydrophila"],
@@ -132,7 +132,7 @@ def concatenate_genome(entry):
 
 	# call(['cat']+sequences+['> %s'%(target_name)])
 	CMD="cd %s && cat %s > %s"%(local_dir," ".join(sequences),target_name)
-	# logger.info("Will run CMD:\n%s",CMD )
+	logger.info("Will run CMD:\n%s",CMD )
 	os.system(CMD)
 	logger.info("Finished concatenatioon %s",local_dir)
 
