@@ -9,7 +9,9 @@ import logging
 
 from Queue import *
 import threading
-n_parallel_connections=1
+
+n_parallel_connections=8
+
 genomes_to_download=[
 # NCBI Directory URL 																	# Local name
 ["genomes/Bacteria/Aeromonas_hydrophila_ATCC_7966_uid58617"						,"Aeromonas_hydrophila"],
@@ -22,8 +24,8 @@ genomes_to_download=[
 ["genomes/Bacteria/Xanthomonas_axonopodis_citrumelo_F1_uid73179"						,"Xanthomonas_axonopodis"]
 ]
 
-#genomes_to_download=[{"ncbi_url":x[0],"local_name":x[1],"extension":".fna"} for x in genomes_to_download]
-genomes_to_download=[{"ncbi_url":x[0],"local_name":x[1],"extension":".gff"} for x in genomes_to_download]
+genomes_to_download=[{"ncbi_url":x[0],"local_name":x[1],"extension":".fna"} for x in genomes_to_download]
+#genomes_to_download=[{"ncbi_url":x[0],"local_name":x[1],"extension":".gff"} for x in genomes_to_download]
 
 logger = logging.getLogger('simple_example')
 logger.setLevel(logging.DEBUG)
