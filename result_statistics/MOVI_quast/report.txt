@@ -1,0 +1,14 @@
+All statistics are based on contigs of size >= 500 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
+
+Assembly                   MOVI_CLC_MIRA_mix  MOVI_AB_CLC_mix  MOVI_AB_MIRA_mix
+# contigs (>= 0 bp)        44                 216              62              
+# contigs (>= 1000 bp)     42                 149              56              
+Total length (>= 0 bp)     1082285            1020785          1055963         
+Total length (>= 1000 bp)  1081975            992867           1054961         
+# contigs                  42                 167              56              
+Largest contig             84800              37376            72523           
+Total length               1081975            1005130          1054961         
+GC (%)                     29.11              29.33            29.11           
+N50                        42644              9974             34552           
+N75                        28730              5153             18728           
+# N's per 100 kbp          5.92               16.61            3.89            
