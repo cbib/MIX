@@ -87,7 +87,9 @@ result_statistics/aureus_quast:result_assemblies/aureus_AP_SP_mix.fasta \
 	datasets/GAGE/Staphylococcus_aureus/SOAPdenovo/SOAP.genome.ctg.fasta \
 	result_assemblies/aureus_AP_BB_mix.fasta \
 	datasets/GAGE/Staphylococcus_aureus/Allpaths-LG/AP.genome.ctg.fasta \
-	result_assemblies/aureus_AP_BB_SP_mix.fasta
+	result_assemblies/aureus_AP_BB_SP_mix.fasta \
+	datasets/GAGE-B/S_aureus_HiSeq/soap_ctg.fasta \
+	datasets/GAGE-B/S_aureus_HiSeq/abyss_ctg.fasta
 	$(pyinterp) bin/quast-2.1/quast.py -o $@ -R datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.fa  -G datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.gff $^ 
 
 result_statistics/b_cereus_quast: \
@@ -97,7 +99,8 @@ result_assemblies/b_cereus_MS_SP_mix.fasta \
 result_assemblies/b_cereus_AB_MS_SP_mix.fasta \
 datasets/GAGE-B/B_cereus_MiSeq/abyss_ctg.fasta \
 datasets/GAGE-B/B_cereus_MiSeq/soap_ctg.fasta \
-datasets/GAGE-B/B_cereus_MiSeq/msrca_ctg.fasta
+datasets/GAGE-B/B_cereus_MiSeq/msrca_ctg.fasta \
+datasets/GAGE-B/B_cereus_MiSeq/spades_ctg.fasta
 	$(pyinterp) bin/quast-2.1/quast.py -o $@ -R datasets/reference/Bacillus_cereus/Bacillus_cereus_ref.fa -G datasets/reference/Bacillus_cereus/Bacillus_cereus_ref.gff  $^ 
 
 result_statistics/a_hydrophila_quast: \

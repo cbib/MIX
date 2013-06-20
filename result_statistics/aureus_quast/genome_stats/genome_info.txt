@@ -21,3 +21,5 @@ genes loaded: 2845
   aureus_AP_BB_mix      | 96.4894882368       | 1.02672456632     | 37          | 2663      | 37        | None      | None      |
   AP.genome.ctg         | 98.8274181809       | 1.01432744054     | 40          | 2728      | 42        | None      | None      |
   aureus_AP_BB_SP_mix   | 98.5748589171       | 1.05247775105     | 52          | 2729      | 42        | None      | None      |
+  soap_ctg              | 90.0160209102       | 1.05485531743     | 105         | 2448      | 54        | None      | None      |
+  abyss_ctg             | 90.632676112        | 1.10613346306     | 100         | 2461      | 67        | None      | None      |
