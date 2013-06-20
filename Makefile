@@ -61,7 +61,6 @@ temp_assemblies/X_axonopodis_AB_MS_SP.fasta: datasets/GAGE-B/X_axonopodis_HiSeq/
 
 
 # Generic GAGE-B rules 
-
 temp_assemblies/B_fragilis_AB_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta
 temp_assemblies/B_fragilis_AB_MS.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta
 temp_assemblies/B_fragilis_MS_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta
@@ -69,9 +68,33 @@ temp_assemblies/B_fragilis_AB_MS_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abys
 
 
 
+temp_assemblies/MOVI_AB_CLC.fasta: datasets/Mollicutes/MOVI/AIP_ABySS_32-scaffolds.fa datasets/Mollicutes/MOVI/AIP_CLC_contigsCLCTrimmed_0.fasta
+temp_assemblies/MOVI_AB_MIRA.fasta: datasets/Mollicutes/MOVI/AIP_ABySS_32-scaffolds.fa datasets/Mollicutes/MOVI/AIP_step2_out.unpadded.fasta
+temp_assemblies/MOVI_CLC_MIRA.fasta: datasets/Mollicutes/MOVI/AIP_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MOVI/AIP_step2_out.unpadded.fasta
+temp_assemblies/MMC_AB_CLC.fasta: datasets/Mollicutes/MMC/AIW_ABySS_30-scaffolds.fa datasets/Mollicutes/MMC/AIW_CLC_contigsCLCTrimmed_0.fasta
+temp_assemblies/MMC_AB_MIRA.fasta: datasets/Mollicutes/MMC/AIW_ABySS_30-scaffolds.fa datasets/Mollicutes/MMC/AIW_step2_out.unpadded.fasta
+temp_assemblies/MMC_CLC_MIRA.fasta: datasets/Mollicutes/MMC/AIW_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MMC/AIW_step2_out.unpadded.fasta
+temp_assemblies/MSCe_AB_CLC.fasta: datasets/Mollicutes/MSCe/AKC_ABySS_35-scaffolds.fa datasets/Mollicutes/MSCe/AKC_CLC_contigsCLCTrimmed_0.fasta
+temp_assemblies/MSCe_AB_MIRA.fasta: datasets/Mollicutes/MSCe/AKC_ABySS_35-scaffolds.fa datasets/Mollicutes/MSCe/AKC_step2_out.unpadded.fasta
+temp_assemblies/MSCe_CLC_MIRA.fasta: datasets/Mollicutes/MSCe/AKC_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MSCe/AKC_step2_out.unpadded.fasta
+temp_assemblies/MSCd_AB_CLC.fasta: datasets/Mollicutes/MSCd/AKE_ABySS_34-scaffolds.fa datasets/Mollicutes/MSCd/AKE_CLC_contigsCLCTrimmed_0.fasta
+temp_assemblies/MSCd_AB_MIRA.fasta: datasets/Mollicutes/MSCd/AKE_ABySS_34-scaffolds.fa datasets/Mollicutes/MSCd/AKE_step2_out.unpadded.fasta
+temp_assemblies/MSCd_CLC_MIRA.fasta: datasets/Mollicutes/MSCd/AKE_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MSCd/AKE_step2_out.unpadded.fasta
+temp_assemblies/MSCc_AB_CLC.fasta: datasets/Mollicutes/MSCc/AIZ_ABySS_27-scaffolds.fa datasets/Mollicutes/MSCc/AIZ_CLC_contigsCLCTrimmed_0.fasta
+temp_assemblies/MSCc_AB_MIRA.fasta: datasets/Mollicutes/MSCc/AIZ_ABySS_27-scaffolds.fa datasets/Mollicutes/MSCc/AIZ_step2_out.unpadded.fasta
+temp_assemblies/MSCc_CLC_MIRA.fasta: datasets/Mollicutes/MSCc/AIZ_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MSCc/AIZ_step2_out.unpadded.fasta
+temp_assemblies/MSCb_AB_CLC.fasta: datasets/Mollicutes/MSCb/AIY_ABySS_29-scaffolds.fa datasets/Mollicutes/MSCb/AIY_CLC_contigsCLCTrimmed_0.fasta
+temp_assemblies/MSCb_AB_MIRA.fasta: datasets/Mollicutes/MSCb/AIY_ABySS_29-scaffolds.fa datasets/Mollicutes/MSCb/AIY_step2_out.unpadded.fasta
+temp_assemblies/MSCb_CLC_MIRA.fasta: datasets/Mollicutes/MSCb/AIY_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MSCb/AIY_step2_out.unpadded.fasta
+
+
 
 #VPATH = src:temp_assemblies:result_assemblies
 
+result_statistics/%_quast: result_assemblies/%_CLC_MIRA_mix.fasta result_assemblies/%_AB_CLC_mix.fasta result_assemblies/%_AB_MIRA_mix.fasta 
+	$(pyinterp) bin/quast-2.1/quast.py -o $@ $^ 
+
+MolliStats: result_statistics/MOVI_quast result_statistics/MMC_quast result_statistics/MSCe_quast result_statistics/MSCd_quast result_statistics/MSCc_quast result_statistics/MSCb_quast
 
 
 result_statistics/rhodo_quast:result_assemblies/rhodo_AP_SP_mix.fasta \
