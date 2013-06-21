@@ -104,12 +104,18 @@ def bounded_bfs_paths(G,sources,max_depth=None):
 			stack.pop(0)
 	
 
-def make_random_directed_grid(dim=[5,5]):
-	g= nx.grid_graph(dim=[5,5])
+def make_random_directed_grid(dim=[12,12]):
+	g= nx.grid_graph(dim=dim)
+	# g=nx.random_geometric_graph(30,5)
+	# g=nx.random_regular_graph(n=1000,d=3)
+
 	# Build mapping to rename nodes
 	mapping = {}
 	for k in g.node.keys():
-		mapping[k]="_".join(map(str,k))
+		if type(k)==type((1,)): # If tuples are used to label nodes:
+			mapping[k]="_".join(map(str,k))
+		else:
+			mapping[k]=str(k)
 	g=nx.relabel_nodes(g,mapping)
 
 	# Make a directed graph by selecting a random direction for each edge
@@ -127,16 +133,20 @@ def make_random_directed_grid(dim=[5,5]):
 		for n in no_input:
 			g_dir.node[n]['In']=True
 	else:
-		g_dir.node[random.choice(g_dir.node.keys())]['In']=True
+		candidate=random.choice(g_dir.node.keys())
+		g_dir.node[candidate]['In']=True
+		no_input=[candidate]
 
 	no_output =[k for k,v in g_dir.out_degree().items() if v==0] 
 
 	if len(no_output)>0:
 		for n in no_output:
 			g_dir.node[n]['Out']=True
-
 	else:
-		g_dir.node[random.choice(g_dir.node.keys())]['Out']=True
+		candidate=random.choice(g_dir.node.keys())
+		g_dir.node[candidate]['Out']=True
+		no_output=[candidate]
+
 
 	# Add constant weights 
 	for src,tgt in g_dir.edges():
@@ -146,7 +156,7 @@ def make_random_directed_grid(dim=[5,5]):
 
 	# Plant a longest path by selecting a path and increasing it's weight
 	# Select a long path, max 1000 iter 
-	implanted_weight=50
+	implanted_weight=1
 	max_path=[]
 	for i in range(1,1000):
 		starting_point = random.choice(no_input)
@@ -170,6 +180,21 @@ def make_random_directed_grid(dim=[5,5]):
 
 g_dir,max_path,best_length=make_random_directed_grid()
 
+
+g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/rhodo_AP_BB_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
+
+for src,tgt,mdata in g_dir.edges(data=True):
+	g_dir[src][tgt]['weight']=mdata.get("length")
+
+
+# Build mapping to rename nodes
+mapping = {}
+for k in g_dir.node.keys():
+	if type(k)==type((1,)): # If tuples are used to label nodes:
+		mapping[k]="_".join(map(str,k))
+	else:
+		mapping[k]=str(k)
+g_dir=nx.relabel_nodes(g_dir,mapping)
 
 
 
@@ -274,7 +299,10 @@ def remove_cycle(g):
 
 
 n_scc = [x for x in nx.strongly_connected_component_subgraphs(g_dir) if len(x)>1]
-print "Found",len(n_scc),"cycles"
+if len(n_scc)>0:
+	print "Found",len(n_scc),"cycles, largest one of size",len(n_scc[0])
+else:
+	print "No cycles"
 # Color them 
 for ccc_idx  in range(len(n_scc)): 
 	for node in n_scc[ccc_idx].nodes():
@@ -325,6 +353,11 @@ assert(nodes_in_order[-1]=="Out")
 # Q? Should we store each path separately or a greedy alg is ok? trying greedy 
 # Q? How to deal with mulitple equivalent paths ?
 
+for n in g_dir_trans_io:
+	g_dir_trans_io.node[n]['in_longest']="False"
+for src,tgt in g_dir_trans_io.edges():
+	g_dir_trans_io[src][tgt]["in_longest"]="False"
+
 g_dir_trans_io.node['In']['longest_path']=[0,[]]
 for n in nodes_in_order[1:]:
 	pred = g_dir_trans_io.predecessors(n)
@@ -350,12 +383,10 @@ longest_path_trans_io.append((current_node,g_dir_trans_io.node[current_node]["lo
 longest_path_trans_io.reverse()
 
 # Mark this path in the graph
-for n in g_dir_trans_io:
-	g_dir_trans_io.node[n]['in_longest']="False"
-for src,tgt in g_dir_trans_io.edges():
-	g_dir_trans_io[src][tgt]["in_longest"]="False"
 
 g_dir_trans_io.node['Out']['in_longest']="True"
+
+
 for i in range(0, len(longest_path_trans_io)-1):
 	n = longest_path_trans_io[i][0]
 	g_dir_trans_io.node[n]['in_longest']="True"
@@ -385,7 +416,7 @@ g_dir.node[last_element]['in_longest']="True"
 
 
 # have to be removed for GML compatibilty
-g_dir_gml=copy.deepcopy(g_dir_trans_io)
+g_dir_gml=copy.deepcopy(g_dir)
 g_dir_trans_io_gml = copy.deepcopy(g_dir_trans_io)
 
 for k,v in g_dir_trans_io.node.items():
@@ -398,6 +429,9 @@ for k,v in g_dir_trans_io.node.items():
 		del g_dir_trans_io_gml.node[k]['Out']
 
 
+# Remove weight for Gephi 
+for src,tgt,mdata in g_dir_gml.edges(data=True):
+	del g_dir_gml[src][tgt]['weight']
 
 # Add some weights to In and Out edges
 for tgt in g_dir_trans_io_gml['In']: 
