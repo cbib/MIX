@@ -4,9 +4,11 @@ Created on Fri Jun 21 00:05:57 2013
 
 @author: hayssam
 """
+import sys
+import copy
 import random
 import networkx as nx 
-
+import network_sampling3 as nxrand
 
 # Make an accessible seed
 import time
@@ -15,8 +17,14 @@ a = long(time.time() * 256) # use fractional seconds
 # Bug for Seed is 351188051725 and grid 12,6
 # a=351188051725
 
-# Bug for see 351188626429, missing one node for the longest path 
+# Bug for see 351188626429, missing one node for the longest path, was a problem of labeling 
 # a=351188626429
+
+# Bug for seed 351189211163, 7*7, longest path not found: It was that the end node of a path felt in a SCC, was not marked as an Out node
+# a=351189211163
+
+# Bug for seed 351189211163, 7*7, longest path not found: When I select the max predecessor in the DAG (in the end), I forgot to consider the edge weight 
+# a= 351189611183
 
 random.seed(a)
 print "Seed is",a
@@ -95,7 +103,7 @@ def bounded_bfs_paths(G,sources,max_depth=None):
 		except StopIteration:
 			stack.pop(0)
 	
-g= nx.grid_graph(dim=[15,15])
+g= nx.grid_graph(dim=[12,12])
 # Build mapping to rename nodes
 mapping = {}
 for k in g.node.keys():
@@ -130,7 +138,7 @@ else:
 
 
 # Randomly place an output node 
-g_dir.node[random.choice(g_dir.node.keys())]['Out']=True
+# g_dir.node[random.choice(g_dir.node.keys())]['Out']=True
 
 # # Nested loops example 
 # g_dir=nx.DiGraph()
@@ -154,6 +162,31 @@ for src,tgt in g_dir.edges():
 
 
 
+# Plant a longest path by selecting a path and increasing it's weight
+# Select a long path, max 1000 iter 
+implanted_weight=5
+max_path=[]
+for i in range(1,1000):
+	starting_point = random.choice(no_input)
+	candidate_path = []
+	for node in nxrand.random_walk(g_dir,starting_point):
+		if node in candidate_path:
+			break
+		candidate_path.append(node)
+	if len(candidate_path)>=len(max_path):
+		max_path=candidate_path
+print "Target path will be",max_path,"of length",implanted_weight*(len(max_path)-1)
+for i in range(0,len(max_path)-1):
+	src,tgt=max_path[i],max_path[i+1]
+	g_dir[src][tgt]['weight']=implanted_weight
+best_length=implanted_weight*(len(max_path)-1)
+# Indicate them also as input and output so that we can find them 
+g_dir.node[max_path[0]]['In']=True
+g_dir.node[max_path[-1]]['Out']=True
+
+
+
+
 
 def remove_cycle(g):
 	# Determine if there are cycles (none for seed 1235)
@@ -165,9 +198,9 @@ def remove_cycle(g):
 	# Transform each SCC into a set of path 
 	g_trans = nx.DiGraph(g)
 	scc=n_scc[0] #take the largest 
-	# Inputs are all the nodes from the scc having predecessors not in the scc
+	# Inputs are all the nodes from the scc having predecessors not in the scc, or nodes marked as inputs and part of the SCC 
 	inputs=set()
-	# Outputs are all the nodes from the scc having sucessors not in the scc
+	# Outputs are all the nodes from the scc having sucessors not in the scc, or nodes marked as outputs and part of the SCC 
 	outputs=set()
 
 	for n in scc:
@@ -188,6 +221,10 @@ def remove_cycle(g):
 	# Generate all paths between nodes in input and nodes in output 
 	inputs_scc= list(set([x[1] for x in inputs]))
 	outputs_scc= list(set([x[0] for x in outputs]))
+	# We add nodes of the SCC that are labeled as I or O 
+
+	inputs_scc=list(set(inputs_scc).union([k for k,v in scc.node.items() if ("In" in v) ]))
+	outputs_scc=list(set(outputs_scc).union([k for k,v in scc.node.items() if ("Out" in v)]))
 	# We only consider paths ending in outputs nodes that are not input nodes 
 	all_paths = [path for path in bounded_bfs_paths(scc,inputs_scc,len(scc)+1) if path[-1] in outputs_scc]
 	print "Found",len(all_paths),"paths"
@@ -197,6 +234,8 @@ def remove_cycle(g):
 	# Two path cannot share a node (if not, we can't guarantee we do not re-introduce shorter cycles)
 	for idx in range(len(all_paths)):
 	# for p in all_paths:
+		if (len(all_paths)>5000) and ((idx%100)==0):
+			print "\tProcessed",idx,"paths"
 		p=all_paths[idx]
 
 		p_renamed= [x+"@"+str(idx) for x in p]
@@ -234,6 +273,7 @@ for ccc_idx  in range(len(n_scc)):
 	for node in n_scc[ccc_idx].nodes():
 		g_dir.node[node]['in_scc']=ccc_idx
 
+#sys.exit(0)
 g_p=g_dir
 for i in range(1,1000): #Up to a thousand iteration
 
@@ -288,19 +328,19 @@ for n in nodes_in_order[1:]:
 		longest_path= [(g_dir_trans_io.node[pred[0]]['longest_path'][0] + g_dir_trans_io[pred[0]][n]['weight']),\
 					pred[0]]
 	for p in pred:
-		if g_dir_trans_io.node[p]['longest_path'][0] > longest_path[0]:
+		if (g_dir_trans_io.node[p]['longest_path'][0]+ g_dir_trans_io[p][n]['weight']) > longest_path[0]:
 			longest_path= [(g_dir_trans_io.node[p]['longest_path'][0]+ g_dir_trans_io[p][n]['weight']),p]
 	g_dir_trans_io.node[n]['longest_path']=longest_path
 
 
 # Rebuild the longest path, starting from "Out" up to "In" in predecessor order 
 current_node = "Out"
-longest_path = []
+longest_path_trans_io = []
 while current_node != "In":
-	longest_path.append((current_node,g_dir_trans_io.node[current_node]["longest_path"][0]))
+	longest_path_trans_io.append((current_node,g_dir_trans_io.node[current_node]["longest_path"][0]))
 	current_node=g_dir_trans_io.node[current_node]['longest_path'][1]
-longest_path.append((current_node,g_dir_trans_io.node[current_node]["longest_path"][0]))
-longest_path.reverse()
+longest_path_trans_io.append((current_node,g_dir_trans_io.node[current_node]["longest_path"][0]))
+longest_path_trans_io.reverse()
 
 # Mark this path in the graph
 for n in g_dir_trans_io:
@@ -309,13 +349,17 @@ for src,tgt in g_dir_trans_io.edges():
 	g_dir_trans_io[src][tgt]["in_longest"]="False"
 
 g_dir_trans_io.node['Out']['in_longest']="True"
-for i in range(0, len(longest_path)-1):
-	n = longest_path[i][0]
+for i in range(0, len(longest_path_trans_io)-1):
+	n = longest_path_trans_io[i][0]
 	g_dir_trans_io.node[n]['in_longest']="True"
-	g_dir_trans_io[longest_path[i][0]][longest_path[i+1][0]]['in_longest']="True"
+	g_dir_trans_io[longest_path_trans_io[i][0]][longest_path_trans_io[i+1][0]]['in_longest']="True"
 
 
 
+
+
+longest_path=[(x[0].split("@")[0],x[1]) for x in longest_path_trans_io][1:-1]
+print longest_path
 
 
 
@@ -333,30 +377,41 @@ g_dir.node[last_element]['in_longest']="True"
 
 
 
+# have to be removed for GML compatibilty
+g_dir_gml=copy.deepcopy(g_dir_trans_io)
+g_dir_trans_io_gml = copy.deepcopy(g_dir_trans_io)
+
 for k,v in g_dir_trans_io.node.items():
 	#g_dir_trans_io.node[k].update({"longest_path":"_".join(map(str,v['longest_path']))})
-	del g_dir_trans_io.node[k]['longest_path']
+	del g_dir_trans_io_gml.node[k]['longest_path']
 
-	if "In" in g_dir_trans_io.node[k]:
-		del g_dir_trans_io.node[k]['In']
-	if "Out" in g_dir_trans_io.node[k]:
-		del g_dir_trans_io.node[k]['Out']
+	if "In" in g_dir_trans_io_gml.node[k]:
+		del g_dir_trans_io_gml.node[k]['In']
+	if "Out" in g_dir_trans_io_gml.node[k]:
+		del g_dir_trans_io_gml.node[k]['Out']
 
 
 
 # Add some weights to In and Out edges
-for tgt in g_dir_trans_io['In']: 
-	g_dir_trans_io['In'][tgt]['weight']=1
+for tgt in g_dir_trans_io_gml['In']: 
+	g_dir_trans_io_gml['In'][tgt]['weight']=1
 
-for src in g_dir_trans_io.predecessors('Out'):
-	g_dir_trans_io[src]["Out"]['weight']=1
+for src in g_dir_trans_io_gml.predecessors('Out'):
+	g_dir_trans_io_gml[src]["Out"]['weight']=1
 
 mapping = {}
-for k in g_dir.node.keys():
+for k in g_dir_gml.node.keys():
 	mapping[k]="N %s"%(k)
-g_dir_trans_io=nx.relabel_nodes(g_dir_trans_io,mapping)
-g_dir=nx.relabel_nodes(g_dir,mapping)
+g_dir_trans_io_gml=nx.relabel_nodes(g_dir_trans_io_gml,mapping)
+g_dir_gml=nx.relabel_nodes(g_dir_gml,mapping)
 
 
-nx.write_gml(g_dir,"grid.gml")
-nx.write_gml(g_dir_trans_io,"grid_trans_long_path.gml")
+nx.write_gml(g_dir_gml,"grid.gml")
+nx.write_gml(g_dir_trans_io_gml,"grid_trans_long_path.gml")
+
+
+# Transform the longest path into a longest path in 
+
+
+
+assert (longest_path[-1][1])>=best_length
