@@ -1,5 +1,5 @@
 import os
-targets=["MOVI", "MMC", "MSCe", "MSCd", "MSCc", "MSCb"]
+targets=["MAUR","MBOVb","MBVG","MCCP", "MOVI", "MMC", "MSCe", "MSCd", "MSCc", "MSCb"]
 template="""
 %(mollicute)s_%(assemblies)s: 
 	./preprocessing.py ../%(mollicute)s/%(assemblyAfname)s ../%(mollicute)s/%(assemblyBfname)s -o ../%(mollicute)s/%(mollicute)s_%(assemblies)s.fasta
