@@ -1,8 +1,9 @@
 #! /usr/bin/python
 # encoding: utf-8
-# Todo : Load, parse and display nucmer alignments in terminal, in a weaving fashion
+
 
 import sys
+import N50 
 import collections
 from Bio.Seq import Seq
 from Bio.SeqUtils import CheckSum
@@ -16,6 +17,7 @@ import sys
 import os
 import argparse
 import logging
+from scipy.stats.mstats import mquantiles
 FORMAT = '%(asctime)-15s %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('mix')
@@ -53,6 +55,8 @@ def main(argv=None):
 #	parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), default=sys.stdin)
 	parser.add_argument('-p',dest="pretty",action="store_true",help="Pretty print using PrettyTable module")
 	parser.add_argument('-d',dest="delimiter",help="Colum separator for output, default to whitespace",default=" ")
+	parser.add_argument('-t',dest="min_length",help="Minimun length threshold to filter fasta file",default=0,type=int)
+	parser.add_argument('-r',dest="reference_length",help="(Not yet implemented)Reference length used to compute corrected Nx values",default=0)
 	parser.add_argument('-o', nargs='?', type=argparse.FileType('w'), default=sys.stdout,dest="outfile")
 	parser.add_argument('FASTAFILE',action='append',nargs="+",help='List of fasta files to keep. Use "*" to keep them all')
 	args=parser.parse_args()
@@ -63,25 +67,30 @@ def main(argv=None):
 
 	for f in FASTAFILE: 
 		for record in SeqIO.parse(f, "fasta", generic_dna):
+			if len(record.seq)<=args.min_length:
+				continue
 			all_records.append(SequenceStat(f,record))
 	# Display summary statistics per file
 	sequences_per_files=collections.defaultdict(list)
 	for s in all_records:
 		sequences_per_files[s.file].append(s)
 	if args.pretty:
-		table=prettytable.PrettyTable(["File","#Seqs","Avg GC","Avg Length","Total Length"])
+		table=prettytable.PrettyTable(["File","#Seqs","Avg GC","Avg Length(kb)", "Quant","Sum Length(kb)","N50(kb)","L50"])
 		table.align["File"] = "l" 
 
 		for file,seqs in sequences_per_files.items():
-			table.add_row([file,len(seqs),scipy.average([x.gc for x in seqs]),\
-				scipy.average([x.length for x in seqs]),sum([x.length for x in seqs])])
-		print >>args.outfile,table.get_string(sortby="Total Length")
+			lengths=[x.length for x in seqs]
+			table.add_row([file,len(seqs),round(scipy.average([x.gc for x in seqs]),2),\
+				round(scipy.average(lengths)/1000,2),mquantiles(lengths),round(sum(lengths)/1000,2),round(N50.N50(lengths)/1000,2),N50.L50(lengths)])
+		print >>args.outfile,table.get_string(sortby="N50(kb)")
 
 	else:
 		for file,seqs in sequences_per_files.items():
+			lengths=[x.length for x in seqs]
+
 			print >>args.outfile," ".join(map(str,[\
 				file,len(seqs),scipy.average([x.gc for x in seqs]),\
-				scipy.average([x.length for x in seqs]),sum([x.length for x in seqs])
+				scipy.average(lengths),sum(lengths),N50.N50(lengths),N50.L50(lengths)
 				]))
 if __name__ == "__main__":
 	sys.exit(main())

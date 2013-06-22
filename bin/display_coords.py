@@ -5,16 +5,17 @@
 import sys
 import os
 # Logger setup
-import logging
-FORMAT = '%(asctime)-15s %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger('mix')
+# import logging
+# FORMAT = '%(asctime)-15s %(message)s'
+# logging.basicConfig(format=FORMAT)
+# logger = logging.getLogger('mix-display')
 
 
 import argparse
 import mummerParser 
 
 
+align_keys="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz"
 
 CODE={
     'ENDC':0,  # RESET COLOR
@@ -129,7 +130,8 @@ def parse_mummerFile (file_adr):
 	results_file.close()
 	return alignments
 
-def print_aligned_contigs(alignments,use_contig_orientation=False,reverse_mix_orientation=False,max_width=110):
+def print_aligned_contigs(alignments,use_contig_orientation=False,reverse_mix_orientation=False,max_width=110,contigs_to_reverse=[]):
+
 	if use_contig_orientation:
 		print colorstr("Reference orientation used, alignments can be weaved if on the same background color","RED")
 	else:
@@ -144,7 +146,6 @@ def print_aligned_contigs(alignments,use_contig_orientation=False,reverse_mix_or
 	largest_length = max(contig_lenghts.values())
 	factor = float(max_width) / largest_length 
 	align_index=0
-	align_keys="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890œ∑†¥øπ∆©ƒ∂ßåΩç√∫µŒ‰ÁØ∏ÅÍÎÏÓÓÔÒÚÂ˜ı◊ıÇ"
 	for c in these_contigs:
 		if use_contig_orientation:
 			contig_orientation=my_assembly.GRAPH.GRAPH.node.get(c,{}).get('orientation','NA')
@@ -154,7 +155,8 @@ def print_aligned_contigs(alignments,use_contig_orientation=False,reverse_mix_or
 				elif contig_orientation=="forward":
 					contig_orientation="reverse"
 
-
+		elif c in contigs_to_reverse:
+			contig_orientation="reverse"
 		else:
 			contig_orientation=""
 		print "\n\n-------",c,contig_orientation,contig_lenghts[c],"nt"
@@ -166,11 +168,14 @@ def print_aligned_contigs(alignments,use_contig_orientation=False,reverse_mix_or
 				end=int(int(an_align['E2'])*factor)
 				alen=int(int(an_align['LENQ'])*factor)
 				label="_q"
+				other=an_align['TAGR']
 			elif an_align['TAGR']==c:
 				start=int(int(an_align['S1'])*factor)
 				end=int(int(an_align['E1'])*factor)
 				alen=int(int(an_align['LENR'])*factor)
 				label="_r"
+				other=an_align['TAGQ']
+
 			else:
 				continue
 			k=align_keys[align_index]
@@ -178,14 +183,14 @@ def print_aligned_contigs(alignments,use_contig_orientation=False,reverse_mix_or
 				# start,end = totlen-start,totlen-end
 				start,end = end,start
 				if contig_orientation=="reverse":
-					print (str(align_index)+label).ljust(12)+"-   "+"_"*(totlen-end-1)+(k*(end-start))+"_"*(start-1) # Reversed alignment on a reversed contig
+					print (str(align_index)+label).ljust(6)+" "+other[0:5]+" -   "+"_"*(totlen-end-1)+(k*(end-start))+"_"*(start-1) # Reversed alignment on a reversed contig
 				else:
-					print (str(align_index)+label).ljust(12)+"-   "+"_"*(start-1)+colorstr(k*(end-start),"INVERT")+"_"*(totlen-end) # Reversed alignment on a forward contig 
+					print (str(align_index)+label).ljust(6)+" "+other[0:5]+" -   "+"_"*(start-1)+colorstr(k*(end-start),"INVERT")+"_"*(totlen-end) # Reversed alignment on a forward contig 
 			else:
 				if contig_orientation=="reverse":
-					print (str(align_index)+label).ljust(12)+"+   "+"_"*(totlen-end)+colorstr(k*(end-start),"INVERT")+"_"*(start-1) # Forward alignments on a reversed  contig 
+					print (str(align_index)+label).ljust(6)+" "+other[0:5]+" +   "+"_"*(totlen-end)+colorstr(k*(end-start),"INVERT")+"_"*(start-1) # Forward alignments on a reversed  contig 
 				else:
-					print (str(align_index)+label).ljust(12)+"+   "+"_"*(start-1)+k*(end-start)+"_"*(totlen-end) # Forward alignments on a Forward contig
+					print (str(align_index)+label).ljust(6)+" "+other[0:5]+" +   "+"_"*(start-1)+k*(end-start)+"_"*(totlen-end) # Forward alignments on a Forward contig
 				
 
 
@@ -205,6 +210,11 @@ def main():
 	print "Found",len(alignments)
 	if len(alignments)<1:
 		sys.exit(0)
+	if len(alignments)>len(align_keys):
+		alignments.sort(key=lambda x:x['LEN2'],reverse=True)
+		alignments=alignments[:len(align_keys)-3]
+		alignments.sort(key=lambda x:x['S1'])
+		print "Filter down to",len(alignments)
 	print_aligned_contigs(alignments,max_width=args.max_width)
 
 
