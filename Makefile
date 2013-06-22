@@ -4,10 +4,10 @@
 # make rhodo_quast will generate QUAST reports for a selection of Rhodbacter assemblies
 ###
 
-pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/ipython -i --
 pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/python
 pyinterp:=python
-MUMmer:=$(shell pwd)/bin/MUMmer
+pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/ipython -i --
+MUMmer:=$(shell pwd)/bin/MUMmer3.23/
 MIXPARAMS:=-A 500 -C 0
 MIXPARAMSFOLDER:=A500_C0
 export PATH := $(MUMmer):$(PATH)

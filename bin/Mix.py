@@ -519,7 +519,10 @@ def processing (all_alignments,alignments, contigs_file, output_base, contig_thr
 
 	if display_dot : 
 		graph_assembly.write_dot_graph(output_dir+"/graph1.dot")
+
+	# Make the extensions
 	paths = graph_assembly.select_extensions(contigs)
+	debug_here()
 
 	if display_dot : 
 		graph_assembly.write_dot_graph(output_dir+"/graph2.dot")

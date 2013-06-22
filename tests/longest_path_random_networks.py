@@ -178,10 +178,14 @@ def make_random_directed_grid(dim=[12,12]):
 	return g_dir,max_path,best_length
 
 
-g_dir,max_path,best_length=make_random_directed_grid()
+#g_dir,max_path,best_length=make_random_directed_grid()
 
 
-g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/rhodo_AP_BB_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
+
+# Reading a MIX example 
+g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/aureus_AP_BB_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
+g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/b_cereus_AB_MS_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
+g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/rhodo_AP_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
 
 for src,tgt,mdata in g_dir.edges(data=True):
 	g_dir[src][tgt]['weight']=mdata.get("length")
@@ -194,7 +198,32 @@ for k in g_dir.node.keys():
 		mapping[k]="_".join(map(str,k))
 	else:
 		mapping[k]=str(k)
+
+inputs_nodes = [k for k,v in g_dir.in_degree().items() if v==0]
+outputs_nodes = [k for k,v in g_dir.out_degree().items() if v==0]
+assert(len(inputs_nodes) ==1)
+assert(len(outputs_nodes) ==1)
+
+for an_in in inputs_nodes:
+	g_dir.node[an_in]['In']=True
+for an_out in outputs_nodes:
+	g_dir.node[an_out]['Out']=True
+
+mapping[inputs_nodes[0]]="In"
+mapping[outputs_nodes[0]]="Out"
+
 g_dir=nx.relabel_nodes(g_dir,mapping)
+
+
+# for an_in in inputs_nodes:
+# 	for succ in g_dir[an_in]:
+# 		g_dir.node[succ]['In']=True
+# for an_out in outputs_nodes:
+# 	for succ in g_dir.predecessors(an_out):
+# 		g_dir.node[succ]['Out']=True
+
+# g_dir.remove_nodes_from(inputs_nodes)
+# g_dir.remove_nodes_from(outputs_nodes)
 
 
 
@@ -338,10 +367,10 @@ g_dir_trans_io = nx.DiGraph(g_dir_trans)
 # This can happen in cases where we had a SCC but without inputs. Once this SCC is removed, some nodes might not have predecessors anymore 
 # We thus connect these nodes without pred back to the In node
 
-for inp in [x for x,v in g_dir_trans_io.node.items() if "In" in v]+[x for x,v in g_dir_trans_io.in_degree().items() if v==0]:
+for inp in [x for x,v in g_dir_trans_io.node.items() if ("In" in v) and (x!="In")]+[x for x,v in g_dir_trans_io.in_degree().items() if (v==0) and (x!="In")]:
 	g_dir_trans_io.add_edge("In",inp,attr_dict={"weight":0})
 
-for inp in [x for x,v in g_dir_trans_io.node.items() if "Out" in v]+[x for x,v in g_dir_trans_io.out_degree().items() if v==0]:
+for inp in [x for x,v in g_dir_trans_io.node.items() if ("Out" in v) and (x!="Out")]+[x for x,v in g_dir_trans_io.out_degree().items() if (v==0) and (x!="Out")]:
 	g_dir_trans_io.add_edge(inp,"Out",attr_dict={"weight":0})
 
 nodes_in_order = nx.topological_sort(g_dir_trans_io)
@@ -358,59 +387,98 @@ for n in g_dir_trans_io:
 for src,tgt in g_dir_trans_io.edges():
 	g_dir_trans_io[src][tgt]["in_longest"]="False"
 
-g_dir_trans_io.node['In']['longest_path']=[0,[]]
-for n in nodes_in_order[1:]:
-	pred = g_dir_trans_io.predecessors(n)
-	if len(pred)==0: 
-		# This can happen in cases where we had a SCC but without inputs. Once this SCC is removed, some nodes might not have predecessors anymore 
-		longest_path=[0,[]]
-	else:
-		longest_path= [(g_dir_trans_io.node[pred[0]]['longest_path'][0] + g_dir_trans_io[pred[0]][n]['weight']),\
-					pred[0]]
-	for p in pred:
-		if (g_dir_trans_io.node[p]['longest_path'][0]+ g_dir_trans_io[p][n]['weight']) > longest_path[0]:
-			longest_path= [(g_dir_trans_io.node[p]['longest_path'][0]+ g_dir_trans_io[p][n]['weight']),p]
-	g_dir_trans_io.node[n]['longest_path']=longest_path
+all_longest_path_trans_io = []
+nodes_in_any_longest_path = set()
+
+inputs_nodes = [k for k,v in g_dir_trans_io.in_degree().items() if v==0]
+inputs_nodes.extend([x for x,v in g_dir_trans_io.node.items() if "In" in v])
+outputs_nodes = [k for k,v in g_dir_trans_io.out_degree().items() if v==0]
+outputs_nodes.extend([x for x,v in g_dir_trans_io.node.items() if "Out" in v])
 
 
-# Rebuild the longest path, starting from "Out" up to "In" in predecessor order 
-current_node = "Out"
-longest_path_trans_io = []
-while current_node != "In":
+
+# Todo: Account for contig ID in longest path
+for long_path_index in range(0,2000):
+	# Clear all longest path info 
+	print "longest path iteration",long_path_index
+	# print nodes_in_any_longest_path
+
+	for n in g_dir_trans_io.node.keys():
+		if "longest_path" in g_dir_trans_io[n]:
+			del g_dir_trans_io[n]['longest_path']
+
+	#Init
+	g_dir_trans_io.node['In']['longest_path']=[0,[]]
+	for n in nodes_in_order[1:]:
+		contig = g_dir_trans_io.node[n].get("contig",n)
+		if contig in nodes_in_any_longest_path:
+			continue
+
+		pred = [x for x in g_dir_trans_io.predecessors(n) if g_dir_trans_io.node[x].get("contig",x) not in nodes_in_any_longest_path]
+
+		if len(pred)==0: 
+			# This can happen in cases where we had a SCC but without inputs. Once this SCC is removed, some nodes might not have predecessors anymore 
+			longest_path=[0,[]]
+		else:
+			longest_path= [(g_dir_trans_io.node[pred[0]]['longest_path'][0] + g_dir_trans_io[pred[0]][n]['weight']),\
+						pred[0]]
+		for p in pred:
+			if (g_dir_trans_io.node[p]['longest_path'][0]+ g_dir_trans_io[p][n]['weight']) > longest_path[0]:
+				longest_path= [(g_dir_trans_io.node[p]['longest_path'][0]+ g_dir_trans_io[p][n]['weight']),p]
+		g_dir_trans_io.node[n]['longest_path']=longest_path
+
+
+	# Rebuild the longest path, starting from "Out" up to "In" in predecessor order 
+	current_node = "Out"
+	longest_path_trans_io = []
+	while (current_node != "In") and current_node!=[]: 
+		longest_path_trans_io.append((current_node,g_dir_trans_io.node[current_node]["longest_path"][0]))
+		current_node=g_dir_trans_io.node[current_node]['longest_path'][1]
+	if current_node==[]:
+		break
 	longest_path_trans_io.append((current_node,g_dir_trans_io.node[current_node]["longest_path"][0]))
-	current_node=g_dir_trans_io.node[current_node]['longest_path'][1]
-longest_path_trans_io.append((current_node,g_dir_trans_io.node[current_node]["longest_path"][0]))
-longest_path_trans_io.reverse()
+	longest_path_trans_io.reverse()
 
-# Mark this path in the graph
+	print longest_path_trans_io
+	print [g_dir_trans_io.node[x[0]].get("contig",x[0]) for x in longest_path_trans_io]
+	if len(longest_path_trans_io)<=2: # only in and out?
+		break
+	all_longest_path_trans_io.append(longest_path_trans_io)
 
-g_dir_trans_io.node['Out']['in_longest']="True"
+	# Mark this path in the graph
 
-
-for i in range(0, len(longest_path_trans_io)-1):
-	n = longest_path_trans_io[i][0]
-	g_dir_trans_io.node[n]['in_longest']="True"
-	g_dir_trans_io[longest_path_trans_io[i][0]][longest_path_trans_io[i+1][0]]['in_longest']="True"
+	g_dir_trans_io.node['Out']['in_longest']="True"
 
 
+	for i in range(0, len(longest_path_trans_io)-1):
+		n = longest_path_trans_io[i][0]
+		g_dir_trans_io.node[n]['in_longest']=long_path_index
+		g_dir_trans_io[longest_path_trans_io[i][0]][longest_path_trans_io[i+1][0]]['in_longest']=long_path_index
+		# debug_here()
+		if (n not in ["In","Out"]):
+			nodes_in_any_longest_path.add(g_dir_trans_io.node[n]['contig'])
 
 
 
-longest_path=[(x[0].split("@")[0],x[1]) for x in longest_path_trans_io][1:-1]
+
+
+longest_path=[(x[0].split("@")[0],x[1]) for x in all_longest_path_trans_io[0]][1:-1]
 print longest_path
 
 
 
 # Prepare for GML output 
 
-for i in range(1, len(longest_path)-2):
-	n = longest_path[i][0].split("@")[0]
-	p = longest_path[i+1][0].split("@")[0]
-	g_dir.node[n]['in_longest']="True"
-	g_dir[n][p]['in_longest']="True"
-# Add the last item
-last_element = longest_path[-2][0].split("@")[0]
-g_dir.node[last_element]['in_longest']="True"
+for lpi in range(0,len(all_longest_path_trans_io)):
+	longest_path=all_longest_path_trans_io[lpi]
+	for i in range(1, len(longest_path)-2):
+		n = longest_path[i][0].split("@")[0]
+		p = longest_path[i+1][0].split("@")[0]
+		g_dir.node[n]['in_longest']=lpi
+		g_dir[n][p]['in_longest']=lpi
+	# Add the last item
+	last_element = longest_path[-2][0].split("@")[0]
+	g_dir.node[last_element]['in_longest']=lpi
 
 
 
