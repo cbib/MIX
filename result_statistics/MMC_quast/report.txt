@@ -1,14 +1,14 @@
 All statistics are based on contigs of size >= 500 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
 
 Assembly                   MMC_CLC_MIRA_mix  MMC_AB_CLC_mix  MMC_AB_MIRA_mix
-# contigs (>= 0 bp)        41                526             53             
-# contigs (>= 1000 bp)     35                287             44             
-Total length (>= 0 bp)     1039388           1006275         1034906        
-Total length (>= 1000 bp)  1037065           872612          1030687        
-# contigs                  37                410             48             
-Largest contig             90183             15061           90183          
-Total length               1038417           964943          1033844        
-GC (%)                     23.68             23.71           23.70          
-N50                        48821             3556            42743          
-N75                        31320             1797            25084          
-# N's per 100 kbp          4.82              30.05           1.26           
+# contigs (>= 0 bp)        41                585             29             
+# contigs (>= 1000 bp)     35                96              23             
+Total length (>= 0 bp)     1039371           1061311         1036597        
+Total length (>= 1000 bp)  1037048           1006126         1034274        
+# contigs                  37                116             25             
+Largest contig             90183             45312           156794         
+Total length               1038400           1019994         1035626        
+GC (%)                     23.68             23.61           23.73          
+N50                        48821             17729           83064          
+N75                        31320             11375           55346          
+# N's per 100 kbp          4.82              7.55            1.16           
