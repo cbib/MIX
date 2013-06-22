@@ -7,9 +7,15 @@ def process_contig_renaming(ass_adr, i, output_file):
 	print ass_adr, " will correspond to the assembly number ", i
 	ass_file = open(ass_adr, "r")
 	line = ass_file.readline()
+	all_ident=[]
 	while line : 
 		if re.match("^>", line) : 
 			identifiant = line.replace(">", ">A"+str(i)+"_")
+			# identifiant= line.replace(" ","_") # DEBUG SAM: SOAP don't have unique ID without spaces
+			identifiant = identifiant.split(" ")[0]
+			if identifiant in all_ident:
+				identifiant+=".2"
+			all_ident.append(identifiant)
 			line = ass_file.readline()
 			output_file.write(identifiant)
 			while line and not re.match("^>", line) :
