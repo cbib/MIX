@@ -10,6 +10,27 @@ import networkx as nx
 from IPython.core.debugger import Tracer; debug_here = Tracer()
 
 
+import logging
+logger = logging.getLogger('mix_logger')
+
+# if "logger" not in globals():
+# 	logger = logging.getLogger('mix_graph')
+# 	logger.setLevel(logging.DEBUG)
+
+# 	# create console handler and set level to debug
+# 	ch = logging.StreamHandler()
+# 	ch.setLevel(logging.DEBUG)
+
+# 	# create formatter
+# 	formatter = logging.Formatter('%(asctime)s - %(filename)s - %(funcName)s - %(message)s',"%Y-%m-%d %H:%M:%S")
+# 	# formatter = logging.Formatter('%(asctime)s - %(message)s')
+# 	# add formatter to ch
+# 	ch.setFormatter(formatter)
+
+# 	# add ch to logger
+# 	logger.addHandler(ch)
+
+
 class graph ():
 	##
 	# @brief Graph representing the assembly 
@@ -256,24 +277,26 @@ class graph ():
 
 	def select_extensions(self,contigs):
 		if len(self.GRAPH)==2: # No alignments! just bail
-			print "alignment graph is empty,bailing out"
+			logger.info("alignment graph is empty,bailing out")
 			return []
 		### Test novel longest_path calculation 
 		mix_graph,mapping,inv_mapping = prepare_mix_graph(copy.copy(self.GRAPH))
-		acyclic_graph = remove_all_cycles(mix_graph)
-		longest_paths = maximal_independant_longest_path_for_acyclic_graph(acyclic_graph,inv_mapping)
+		self.acyclic_graph = remove_all_cycles(mix_graph)
+		self.mapping_from_acyclic_to_self = inv_mapping
+		self.longest_paths = maximal_independant_longest_path_for_acyclic_graph(self.acyclic_graph,self.mapping_from_acyclic_to_self)
 #		debug_here()
-		print longest_paths
-		for p in longest_paths : 
+		logger.debug("Longest paths:%s",self.longest_paths)
+		for p in self.longest_paths : 
 			for n in p :
 				self.GRAPH.node[n]["selected"]="True"
 
 		# DEBUG: Does she expect all paths to ber inversed ?
 		longest_paths_inversed=[]
-		for p in longest_paths:
+		for p in self.longest_paths:
 			p.reverse()
 			longest_paths_inversed.append(p)
-		return self.simplify_paths(longest_paths, contigs)
+
+		return self.simplify_paths(self.longest_paths, contigs)
 
 	def simplify_paths (self, paths, contigs) : 
 		new_paths = []
@@ -565,7 +588,7 @@ def remove_cycle(g):
 			print "\tProcessed",idx,"paths"
 		p=all_paths[idx]
 
-		p_renamed= [x+"@"+str(idx) for x in p]
+		p_renamed= [str(x)+"@"+str(idx) for x in p]
 		g_trans.add_path(p_renamed)
 		# Copy nodes and edges attributes from the original graph 
 		for i in range(0,len(p)-1):
