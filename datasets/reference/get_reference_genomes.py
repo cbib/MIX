@@ -128,7 +128,7 @@ def concatenate_genome(entry):
 	logger.info("Concatenating %s",local_dir)
 	sequences=[x for x in os.listdir(local_dir) if x.endswith(entry["extension"])]
 	if entry["extension"]==".fna":
-		target_name=local_dir+"_ref.fa"
+		target_name=local_dir+"_ref.fasta"
 	else:
 		target_name=local_dir+"_ref"+entry["extension"]
 
