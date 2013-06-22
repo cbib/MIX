@@ -7,7 +7,10 @@ import networkx as nx
 import collections
 import integer_set as iset
 import os
+import display_coords 
 import re
+import prettytable
+
 #from decimal import Decimal, getcontext
 from optparse import OptionParser 
 #from types import *
@@ -21,6 +24,102 @@ from IPython.core.debugger import Tracer; debug_here = Tracer()
 import graph as graph 
 
 import mummerParser
+
+
+import logging
+if "logger" not in globals():
+	logger = logging.getLogger('mix_logger')
+	logger.setLevel(logging.DEBUG)
+
+	# while len(logger.handlers()) > 0:
+	#  	logger.pop()
+
+	# create console handler and set level to debug
+	ch = logging.StreamHandler()
+	ch.setLevel(logging.DEBUG)
+
+	# create formatter
+	formatter = logging.Formatter('%(asctime)s - %(filename)s - %(funcName)s - %(message)s',"%Y-%m-%d %H:%M:%S")
+	# formatter = logging.Formatter('%(asctime)s - %(message)s')
+	# add formatter to ch
+	ch.setFormatter(formatter)
+
+	# add ch to logger
+	logger.addHandler(ch)
+
+
+logger = logging.getLogger('mix_logger')
+
+
+
+global all_alignments,aln_threshold,ctg_threshold,idy_threshold,cov_threshold,boundary_set_off
+
+
+idy_threshold = 98 #98 # For previous QUAST: 75
+cov_threshold = 95 #95 # For previous QUAST: 99
+
+def make_contig_table(list_of_list_of_single_contigs):
+	x = prettytable.PrettyTable(["P.Idx", "C.Idx", "ID", "length","Sum length","start","end","direction"])
+	for i in range(len(list_of_list_of_single_contigs)):
+		sum_length = 0
+		list_of_ctg = list_of_list_of_single_contigs[i]
+		for ci in range(len(list_of_ctg)):
+			c= list_of_ctg[ci]
+			sum_length+= c['end']-c['start']
+			x.add_row([i,ci,c['contig'], c['end']-c['start'],sum_length,c['start'],c['end'],c['sens']])
+	return x
+
+def swap_alignment(a):
+	return {
+"Idx":a.get("Idx",-1),
+"TAGR":a['TAGQ'],
+"TAGQ":a['TAGR'],
+"IDY":a['IDY'],
+"LENR":a['LENQ'],
+"LENQ":a['LENR'],
+"LEN1":a['LEN2'],
+"LEN2":a['LEN1'],
+"COVR":a['COVQ'],
+"COVQ":a['COVR'],
+"S1":a['S2'],
+"E1":a['E2'],
+"S2":a['S1'],
+"E2":a['E1']
+	}
+
+def print_alignments(considered_alignemts,with_ascii_output=False):
+	x = prettytable.PrettyTable(["Idx","R", "Q", "LENR", "LENQ","IDY", "LEN@Q","LEN@R","MyCOV%", "COVR","COVQ","SR","ER","SQ","EQ","EXTR","OK","INC"])
+	for a in considered_alignemts:
+		if 'Idx' not in a:
+			a['Idx']=all_alignments.index(a)
+		cr=[{"contig":a['TAGR'],"start":0,"end":contigs[a['TAGR']],"sens":"f"}]
+		cq=[{"contig":a['TAGQ'],"start":0,"end":contigs[a['TAGQ']],"sens":"f"}]
+		mycov=coverage(cr,cq)
+		mycov = (int(100*mycov[0]),int(100*mycov[1]))
+		x.add_row([a['Idx'],a['TAGR'],a['TAGQ'],a['LENR'],a['LENQ'],a['IDY'],a['LEN1'],a['LEN2'],mycov, a['COVR'],a['COVQ'],a['S1'],a['E1'],a['S2'],a['E2'],str(is_extremal(a))[0],str(aln_pass_thresholds(a))[0],str(aln_implies_inclusion(a))[0]])
+	logger.info("\n"+x.get_string(sortby="COVR"))
+	if with_ascii_output:
+		display_coords.print_aligned_contigs(considered_alignemts)
+
+
+def print_alignments_for_contigs(contigs,with_ascii_output=False,only_within=False,only_distinct_assembler=True):
+	considered_alignemts=[]
+	for c in contigs:
+		if c not in alignments_index:
+			continue
+		for tgq in alignments_index[c].values():
+			for al in tgq:
+				if only_within and ((al['TAGR'] not in contigs) or (al['TAGQ'] not in contigs)):
+					continue
+				if 'Idx' not in al:
+					al['Idx']=all_alignments.index(al)
+				if only_distinct_assembler and (get_assembler_name(al['TAGR'])==get_assembler_name(al['TAGQ'])):
+					continue
+				if al['TAGR']!=c:
+					considered_alignemts.append(swap_alignment(al))
+				else:
+					considered_alignemts.append(al)
+	print_alignments(considered_alignemts,with_ascii_output)
 
 def reverse_is_in_alignments (aln, alignments) :
 	new_aln = {}
@@ -45,11 +144,16 @@ def reverse_is_in_alignments (aln, alignments) :
 			result = True
 	return result
 
-def aln_pass_thresholds(aln,aln_threshold,ctg_threshold):
-	idy_threshold = 75 #98
-	cov_threshold = 99 #95
-	# aln_threshold = 125 
-	# ctg_threshold= 0
+def aln_implies_inclusion(aln):
+	global cov_threshold,ctg_threshold
+	if ((aln["COVR"] > cov_threshold) or ((aln["LENR"] - aln["LEN1"]) < ctg_threshold)):
+		return True
+	elif ((aln["COVQ"] > cov_threshold) or ((aln["LENQ"] - aln["LEN2"]) < ctg_threshold)):
+		return True
+	return False
+
+def aln_pass_thresholds(aln):
+	global aln_threshold,ctg_threshold,idy_threshold,cov_threshold,boundary_set_off
 	# skip self
 	if aln['TAGQ']==aln['TAGR']:
 		return False
@@ -77,42 +181,42 @@ def aln_pass_thresholds(aln,aln_threshold,ctg_threshold):
 	# return False
 
 def is_extremal(a):
-	boudary_set_off = 52
-	ref_boudary_set_off = boudary_set_off
-	query_boudary_set_off = boudary_set_off
-	#ref_boudary_set_off = (a["LENR"]/10000)+2
-	#query_boudary_set_off = (a["LENQ"]/10000)+2
+	boundary_set_off = 52
+	ref_boundary_set_off = boundary_set_off
+	query_boundary_set_off = boundary_set_off
+	#ref_boundary_set_off = (a["LENR"]/10000)+2
+	#query_boundary_set_off = (a["LENQ"]/10000)+2
 	ref_forward = a["S1"] < a["E1"]
 	query_forward = a["S2"] < a["E2"]
 	if ref_forward : 
-		ref_aln_5 = a["S1"] < ref_boudary_set_off
-		ref_aln_3 = a["E1"] > a["LENR"] - ref_boudary_set_off
+		ref_aln_5 = a["S1"] < ref_boundary_set_off
+		ref_aln_3 = a["E1"] > (a["LENR"] - ref_boundary_set_off)
 	else : 
-		ref_aln_5 = a["E1"] < ref_boudary_set_off
-		ref_aln_3 = a["S1"] > a["LENR"] - ref_boudary_set_off
+		ref_aln_5 = a["E1"] < ref_boundary_set_off
+		ref_aln_3 = a["S1"] > (a["LENR"] - ref_boundary_set_off)
 	if query_forward : 
-		query_aln_5 = a["S2"] < query_boudary_set_off
-		query_aln_3 = a["E2"] > a["LENQ"] - query_boudary_set_off
+		query_aln_5 = a["S2"] < query_boundary_set_off
+		query_aln_3 = a["E2"] > (a["LENQ"] - query_boundary_set_off)
 	else : 
-		query_aln_5 = a["E2"] < query_boudary_set_off
-		query_aln_3 = a["S2"] > a["LENQ"] - query_boudary_set_off
+		query_aln_5 = a["E2"] < query_boundary_set_off
+		query_aln_3 = a["S2"] > (a["LENQ"] - query_boundary_set_off)
 	if ref_forward and query_forward : 
 		extends = (ref_aln_5 and query_aln_3) or (query_aln_5 and ref_aln_3)
 	else : 
 		extends = (ref_aln_5 and query_aln_5) or (query_aln_3 and ref_aln_3)	
 	return extends	
 
-def parse_alignments (file_adr, aln_threshold, ctg_threshold):
+def parse_alignments (file_adr):
 	##
 	# @brief Read the COORD file 'file_adr' to fill and return a table containing all the alignments between two different contigs.
 	# @param file_adr file containing the alignments between two assemblies (MUMmer COORD file)
 	# @return a table containing all the alignments between two different contigs
-	idy_threshold = 75 #98
-	cov_threshold = 95 #95
-	all_alignments = mummerParser.parse_mummerFile(file_adr)
+	global all_alignments,aln_threshold,ctg_threshold,ctg_threshold,cov_threshold
+
+	all_alignments = [x for x in mummerParser.parse_mummerFile(file_adr) if x['TAGQ']!=x['TAGR']]
 	alignments=[]
 	contigs = {}
-	included_contigs = []
+	contigs_included_in_other = []
 	for aln in all_alignments:
 		# Build mapping
 		for c in ["R", "Q"] :
@@ -127,15 +231,16 @@ def parse_alignments (file_adr, aln_threshold, ctg_threshold):
 		# Do we have contigs completely included (AKA "covered") by another ? 
 
 		if ((aln["COVR"] > cov_threshold) or ((aln["LENR"] - aln["LEN1"]) < ctg_threshold)):
-			included_contigs.append(aln["TAGR"])
+			contigs_included_in_other.append(aln["TAGR"])
 		elif ((aln["COVQ"] > cov_threshold) or ((aln["LENQ"] - aln["LEN2"]) < ctg_threshold)):
-			included_contigs.append(aln["TAGQ"])
+			contigs_included_in_other.append(aln["TAGQ"])
 
-		if (aln_pass_thresholds(aln,aln_threshold,ctg_threshold)) and (not reverse_is_in_alignments(aln, alignments)) and (is_extremal(aln)):
+		if (aln_pass_thresholds(aln)) and (not reverse_is_in_alignments(aln, alignments)) and (is_extremal(aln)):
 			alignments.append(aln)
-	#print "list of contigs "+str(contigs),"included:",included_contigs
+	contigs_included_in_other=list(set(contigs_included_in_other))
+	logger.debug("list of contigs %s\n included in others:%s ",str(contigs),contigs_included_in_other)
 
-	return all_alignments,alignments, contigs, included_contigs
+	return alignments, contigs, contigs_included_in_other
 
 ### Output Assembly Sequences #############################################################################
 def get_assembler_name (contig_name):
@@ -144,30 +249,46 @@ def get_assembler_name (contig_name):
 	else :
 		return "None"
 
-def parse_input_contigs_file (file_adr, contigs_list) : 
-	contigs_sequences = {}
-	contigs_file = open(file_adr, "r")
-	line = contigs_file.readline()
-	while line != "":
-		contig_sequence=""
-		if (re.match('>', line)):
-			tab1=line.rstrip().split(">")
-			tab2=tab1[1].split(" ")
-			contig_id=tab2[0]
-			line = contigs_file.readline()
-		else :
-			0/0
-			sys.exit("Error : the file doesn't begin with a contig id like \">id\"\n"+line)
-		if (re.match('^[A,T,G,C,N,a,t,c,g,n,\*,w,k,y,r,m,s,W,K,Y,R,M,S]+' , line)):
-			while (re.match('^[A,T,G,C,N,a,t,c,g,n,\*,w,k,y,r,m,s,W,K,Y,R,M,S]+' , line)):
-				contig_sequence = contig_sequence+line.upper().rstrip()
-				line = contigs_file.readline()
-		else :
-			sys.exit("Error : no sequence for the contig id :"+contig_id+"\n"+line) 
-		if contig_id in contigs_list : 
-			contigs_sequences[contig_id]= contig_sequence
-	contigs_file.close()
+
+def parse_input_contigs_file(file_adr,contigs_list):
+	contigs_sequences={}
+	for record in SeqIO.parse(file_adr, "fasta", generic_dna):
+		# all_records.append(SequenceStat(f,record))
+		if record.id not in contigs_list:
+			continue
+		contigs_sequences[record.id]=str(record.seq)
+	missing = set(contigs_list).difference(set(contigs_sequences.keys()))
+	if len(missing)>0:
+		logger.critical("Cannot find sequence for contigs %s in FASTA file %s",";".join(missing),file_adr)
+		sys.exit(0)
 	return contigs_sequences
+	# debug_here()
+
+
+# def parse_input_contigs_file (file_adr, contigs_list) : 
+# 	contigs_sequences = {}
+# 	contigs_file = open(file_adr, "r")
+# 	line = contigs_file.readline()
+# 	while line != "":
+# 		contig_sequence=""
+# 		if (re.match('>', line)):
+# 			tab1=line.rstrip().split(">")
+# 			tab2=tab1[1].split(" ")
+# 			contig_id=tab2[0]
+# 			line = contigs_file.readline()
+# 		else :
+# 			0/0
+# 			sys.exit("Error : the file doesn't begin with a contig id like \">id\"\n"+line)
+# 		if (re.match('^[A,T,G,C,N,a,t,c,g,n,\*,w,k,y,r,m,s,W,K,Y,R,M,S]+' , line)):
+# 			while (re.match('^[A,T,G,C,N,a,t,c,g,n,\*,w,k,y,r,m,s,W,K,Y,R,M,S]+' , line)):
+# 				contig_sequence = contig_sequence+line.upper().rstrip()
+# 				line = contigs_file.readline()
+# 		else :
+# 			sys.exit("Error : no sequence for the contig id :"+contig_id+"\n"+line) 
+# 		if contig_id in contigs_list : 
+# 			contigs_sequences[contig_id]= contig_sequence
+# 	contigs_file.close()
+# 	return contigs_sequences
 
 def write_sequence (output_file, contigs_sequences, path) :
 	for c in path :
@@ -255,9 +376,9 @@ def select_single_contigs_of_one_assembly_byL50 (paths, single_contigs, contigs)
 				if N50_by_assembler[a] >= total_length_by_assembler[a]*50/100 : 
 					L50_by_assembler[a] = c+1
 
-	best_assembler,best_L50 = sorted(L50_by_assembler.items(),key=itemgetter(1))[0] # Select the assembler with min L50 (It's the number of contigs corresponding to the N50 Length, AKA N500 count)
+	best_assembler,best_L50 = sorted(L50_by_assembler.items(),key=itemgetter(1))[0] # Select the assembler with min L50 (It's the number of contigs corresponding to the N50 Length, AKA N50 count)
 
-	print "Selected assembler",best_assembler,"with L50 of",L50_by_assembler[best_assembler], "out of", L50_by_assembler
+	logger.info("Selected assembler: %s, with L50 of %d out of %s",best_assembler,L50_by_assembler[best_assembler],L50_by_assembler)
 	selected_single_contigs = []
 	for s in single_contigs : 
 		if get_assembler_name(s) == best_assembler : 
@@ -343,248 +464,121 @@ def print_stats(paths, single_contigs, contigs):
 			print "\t"+str(length_of_parts_from_each_assembly[a]+0)+" bp"
 		else : 
 			print "\t"+str(length_of_parts_from_each_assembly[a]+length_of_contigs_from_each_assembly[a])+" bp"
-		
-# def remove_included_contigs_in_paths_from_selected_contigs(paths, selected_single_contigs, alignments, contig_threshold) :
-# 	cov_threshold = 50 #Debug macha
-# 	contigs_in_paths = []
-# 	for p in paths : 
-# 		for n in p : 
-# 			contigs_in_paths.append(n["contig"])
-# 	contigs_included = []
-# 	contigs_not_included = list(selected_single_contigs)
-# 	for s in selected_single_contigs : 
-# 		contig_name = s[0]["contig"]
-# 		if is_contig_aligned_with_a_path(cov_threshold, contig_threshold, contig_name, paths, alignments) : 
-# 				contigs_included.append(s)
-# 	for i in contigs_included : 
-# 		if i in contigs_not_included :
-# 			contigs_not_included.remove(i)
-# 	return contigs_not_included
-
-# def is_contig_aligned_with_a_path(cov_threshold, contig_threshold, contig, paths, alignments):
-# 	cov_sum_by_ctg = {}
-# 	# debug_here()
-# 	# if contig=="A2_SOAP.scaffold8.1":
-# 	# 	debug_here()
-# 	for a in alignments :
-# 		# if ("A2_SOAP.scaffold8.1" == a['TAGR']) or ("A2_SOAP.scaffold8.1" == a['TAGQ']):
-# 		# 	debug_here()
-# 		if (a["TAGR"] == contig) and (find_contig_in_paths(paths, a["TAGQ"])!=None): 
-# 			if ((a["COVR"] >= cov_threshold) or ((a["LENR"] - a["LEN1"]) < contig_threshold*2)) :
-# 				return True
-# 			elif a["TAGQ"] in cov_sum_by_ctg.keys() : 
-# 				cov_sum_by_ctg[a["TAGQ"]] += float(a["COVR"])
-# 			else : 
-# 				cov_sum_by_ctg[a["TAGQ"]] = float(a["COVR"])
-# 		elif (a["TAGQ"] == contig) and (find_contig_in_paths(paths, a["TAGR"])!=None): 
-# 			if ((a["COVQ"] >= cov_threshold) or ((a["LENQ"] - a["LEN2"]) < contig_threshold*2)) :
-# 				return True
-# 			elif a["TAGR"] in cov_sum_by_ctg.keys() : 
-# 				cov_sum_by_ctg[a["TAGR"]] += float(a["COVQ"])
-# 			else : 
-# 				cov_sum_by_ctg[a["TAGR"]] = float(a["COVQ"])
-# 	# debug_here()
-# 	print cov_sum_by_ctg
-# 	for path_nb in range(len(paths)) :
-# 		for p in paths[path_nb] : 
-# 			p_cov_sum = 0
-# 			p_id = p["contig"]
-# 			if p_id in cov_sum_by_ctg.keys() : 
-# 				p_cov_sum += cov_sum_by_ctg[p_id]
-# 			if (p_cov_sum > cov_threshold) : 
-# 				return True
-# 	return False
-
-
-			
-
-
-def lower_duplication(paths,selected_single_contigs,cv_thr=0.65):
-	# debug_here()
-	all_elements=paths+selected_single_contigs
-	# all_elements=paths
-	scores=scipy.zeros((len(all_elements),len(all_elements)))
-
-	for i in range(len(all_elements)):
-		for j in range(i+1,len(all_elements)):
-			p1=all_elements[i]
-			p2=all_elements[j]
-			cv=coverage(alignments,p1,p2)
-			# if cv!=(0,0):
-			# 	print p1,p2,cv
-			# print i,j,cv
-			if cv[0]>cv_thr and cv[1]>cv_thr: #competition 
-				if cv[0]>cv[1]: #p1 is more covered by p2, we add an "inclusion" edge from p1 to p2 
-					scores[i,j]=int(cv[0]*100)
-				else:
-					scores[j,i]=int(cv[0]*100) # we do it from p2 to p1 
-			elif cv[0]>cv_thr:
-				scores[i,j]=int(cv[0]*100)
-			elif cv[1]>cv_thr:
-				scores[j,i]=int(cv[1]*100)
-
-	D=nx.DiGraph(scores)
-	# Detect elements to remove 
-	somethingChanged=True
-	while (somethingChanged):
-		somethingChanged=False
-		# print "New iter"
-		for (n,d_in),(n,d_out) in zip(D.in_degree_iter(),D.out_degree_iter()):
-			if (d_in==0) and (d_out >0) :
-				src_ctg=[x['contig'] for x in all_elements[n]]
-				src_assemblers=[x[:2] for x in src_ctg]
-				# print n,src_assemblers,src_ctg
-				if len(src_ctg)>1: #is a path, either covered by a path or by a contig
-					# print "is path"
-					# print "removing",src_ctg,"covered by",D[n],"which is",[all_elements[x] for x in D[n]]
-					paths[n]=[]
-					D.remove_node(n)
-					somethingChanged=True
-				else:
-					# print "is single"
-					tgt_assemblers=set()
-					covered_by_a_path=False
-					for tgt in D[n]:
-						tgt_ctg=[x['contig'] for x in all_elements[tgt]]
-						if len(tgt_ctg)>1:
-							covered_by_a_path=True
-						tgt_assemblers.update([x[:2] for x in tgt_ctg])
-						# print "\t"*2,tgt_assemblers,tgt_ctg,D[n][tgt]
-					# if  (not covered_by_a_path):
-					# 	continue
-					# if "A2" in tgt_assemblers:
-					# 	continue
-					# print "removing",src_ctg,"covered by",D[n],"which is",[all_elements[x] for x in D[n]]
-					selected_single_contigs[n-len(paths)]=[]
-					D.remove_node(n)
-					somethingChanged=True
-	return paths,selected_single_contigs
-
-
 
 
 ### Global processing #############################################################################
-def processing (all_alignments,alignments, contigs_file, output_base, contig_threshold, aln_threshold, display_dot, display_cytoscape, contigs, included_contigs):
+def processing (alignments, contigs_file, output_repository, ctg_threshold, aln_threshold, display_dot, display_cytoscape, contigs, contigs_included_in_other):
 	##
 	# @brief Construct an assembly from the alignments, and then make a graph with it to extend the contigs and write them in a new file. 
 	# @param alignments		list containing all the alignments between tow different contigs
 	# @param contigs_files		list of file(s) containing the contigs sequences
 	# @param output_repository	repository address where the results will be written
-	# @param contig_threshold	minimum contig length to consider
+	# @param ctg_threshold	minimum contig length to consider
 	# @param aln_threshold		minimum length alignment to consider
 	# @param pattern			pattern to use to distinguish the contigs from the two assemblers
 	
-	global graph_assembly,single_contigs,selected_single_contigs,selected_single_contigs_not_included,selected_paths,selected_contigs,paths
-	output_dir = output_base+"/Mix_results_A"+str(aln_threshold)+"_C"+str(contig_threshold)
-	try:
-		os.mkdir(output_base)
-	except:
-		pass
+	global all_alignments,assembly_graph,single_contigs,selected_single_contigs,selected_single_contigs_not_included,selected_paths,selected_contigs,paths
+	if output_repository:
+		output_dir = output_repository+"/Mix_results_A"+str(aln_threshold)+"_C"+str(ctg_threshold)
+		try:
+			os.mkdir(output_repository)
+		except:
+			pass
 
-	try:
-		os.mkdir(output_dir)
-	except OSError:
-		pass
+		try:
+			os.mkdir(output_dir)
+		except OSError:
+			pass
+	else:
+		output_dir=None
 
-	print "included?",("A2_scf1_33" in included_contigs)
+	assembly_graph = graph.graph(alignments, contigs, contigs_included_in_other)
+	initial_assembly_graph=copy.deepcopy(assembly_graph)
+	single_contigs = assembly_graph.get_single_contigs(contigs)
 
-	graph_assembly = graph.graph(alignments, contigs, included_contigs)
-	initial_assembly_graph=copy.deepcopy(graph_assembly)
-	single_contigs = graph_assembly.get_single_contigs(contigs)
-
-	if display_dot : 
-		graph_assembly.write_dot_graph(output_dir+"/graph1.dot")
+	if display_dot and output_dir : 
+		assembly_graph.write_dot_graph(output_dir+"/graph1.dot")
 
 	# Make the extensions
-	paths = graph_assembly.select_extensions(contigs)
+	paths = assembly_graph.select_extensions(contigs)
 #	debug_here()
 
-	if display_dot : 
-		graph_assembly.write_dot_graph(output_dir+"/graph2.dot")
-	if display_cytoscape : 
-		graph_assembly.write_cytoscape_graph(output_dir+"/")
+	if display_dot and output_dir  : 
+		assembly_graph.write_dot_graph(output_dir+"/graph2.dot")
+	if display_cytoscape  and output_dir : 
+		assembly_graph.write_cytoscape_graph(output_dir+"/")
 
 	#selected_single_contigs = select_single_contigs_of_one_assembly(paths, single_contigs, contigs)
-	selected_single_contigs = select_single_contigs_of_one_assembly_byL50(paths, single_contigs, contigs)
-	print "selected_single_contigs"+str(selected_single_contigs)
-	print len(selected_single_contigs)
-	#selected_single_contigs_not_included = remove_included_contigs_from_selected_contigs(selected_single_contigs, alignments)
-	# selected_single_contigs_not_included = remove_included_contigs_in_paths_from_selected_contigs(paths, selected_single_contigs, alignments, contig_threshold)
-	# selected_paths=paths
-	# selected_paths = remove_paths_included_in_selected_contigs(paths, contigs, alignments)
+	# Specific cases where no extension have been detected: we thus fall back to a single aligner 
+	if len(cleaned_alignments)==0:
+		logger.critical("No extension found, falling back to single aligner mode")
+		selected_single_contigs = select_single_contigs_of_one_assembly_byL50(paths, single_contigs, contigs)
+	else:
+		## UGLY: single_contigs is a list of ID, while selected_single_contigs is a list of list of dict (singleton path of contig "objects")
+		## TODO: Get rid of the two representation by managing a single global list of contig objects
+
+		# selected_single_contigs=[[{"contig":s,"start":0,"end":contigs[s],"sens":"f"}] for s in single_contigs] 
+		selected_single_contigs = select_single_contigs_of_one_assembly_byL50(paths, single_contigs, contigs)
+
+	logger.debug("selected_single_contigs (%d contigs): %s",len([x for x in selected_single_contigs if len(x)!=0]),"\n"+make_contig_table(selected_single_contigs).get_string(sortby="length"))
+
+
 
 	# Todo: Real optimization to select the assembly
 	#Remove paths covered by selected contig 
 	# Todo: Iterative computation, removing one element at a time 
 	# Todo: Maybe consider the problem of coverage by the same assembly: should be kept anyhow?
 	# Might be order dependant! 
-	index_alignment(all_alignments)
-	# cv_thr=0.50
-	# selected_paths=[]
-	# for p in paths:
-	# 	covered=False
-	# 	print p
-	# 	for c in selected_single_contigs:
-	# 		cv1,cv2=coverage(all_alignments,p,c)
-	# 		if cv1>=cv_thr : 
-	# 			print "should remove",p,"covered at",cv1,"by",c
-	# 			covered=True
-	# 			break
-	# 		# if cv2>=cv_thr:
-	# 		# 	print "should remove",c,"covered at",cv2,"by",p
-	# 	if not covered:
-	# 		selected_paths.append(p)
-
-	# selected_contigs=[]
-	# for c in selected_single_contigs:
-	# 	print c
-	# 	covered=False
-	# 	for p in selected_paths:
-	# 		cv1,cv2=coverage(all_alignments,c,p)
-	# 		if cv1>=cv_thr : 
-	# 			print "should remove",c,"covered at",cv1,"by",p
-	# 			covered=True
-	# 			break
-	# 	if not covered:
-	# 		selected_contigs.append(c)
+	index_alignments()
 	selected_paths,selected_contigs=lower_duplication(paths,selected_single_contigs)
-	print "After duplication minimisation"
-	print "selected_single_contigs"+str(selected_single_contigs)
-	print len(selected_single_contigs)
+	if(len(selected_contigs)!=len(selected_single_contigs)):
+		logger.debug("After duplication minimisation: selected_single_contigs (%d contigs): %s",len([x for x in selected_single_contigs if len(x)!=0]),"\n"+make_contig_table(selected_single_contigs).get_string(sortby="length"))
 
-	save_statistics_to_files(\
-		initial_assembly_graph=initial_assembly_graph,\
-		assembly_graph=graph_assembly,\
-		all_alignments=all_alignments,\
-		selected_alignements=alignments,\
-		all_paths=paths,\
-		selected_paths=selected_paths,\
-		all_contigs=contigs,\
-		included_contigs=included_contigs,\
-		single_contigs=single_contigs,\
-		selected_single_contigs=selected_single_contigs,\
-		selected_contigs=selected_contigs,\
-		output_dir=output_dir)
 
-	output_fasta(contigs_file, selected_paths, selected_contigs, contigs, output_dir, alignments)
+	if output_dir:
+		save_statistics_to_files(\
+			initial_assembly_graph=initial_assembly_graph,\
+			assembly_graph=assembly_graph,\
+			all_alignments=all_alignments,\
+			selected_alignements=alignments,\
+			all_paths=paths,\
+			selected_paths=selected_paths,\
+			all_contigs=contigs,\
+			contigs_included_in_other=contigs_included_in_other,\
+			single_contigs=single_contigs,\
+			selected_single_contigs=selected_single_contigs,\
+			selected_contigs=selected_contigs,\
+			output_dir=output_dir)
+
+
+	all_elements= [x for x in selected_paths+selected_contigs if len(x)!=0]
+	total_length = 0
+	for path in all_elements:
+		for c in path:
+			total_length+=c['end']-c['start']
+	logger.debug("Final assembly: selected_single_contigs (%d contigs, %d bp): %s",len(all_elements),total_length,"\n"+make_contig_table(all_elements).get_string(sortby="P.Idx"))
+
+	if output_dir:
+		output_fasta(contigs_file, selected_paths, selected_contigs, contigs, output_dir, alignments)
 	#output_fasta(contigs_file, paths, selected_single_contigs, contigs, output_dir)
 	# print_stats(selected_paths, selected_contigs, contigs)
 	#print_stats(paths, selected_single_contigs, contigs)
 
-def save_statistics_to_files(initial_assembly_graph,assembly_graph,all_alignments,selected_alignements,all_paths, selected_paths, all_contigs,included_contigs, selected_contigs,selected_single_contigs,single_contigs,output_dir):
-	if len(alignments)<1:
+def save_statistics_to_files(initial_assembly_graph,assembly_graph,all_alignments,selected_alignements,all_paths, selected_paths, all_contigs,contigs_included_in_other, selected_contigs,selected_single_contigs,single_contigs,output_dir):
+
+	if len(all_alignments)<1:
 		return
-	global aln_threshold,contig_threshold
+	global aln_threshold,ctg_threshold
 	nx.write_gml(initial_assembly_graph.GRAPH,output_dir+"/initial_assembly_graph.gml")
 	nx.write_gml(assembly_graph.GRAPH,output_dir+"/reduced_assembly_graph.gml")
 	all_alignments_file = open(output_dir+"/all_alignments.csv","w")
-	a=alignments[0]
+	a=all_alignments[0]
 	header = sorted(a.keys())+["is_selected","is_extremal","pass_thr"]
 	print >>all_alignments_file,",".join(header)
-	for a in alignments:
+	for a in all_alignments:
 		is_selected=("is_selected",a in selected_alignements)
 		is_extremal_a = ("is_extremal",is_extremal(a))
-		pass_thr = ("pass_thr",aln_pass_thresholds(a,aln_threshold,contig_threshold))
+		pass_thr = ("pass_thr",aln_pass_thresholds(a))
 		items = a.items()
 		items.sort(key=itemgetter(0))
 		items +=[is_selected,is_extremal_a,pass_thr]
@@ -625,17 +619,17 @@ def save_statistics_to_files(initial_assembly_graph,assembly_graph,all_alignment
 
 		in_assembly_graph=len([x for x in initial_assembly_graph.GRAPH.nodes(data=True) if x[1]['contig']==c])
 		in_final_assembly_graph=len([x for x in assembly_graph.GRAPH.nodes(data=True) if x[1]['contig']==c])
-		items=(c,all_contigs[c],get_assembler_name(c),c in included_contigs, c in selected_contigs_c,c in selected_single_contigs_c,c in single_contigs,contig_tally[c],in_path,in_selected_path,in_path_idx,idx_in_selected_path,in_selected_path,in_final_assembly_graph)
+		items=(c,all_contigs[c],get_assembler_name(c),c in contigs_included_in_other, c in selected_contigs_c,c in selected_single_contigs_c,c in single_contigs,contig_tally[c],in_path,in_selected_path,in_path_idx,idx_in_selected_path,in_selected_path,in_final_assembly_graph)
 		print >>all_contigs_file,",".join(map(str,items))
 	all_alignments_file.close()
 	all_contigs_file.close()
 
 
 def main():
-	global alignments,contigs,included_contigs,aln_threshold,contig_threshold
+	global all_alignments,valid_alignments,cleaned_alignments,contigs,contigs_included_in_other,aln_threshold,ctg_threshold,contigs_with_too_many_alignments,aln_threshold,ctg_threshold
 	parser = OptionParser()
 	parser.add_option("-a", "--aln", dest="aln", help ="the file containing the alignments (.coords)")
-	parser.add_option("-o", "--out", dest="out", help ="the output directory where the scaffolds will be written (it must already exist)") 
+	parser.add_option("-o", "--out", dest="out", help ="the output directory where the scaffolds will be written (it must already exist)",default=None) 
 	parser.add_option("-c", "--ctg", dest="ctg", help ="the file containing all the contigs that were used in the alignment") 
 	parser.add_option("-A", "--ath", dest="ath", help ="minimum length of alignment (optionnal)")
 	parser.add_option("-C", "--cth", dest="cth", help ="minimum length of contig (optionnal)")
@@ -653,7 +647,7 @@ def main():
 	restrict_aligned=options.restrict_aligned
 
 	if cth :
-		contig_threshold = int(cth)
+		ctg_threshold = int(cth)
 		if ath :
 			aln_threshold = int(ath)
 		else :
@@ -661,10 +655,10 @@ def main():
 	else :
 		if ath :
 			aln_threshold = int(ath)
-			contig_threshold = 0
+			ctg_threshold = 0
 
-	alignments,included_alignemnts, contigs, included_contigs = parse_alignments(aln_adr, aln_threshold, contig_threshold)
-	cleaned_alignments=[x for x in included_alignemnts if ((x['TAGQ'] not in included_contigs)and(x['TAGR'] not in included_contigs))]
+	valid_alignments, contigs, contigs_included_in_other = parse_alignments(aln_adr)
+	cleaned_alignments=[x for x in valid_alignments if ((x['TAGQ'] not in contigs_included_in_other)and(x['TAGR'] not in contigs_included_in_other))]
 
 	# We check whether we have contigs with too many alignements. E.g. One of the contigs of CLC consisted of reads that are mapped by MIRA onto k contigs. Once aligned, we have a CLC contig aligned to k MIRA contigs, without any inclusion 
 	contig_tally=collections.defaultdict(int)
@@ -673,37 +667,143 @@ def main():
 		contig_tally[a['TAGR']]+=1
 	mu=scipy.average(contig_tally.values())
 	sigma=scipy.std(contig_tally.values())
-	extreme_contigs = [k for k,v in contig_tally.items() if v>=3*mu]
-	print "Removed contigs with too many alignments:",[contig_tally[k] for k in extreme_contigs]
-	cleaned_alignments=[x for x in cleaned_alignments if ((x['TAGQ'] not in extreme_contigs)and(x['TAGR'] not in extreme_contigs))]
-	included_contigs=list(set(included_contigs).union(extreme_contigs))
-
-
+	contigs_with_too_many_alignments = [k for k,v in contig_tally.items() if v>=3*mu]
+	if len(contigs_with_too_many_alignments):
+		print "Removed contigs with too many alignments:",[contig_tally[k] for k in contigs_with_too_many_alignments]
+	cleaned_alignments=[x for x in cleaned_alignments if ((x['TAGQ'] not in contigs_with_too_many_alignments)and(x['TAGR'] not in contigs_with_too_many_alignments))]
+	contigs_included_in_other=list(set(contigs_included_in_other).union(contigs_with_too_many_alignments))
 
 
 	# Add contigs without any alignement 
-	# contigs['A2_SOAP.C769.1']=12345
-	# included_contigs.append('A2_SOAP.C769.1')
 
 	if not restrict_aligned:
 		handle = open(ctg_adr, "rU")
 		for record in SeqIO.parse(handle, "fasta") :
-			if (record.id in included_contigs) or (record.id in contigs):
+			if (record.id in contigs_included_in_other) or (record.id in contigs):
 				continue
 			found=False
-			for a in alignments:
+			for a in all_alignments:
 				if (a['TAGR']==record.id) or (a['TAGQ']==record.id):
 					found=True
 					break
 			if found:
 				continue
 			contigs[record.id]=len(record.seq)
-			included_contigs.append(record.id)
-			print "DEBUG SAM Added conting ID",record.id
+			# contigs_included_in_other.append(record.id)
+			logger.debug("SAM: Added conting ID %s (not present in alignments)",record.id)
 		handle.close()
 
-	processing(alignments,cleaned_alignments, ctg_adr, output_repository, contig_threshold, aln_threshold, display_dot, display_cytoscape, contigs, included_contigs)
+	processing(cleaned_alignments, ctg_adr, output_repository, ctg_threshold, aln_threshold, display_dot, display_cytoscape, contigs, contigs_included_in_other)
 
+
+
+### Pruning of duplicate contigs 
+### Works by building a coverage graph: for any path p1,p2 (that can consist of a single contig), p1 -> p2 <=> p1 is covered by p2 at more than cv_thr % (default == 65%)
+
+def lower_duplication(paths,selected_single_contigs,cv_thr=0.65):
+	# debug_here()
+	global coverage_scores,coverage_graph,all_alignments
+
+	all_elements=paths+selected_single_contigs
+	# all_elements=paths
+	coverage_scores=scipy.zeros((len(all_elements),len(all_elements)))
+
+	for i in range(len(all_elements)):
+		for j in range(i+1,len(all_elements)):
+			p1=all_elements[i]
+			p2=all_elements[j]
+			cv=coverage(p1,p2)
+			# if cv!=(0,0):
+			# 	print p1,p2,cv
+			# print i,j,cv
+			if cv[0]>cv_thr and cv[1]>cv_thr: #competition 
+				if cv[0]>cv[1]: #p1 is more covered by p2, we add an "inclusion" edge from p1 to p2 
+					coverage_scores[i,j]=cv[0]
+				else:
+					coverage_scores[j,i]=cv[0] # we do it from p2 to p1 
+			elif cv[0]>cv_thr:
+				coverage_scores[i,j]=cv[0]
+			elif cv[1]>cv_thr:
+				coverage_scores[j,i]=cv[1]
+
+	coverage_graph=nx.DiGraph(coverage_scores)
+
+	D=copy.deepcopy(coverage_graph)
+	for n in coverage_graph.node:
+		coverage_graph.node[n]['path']="; ".join([x['contig'] for x in all_elements[n]])
+		coverage_graph.node[n]['is.path']=len([x['contig'] for x in all_elements[n]])>1
+
+	coverage_graph.get_by_contig = lambda x: [(k,v) for k,v in coverage_graph.node.items() if x in v['path']]
+	# Detect elements to remove 
+	somethingChanged=True
+	# Break cycles in the coverage graph
+	# Contrary to the assembly graph, cycles in the coverage graph indicate that each contigs of the SCC 
+	# have similar length (they are all included mutually)
+	# We apply a greedy heuristic: We remove all but the node corresponding to the longest sequence
+	nodes_to_remove=[]
+	nodes_to_contigs=dict({x:coverage_graph.node[x]['path'] for x in coverage_graph})
+	contigs_to_nodes = dict({v:k for k,v in nodes_to_contigs.items()})
+
+	for scc in [x for x in nx.strongly_connected_components(coverage_graph) if len(x) > 1]:
+		# Possible bug: Getting the length of a path does not work 
+		# We can take at most two node with the guarantee to break all cycles, as there's no cycle of length 2 
+		these_contigs=[nodes_to_contigs[x] for x in scc]
+		if len(scc)>2:
+			contigs_with_longest_sequence=sorted([(x,contigs.get(x,100)) for x in these_contigs],key=itemgetter(1))[-2:]
+		else:
+			contigs_with_longest_sequence=sorted([(x,contigs.get(x,100)) for x in these_contigs],key=itemgetter(1))[-2:]
+
+		nodes_to_remove.extend([x for x in scc if nodes_to_contigs[x] not in contigs_with_longest_sequence])
+	if len(nodes_to_remove):
+		logger.debug("Cycle breaking: Removing node batch of size %d for contigs %s",len(nodes_to_remove)," ".join([nodes_to_contigs[x] for x in nodes_to_remove]))
+	contigs_to_remove = set([nodes_to_contigs[x] for x in nodes_to_remove])
+	D.remove_nodes_from(nodes_to_remove)
+
+	#Assert no more cycles 
+	assert(len([x for x in nx.strongly_connected_components(D) if len(x) > 1])==0)
+
+	# Todo: Swith to a topological ordering based solution 
+	while (somethingChanged):
+		somethingChanged=False
+		# print "New iter"
+		for (n,d_in),(n,d_out) in zip(D.in_degree_iter(),D.out_degree_iter()):
+			if (d_in==0) and (d_out >0) :
+				src_ctg=[x['contig'] for x in all_elements[n]]
+				src_assemblers=[x[:2] for x in src_ctg]
+				# logger.debug("Considering node %d for contig %s",n,src_ctg)
+				if len(src_ctg)>1: #is a path, either covered by a path or by a contig
+					# print "is path"
+					logger.debug("%s removed: covered by %s (%s)",src_ctg,D[n],[[y['contig'] for y in all_elements[x]] for x in D[n]])
+					paths[n]=[]
+					D.remove_node(n)
+					coverage_graph.node[n]['removed']="True"
+					somethingChanged=True
+				else:
+					# print "is single"
+					tgt_assemblers=set()
+					covered_by_a_path=False
+					for tgt in D[n]:
+						tgt_ctg=[x['contig'] for x in all_elements[tgt]]
+						if len(tgt_ctg)>1:
+							covered_by_a_path=True
+						tgt_assemblers.update([x[:2] for x in tgt_ctg])
+					coverage_graph.node[n]['removed']="True"
+
+					# if  (not covered_by_a_path):
+					# 	continue
+					# if "A2" in tgt_assemblers:
+					# 	continue
+					logger.debug("%s removed: covered by %s (%s)",src_ctg,D[n],[[y['contig'] for y in all_elements[x]] for x in D[n]])
+
+					# print "removing",src_ctg,"covered by",D[n],"which is",[all_elements[x] for x in D[n]]
+					selected_single_contigs[n-len(paths)]=[]
+					D.remove_node(n)
+					somethingChanged=True
+
+	selected_single_contigs=[path for path in selected_single_contigs if len(path)!=0]
+	selected_single_contigs=[path for path in selected_single_contigs if contigs_to_remove.isdisjoint([c['contig'] for c in path])]
+
+	return paths,selected_single_contigs
 
 def assemble_path_as_intset(path):
 	#Determine for each path the offset to apply to each of its contig for the weaving 
@@ -724,16 +824,16 @@ def assemble_path_as_intset(path):
 	return path_assembly
 
 
-def index_alignment(all_alignments):
-	global indexed_alignments 
-	indexed_alignments={}
+def index_alignments():
+	global alignments_index,all_alignments
+	alignments_index={}
 	for a in all_alignments:
-		if a['TAGQ'] not in indexed_alignments:
-			indexed_alignments[a['TAGQ']]=collections.defaultdict(list)
-		if a['TAGR'] not in indexed_alignments:
-			indexed_alignments[a['TAGR']]=collections.defaultdict(list)
-		indexed_alignments[a['TAGQ']][a['TAGR']].append(a)
-		indexed_alignments[a['TAGR']][a['TAGQ']].append(a)
+		if a['TAGQ'] not in alignments_index:
+			alignments_index[a['TAGQ']]=collections.defaultdict(list)
+		if a['TAGR'] not in alignments_index:
+			alignments_index[a['TAGR']]=collections.defaultdict(list)
+		alignments_index[a['TAGQ']][a['TAGR']].append(a)
+		alignments_index[a['TAGR']][a['TAGQ']].append(a)
 
 def test_indexation():
 	import random
@@ -742,15 +842,16 @@ def test_indexation():
 			al=[a for a in alignments if set([a['TAGQ'],a['TAGR']])==set([c1,c2])]
 			print al
 
-			print indexed_alignments.get(c1,{}).get(c2,[])
-			print indexed_alignments.get(c2,{}).get(c1,[])
+			print alignments_index.get(c1,{}).get(c2,[])
+			print alignments_index.get(c2,{}).get(c1,[])
 			print "--"*12
-			assert len(al)==len(indexed_alignments.get(c1,{}).get(c2,[]))
+			assert len(al)==len(alignments_index.get(c1,{}).get(c2,[]))
 
 
-def coverage(all_alignments,contigs1,contigs2,verbose=False):
+def coverage(contigs1,contigs2,verbose=False):
 
 	#contigs1,contigs2 are assumed to be paths, possibly of lenght 1
+	global all_alignments
 	contigs1_covered=iset.IntSet()
 	contigs2_covered=iset.IntSet()
 	c1_c2_coverage={}
@@ -758,7 +859,7 @@ def coverage(all_alignments,contigs1,contigs2,verbose=False):
 		for c2 in contigs2:
 			# get alignment between them 
 			# al=[a for a in all_alignments if set([a['TAGQ'],a['TAGR']])==set([c1['contig'],c2['contig']])]
-			al=indexed_alignments.get(c1['contig'],{}).get(c2['contig'],[])
+			al=alignments_index.get(c1['contig'],{}).get(c2['contig'],[])
 			if len(al)<1:
 				continue
 			if c1['contig'][:2]==c2['contig']:#Same assembler
