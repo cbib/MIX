@@ -18,7 +18,7 @@ from Bio.Alphabet import generic_dna
 
 from IPython.core.debugger import Tracer; debug_here = Tracer()
 
-import graph 
+import graph as graph 
 
 import mummerParser
 
@@ -133,7 +133,7 @@ def parse_alignments (file_adr, aln_threshold, ctg_threshold):
 
 		if (aln_pass_thresholds(aln,aln_threshold,ctg_threshold)) and (not reverse_is_in_alignments(aln, alignments)) and (is_extremal(aln)):
 			alignments.append(aln)
-	print "list of contigs "+str(contigs),"included:",included_contigs
+	#print "list of contigs "+str(contigs),"included:",included_contigs
 
 	return all_alignments,alignments, contigs, included_contigs
 
@@ -231,6 +231,8 @@ def select_single_contigs_of_one_assembly (paths, single_contigs, contigs) :
 def select_single_contigs_of_one_assembly_byL50 (paths, single_contigs, contigs) :
 	### DEBUG SAM: If we use the L50 criterion, then it's the min L50 that we should choose, not the max as Florence coded!
 	### DEBUGGED 
+	if len(single_contigs)<1:
+		return single_contigs
 	sorted_contigs_length_lists_by_assembler = {}
 	total_length_by_assembler = {}
 	for s in single_contigs : 
@@ -342,93 +344,63 @@ def print_stats(paths, single_contigs, contigs):
 		else : 
 			print "\t"+str(length_of_parts_from_each_assembly[a]+length_of_contigs_from_each_assembly[a])+" bp"
 		
-def remove_included_contigs_in_paths_from_selected_contigs(paths, selected_single_contigs, alignments, contig_threshold) :
-	cov_threshold = 50 #Debug macha
-	contigs_in_paths = []
-	for p in paths : 
-		for n in p : 
-			contigs_in_paths.append(n["contig"])
-	contigs_included = []
-	contigs_not_included = list(selected_single_contigs)
-	for s in selected_single_contigs : 
-		contig_name = s[0]["contig"]
-		if is_contig_aligned_with_a_path(cov_threshold, contig_threshold, contig_name, paths, alignments) : 
-				contigs_included.append(s)
-	for i in contigs_included : 
-		if i in contigs_not_included :
-			contigs_not_included.remove(i)
-	return contigs_not_included
+# def remove_included_contigs_in_paths_from_selected_contigs(paths, selected_single_contigs, alignments, contig_threshold) :
+# 	cov_threshold = 50 #Debug macha
+# 	contigs_in_paths = []
+# 	for p in paths : 
+# 		for n in p : 
+# 			contigs_in_paths.append(n["contig"])
+# 	contigs_included = []
+# 	contigs_not_included = list(selected_single_contigs)
+# 	for s in selected_single_contigs : 
+# 		contig_name = s[0]["contig"]
+# 		if is_contig_aligned_with_a_path(cov_threshold, contig_threshold, contig_name, paths, alignments) : 
+# 				contigs_included.append(s)
+# 	for i in contigs_included : 
+# 		if i in contigs_not_included :
+# 			contigs_not_included.remove(i)
+# 	return contigs_not_included
 
-def is_contig_aligned_with_a_path(cov_threshold, contig_threshold, contig, paths, alignments):
-	cov_sum_by_ctg = {}
-	# debug_here()
-	# if contig=="A2_SOAP.scaffold8.1":
-	# 	debug_here()
-	for a in alignments :
-		# if ("A2_SOAP.scaffold8.1" == a['TAGR']) or ("A2_SOAP.scaffold8.1" == a['TAGQ']):
-		# 	debug_here()
-		if (a["TAGR"] == contig) and (find_contig_in_paths(paths, a["TAGQ"])!=None): 
-			if ((a["COVR"] >= cov_threshold) or ((a["LENR"] - a["LEN1"]) < contig_threshold*2)) :
-				return True
-			elif a["TAGQ"] in cov_sum_by_ctg.keys() : 
-				cov_sum_by_ctg[a["TAGQ"]] += float(a["COVR"])
-			else : 
-				cov_sum_by_ctg[a["TAGQ"]] = float(a["COVR"])
-		elif (a["TAGQ"] == contig) and (find_contig_in_paths(paths, a["TAGR"])!=None): 
-			if ((a["COVQ"] >= cov_threshold) or ((a["LENQ"] - a["LEN2"]) < contig_threshold*2)) :
-				return True
-			elif a["TAGR"] in cov_sum_by_ctg.keys() : 
-				cov_sum_by_ctg[a["TAGR"]] += float(a["COVQ"])
-			else : 
-				cov_sum_by_ctg[a["TAGR"]] = float(a["COVQ"])
-	# debug_here()
-	print cov_sum_by_ctg
-	for path_nb in range(len(paths)) :
-		for p in paths[path_nb] : 
-			p_cov_sum = 0
-			p_id = p["contig"]
-			if p_id in cov_sum_by_ctg.keys() : 
-				p_cov_sum += cov_sum_by_ctg[p_id]
-			if (p_cov_sum > cov_threshold) : 
-				return True
-	return False
+# def is_contig_aligned_with_a_path(cov_threshold, contig_threshold, contig, paths, alignments):
+# 	cov_sum_by_ctg = {}
+# 	# debug_here()
+# 	# if contig=="A2_SOAP.scaffold8.1":
+# 	# 	debug_here()
+# 	for a in alignments :
+# 		# if ("A2_SOAP.scaffold8.1" == a['TAGR']) or ("A2_SOAP.scaffold8.1" == a['TAGQ']):
+# 		# 	debug_here()
+# 		if (a["TAGR"] == contig) and (find_contig_in_paths(paths, a["TAGQ"])!=None): 
+# 			if ((a["COVR"] >= cov_threshold) or ((a["LENR"] - a["LEN1"]) < contig_threshold*2)) :
+# 				return True
+# 			elif a["TAGQ"] in cov_sum_by_ctg.keys() : 
+# 				cov_sum_by_ctg[a["TAGQ"]] += float(a["COVR"])
+# 			else : 
+# 				cov_sum_by_ctg[a["TAGQ"]] = float(a["COVR"])
+# 		elif (a["TAGQ"] == contig) and (find_contig_in_paths(paths, a["TAGR"])!=None): 
+# 			if ((a["COVQ"] >= cov_threshold) or ((a["LENQ"] - a["LEN2"]) < contig_threshold*2)) :
+# 				return True
+# 			elif a["TAGR"] in cov_sum_by_ctg.keys() : 
+# 				cov_sum_by_ctg[a["TAGR"]] += float(a["COVQ"])
+# 			else : 
+# 				cov_sum_by_ctg[a["TAGR"]] = float(a["COVQ"])
+# 	# debug_here()
+# 	print cov_sum_by_ctg
+# 	for path_nb in range(len(paths)) :
+# 		for p in paths[path_nb] : 
+# 			p_cov_sum = 0
+# 			p_id = p["contig"]
+# 			if p_id in cov_sum_by_ctg.keys() : 
+# 				p_cov_sum += cov_sum_by_ctg[p_id]
+# 			if (p_cov_sum > cov_threshold) : 
+# 				return True
+# 	return False
 
 
 			
-def get_path_len(path):
-	path_len = 0
-	for ctg in path : 
-		path_len += abs(ctg["end"] - ctg["start"])
-	return path_len
 
-def remove_paths_included_in_selected_contigs(paths, contigs, alignments) :
-	paths_included = []
-	paths_not_included = list(paths)
-	for path in paths : 
-		if is_path_aligned_with_a_contig (path, alignments) :
-			paths_included.append(path)
-	for i in paths_included : 
-		if i in paths_not_included :
-			paths_not_included.remove(i)
-	return paths_not_included
-	
-def is_path_aligned_with_a_contig (path, alignments):
-	path_len = get_path_len(path)
-	ctg_aligned_with_path = collections.defaultdict(set)
-	for ctg_ext in path : 
-		contig_name = ctg_ext["contig"]
-		for a in alignments :
-			if (a["TAGR"] == contig_name) and (a["LENQ"] > path_len) : 
-				ctg_aligned_with_path[a["TAGQ"]].add(a["TAGR"])
-			elif (a["TAGQ"] == contig_name) and (a["LENR"] > path_len) : 
-				ctg_aligned_with_path[a["TAGR"]].add(a["TAGQ"])
-	debug_here()
-	for ctg_aln in ctg_aligned_with_path.keys() : 
-		if len(ctg_aligned_with_path[ctg_aln]) == len(path) : 
-			return True
-	return False
 
 def lower_duplication(paths,selected_single_contigs,cv_thr=0.65):
+	# debug_here()
 	all_elements=paths+selected_single_contigs
 	# all_elements=paths
 	scores=scipy.zeros((len(all_elements),len(all_elements)))
@@ -438,6 +410,8 @@ def lower_duplication(paths,selected_single_contigs,cv_thr=0.65):
 			p1=all_elements[i]
 			p2=all_elements[j]
 			cv=coverage(alignments,p1,p2)
+			# if cv!=(0,0):
+			# 	print p1,p2,cv
 			# print i,j,cv
 			if cv[0]>cv_thr and cv[1]>cv_thr: #competition 
 				if cv[0]>cv[1]: #p1 is more covered by p2, we add an "inclusion" edge from p1 to p2 
@@ -454,20 +428,21 @@ def lower_duplication(paths,selected_single_contigs,cv_thr=0.65):
 	somethingChanged=True
 	while (somethingChanged):
 		somethingChanged=False
-		print "New iter"
+		# print "New iter"
 		for (n,d_in),(n,d_out) in zip(D.in_degree_iter(),D.out_degree_iter()):
 			if (d_in==0) and (d_out >0) :
 				src_ctg=[x['contig'] for x in all_elements[n]]
 				src_assemblers=[x[:2] for x in src_ctg]
 				# print n,src_assemblers,src_ctg
 				if len(src_ctg)>1: #is a path, either covered by a path or by a contig
-					print "removing",src_ctg
+					# print "is path"
+					# print "removing",src_ctg,"covered by",D[n],"which is",[all_elements[x] for x in D[n]]
 					paths[n]=[]
 					D.remove_node(n)
 					somethingChanged=True
 				else:
+					# print "is single"
 					tgt_assemblers=set()
-					# print "considering",src_ctg
 					covered_by_a_path=False
 					for tgt in D[n]:
 						tgt_ctg=[x['contig'] for x in all_elements[tgt]]
@@ -479,7 +454,7 @@ def lower_duplication(paths,selected_single_contigs,cv_thr=0.65):
 					# 	continue
 					# if "A2" in tgt_assemblers:
 					# 	continue
-					print "removing",src_ctg,tgt_assemblers
+					# print "removing",src_ctg,"covered by",D[n],"which is",[all_elements[x] for x in D[n]]
 					selected_single_contigs[n-len(paths)]=[]
 					D.remove_node(n)
 					somethingChanged=True
@@ -522,7 +497,7 @@ def processing (all_alignments,alignments, contigs_file, output_base, contig_thr
 
 	# Make the extensions
 	paths = graph_assembly.select_extensions(contigs)
-	debug_here()
+#	debug_here()
 
 	if display_dot : 
 		graph_assembly.write_dot_graph(output_dir+"/graph2.dot")

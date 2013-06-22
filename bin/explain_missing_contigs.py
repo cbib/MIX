@@ -65,9 +65,9 @@ def parse_mummerFile (file_adr):
 
 
 
-mix_output= "~/Documents/MIX/Mix-1.1/outRhodo_APSPBB_no_removal/Mix_results_A125_C0/Mix_assembly.fasta"
-soap="~/Documents/MIX/Rhodobacter_Assembly/SOAPdenovo/genome.ctg.fasta"
-coords_file = "~/Documents/MIX/AllpathSoapBambus.coords"
+mix_output= "result_assemblies/rhodo_AP_SP_mix.fasta"
+soap="datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta"
+coords_file = "temp_assemblies/rhodo_AP_BB_SP.coords"
 mix_line_re = re.compile(">\d+(.*)")
 mix_line_re_2 = re.compile(">\d+_A\d_\w+\.(.*)")
 mix_line_re_3 = re.compile("A\d_\w+\.(.*)")

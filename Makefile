@@ -5,8 +5,8 @@
 ###
 
 pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/python
-pyinterp:=python
 pyinterp:= /Library/Frameworks/Python.framework/Versions/Current/bin/ipython -i --
+pyinterp:=python
 MUMmer:=$(shell pwd)/bin/MUMmer3.23/
 MIXPARAMS:=-A 500 -C 0
 MIXPARAMSFOLDER:=A500_C0
@@ -187,6 +187,19 @@ clean_for_git:
 
 
 
+rhodoExpansion: temp_assemblies/rhodo_AP_BB_SP.coords
+	bin/nucmer_coords_filter.py temp_assemblies/rhodo_AP_BB_SP.coords A1_119 A3_scaffold13.3 A3_scaffold13.5 > temp_assemblies/TEST_rhodoExpansion.coords
+	# Display original input
+	bin/display_coords.py temp_assemblies/TEST_rhodoExpansion.coords
+	# Execute mix
+	$(pyinterp) bin/Mix.py --graph -r -a temp_assemblies/TEST_rhodoExpansion.coords -o TEST_rhodoExpansion -c temp_assemblies/rhodo_AP_BB_SP.fasta -A 125 -C 0
+	# Check the resulting assembly with nucmer 
+	bin/MUMmer3.23/nucmer -p "TEST_rhodoExpansion_assembly" --maxmatch -l 30 -banded TEST_rhodoExpansion/Mix_results_A125_C0/Mix_assembly.fasta TEST_rhodoExpansion/Mix_results_A125_C0/Mix_assembly.fasta 2> /dev/null
+	../MUMmer3.23/show-coords -l -c TEST_rhodoExpansion_assembly.delta > TEST_rhodoExpansion_assembly.coords
+	cat TEST_rhodoExpansion_assembly.coords
+	./display_coords.py TEST_rhodoExpansion_assembly.coords
+	./compute_n50.pl TEST_rhodoExpansion/Mix_results_A125_C0/Mix_assembly.fasta
+
 
 
 
@@ -326,18 +339,6 @@ result_assemblies/%_mix.fasta: temp_assemblies/%.coords temp_assemblies/%.fasta 
 # 	# ./nucmer_coords_filter.py TEST_rhodov2.coords -p -s "*" 
 
 
-# rhodoExpansion: ../AllpathSoapBambus_v2.coords
-# 	./nucmer_coords_filter.py ../AllpathSoapBambus_v2.coords A1_ALLPATH.119 A2_SOAP.scaffold13.3 A2_SOAP.scaffold13.5 > ../TEST_rhodoExpansion.coords
-# 	# Display original input
-# 	./display_coords.py ../TEST_rhodoExpansion.coords
-# 	# Execute mix
-# 	$(pyinterp) Mix.py --graph -r -a ../TEST_rhodoExpansion.coords -o TEST_rhodoExpansion -c ../contigs.AllpathSoapBambus.fa -A 125 -C 0
-# 	# Check the resulting assembly with nucmer 
-# 	../MUMmer3.23/nucmer -p "TEST_rhodoExpansion_assembly" --maxmatch -l 30 -banded TEST_rhodoExpansion/Mix_results_A125_C0/Mix_assembly.fasta TEST_rhodoExpansion/Mix_results_A125_C0/Mix_assembly.fasta 2> /dev/null
-# 	../MUMmer3.23/show-coords -l -c TEST_rhodoExpansion_assembly.delta > TEST_rhodoExpansion_assembly.coords
-# 	cat TEST_rhodoExpansion_assembly.coords
-# 	./display_coords.py TEST_rhodoExpansion_assembly.coords
-# 	./compute_n50.pl TEST_rhodoExpansion/Mix_results_A125_C0/Mix_assembly.fasta
 
 # Aureus_AP_SOAP_BB.fasta: ../Aureus_Assembly/Allpaths-LG/AP_genome.ctg.fasta ../Aureus_Assembly/SOAPdenovo/SOAP_genome.ctg.fasta ../Aureus_Assembly/Bambus2/genome.ctg.fasta
 # 	./preprocessing.py ../Aureus_Assembly/Allpaths-LG/AP_genome.ctg.fasta ../Aureus_Assembly/SOAPdenovo/SOAP_genome.ctg.fasta ../Aureus_Assembly/Bambus2/genome.ctg.fasta  -o ../Aureus_AP_SOAP_BB.fasta

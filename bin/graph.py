@@ -1,4 +1,5 @@
 import re
+import copy
 #from Bio.Seq import Seq
 #from Bio.Alphabet import generic_dna
 import sys
@@ -21,8 +22,9 @@ class graph ():
 		self.GRAPH.add_node("In", contig="In", bi="None", sens="None", coords="None")
 		self.GRAPH.add_node("Out", contig="Out", bi="None", sens="None", coords="None")	
 		self.append_alignments(alignments, contigs, included_contigs)
+
 		# debug_here()
-		self.remove_cycles()
+		#self.remove_cycles()
 
 ### Construction of the graph ####################################################################
 
@@ -237,19 +239,41 @@ class graph ():
 
 ### Path selection ##############################################################################################
 
-	def select_extensions (self, contigs) : 
-		graph_copy = self.GRAPH.copy()
-		longuest_paths = []
-		while len(graph_copy.nodes()) > 2 : 
-			print "longuest_path", len(graph_copy.nodes())
-			longuest_path = self.longuest_path_in_G (graph_copy)
-			longuest_paths.append(longuest_path)
-			self.remove_path_in_a_graph (graph_copy, longuest_path)
-		print longuest_paths
-		for p in longuest_paths : 
+	# def select_extensions (self, contigs) : 
+	# 	self.remove_cycles()
+	# 	graph_copy = self.GRAPH.copy()
+	# 	longest_paths = []
+	# 	while len(graph_copy.nodes()) > 2 : 
+	# 		print "longest_path", len(graph_copy.nodes())
+	# 		longest_path = self.longest_path_in_G (graph_copy)
+	# 		longest_paths.append(longest_path)
+	# 		self.remove_path_in_a_graph (graph_copy, longest_path)
+	# 	print longest_paths
+	# 	for p in longest_paths : 
+	# 		for n in p :
+	# 			self.GRAPH.node[n]["selected"]="True"
+	# 	return self.simplify_paths (longest_paths, contigs)
+
+	def select_extensions(self,contigs):
+		if len(self.GRAPH)==2: # No alignments! just bail
+			print "alignment graph is empty,bailing out"
+			return []
+		### Test novel longest_path calculation 
+		mix_graph,mapping,inv_mapping = prepare_mix_graph(copy.copy(self.GRAPH))
+		acyclic_graph = remove_all_cycles(mix_graph)
+		longest_paths = maximal_independant_longest_path_for_acyclic_graph(acyclic_graph,inv_mapping)
+#		debug_here()
+		print longest_paths
+		for p in longest_paths : 
 			for n in p :
 				self.GRAPH.node[n]["selected"]="True"
-		return self.simplify_paths (longuest_paths, contigs)
+
+		# DEBUG: Does she expect all paths to ber inversed ?
+		longest_paths_inversed=[]
+		for p in longest_paths:
+			p.reverse()
+			longest_paths_inversed.append(p)
+		return self.simplify_paths(longest_paths, contigs)
 
 	def simplify_paths (self, paths, contigs) : 
 		new_paths = []
@@ -317,16 +341,16 @@ class graph ():
 				G.remove_node(ng)
 		print "removed contigs "+str(contigs_to_remove)
 
-	def longuest_path_in_G (self, G) : 
+	def longest_path_in_G (self, G) : 
 		adjacency_matrix = self.get_adjacency_matrix_of_the_graph(G)
 		#FW_predecessors, FW_weigth = self.Floyd_Warshall(adjacency_matrix)
 		FW_predecessors = self.Floyd_Warshall(adjacency_matrix)
 		del adjacency_matrix
-		longuest_path = self.extract_longuest_path_from_FW(FW_predecessors)#, FW_weigth)
+		longest_path = self.extract_longest_path_from_FW(FW_predecessors)#, FW_weigth)
 		del FW_predecessors
-		return longuest_path
+		return longest_path
 
-	def extract_longuest_path_from_FW(self, FW_predecessors):#, FW_weigth ) :
+	def extract_longest_path_from_FW(self, FW_predecessors):#, FW_weigth ) :
 		n1, n2 = "In", "Out"
 		path = []
 		while (n2 != "In") : 
@@ -431,3 +455,276 @@ class graph ():
 			length = str(self.GRAPH.edge[n1][n2]["length"])
 			network_file.write(str(n1)+"\t"+str(n2)+"\t"+length+"\n")
 		network_file.close()
+
+
+
+### Longest path using SCC decomposition 
+
+def bounded_bfs_paths(G,sources,max_depth=None):
+	"""Produce edges in a breadth-first-search starting at source."""
+	visited=set(sources)
+	depth=0
+	stack = []
+	for source in sources:
+		stack.append((source,iter(G[source]),depth,[source]))
+	while stack:
+		# print stack
+		parent,children,last_depth,path = stack[0]
+		depth=last_depth+1
+		if (max_depth) and (depth > max_depth):
+			break
+		try:
+			child = next(children)
+			# if child not in visited:
+#			yield parent,child
+#			visited.add(child)
+			if child not in path :
+				yield path+[child]
+				stack.append((child,iter(G[child]),depth,path+[child]))
+		except StopIteration:
+			stack.pop(0)
+
+
+def prepare_mix_graph(g_dir):
+	for src,tgt,mdata in g_dir.edges(data=True):
+		g_dir[src][tgt]['weight']=mdata.get("length")
+
+
+	# Build mapping to rename nodes
+	mapping = {}
+	for k in g_dir.node.keys():
+		if type(k)==type((1,)): # If tuples are used to label nodes:
+			mapping[k]="_".join(map(str,k))
+		else:
+			mapping[k]=str(k)
+
+	inputs_nodes = [k for k,v in g_dir.in_degree().items() if v==0]
+	outputs_nodes = [k for k,v in g_dir.out_degree().items() if v==0]
+	assert(len(inputs_nodes) ==1)
+	assert(len(outputs_nodes) ==1)
+
+	for an_in in inputs_nodes:
+		g_dir.node[an_in]['In']=True
+	for an_out in outputs_nodes:
+		g_dir.node[an_out]['Out']=True
+
+	mapping[inputs_nodes[0]]="In"
+	mapping[outputs_nodes[0]]="Out"
+
+	g_dir=nx.relabel_nodes(g_dir,mapping)	
+	return g_dir,mapping, {v:k for k, v in mapping.items()}
+
+
+def remove_cycle(g):
+	# Determine if there are cycles (none for seed 1235)
+	n_scc = [x for x in nx.strongly_connected_component_subgraphs(g) if len(x)>1]
+	if len(n_scc)==0:
+		return g
+	# scc=n_scc[0]
+	# Mark nodes in the SCC 
+	# Transform each SCC into a set of path 
+	g_trans = nx.DiGraph(g)
+	scc=n_scc[0] #take the largest 
+	# Inputs are all the nodes from the scc having predecessors not in the scc, or nodes marked as inputs and part of the SCC 
+	inputs=set()
+	# Outputs are all the nodes from the scc having sucessors not in the scc, or nodes marked as outputs and part of the SCC 
+	outputs=set()
+
+	for n in scc:
+		# Inputs 
+		outside=set(g.predecessors(n)).difference(scc.nodes())
+		for o in outside:
+			inputs.add((o,n))
+
+	for n in scc:
+		# Inputs 
+		outside=set(g.successors(n)).difference(scc.nodes())
+		for o in outside:
+			outputs.add((n,o))
+
+	inputs=list(inputs)
+	outputs=list(outputs)
+
+	# Generate all paths between nodes in input and nodes in output 
+	inputs_scc= list(set([x[1] for x in inputs]))
+	outputs_scc= list(set([x[0] for x in outputs]))
+	# We add nodes of the SCC that are labeled as I or O 
+
+	inputs_scc=list(set(inputs_scc).union([k for k,v in scc.node.items() if ("In" in v) ]))
+	outputs_scc=list(set(outputs_scc).union([k for k,v in scc.node.items() if ("Out" in v)]))
+	# We only consider paths ending in outputs nodes that are not input nodes 
+	all_paths = [path for path in bounded_bfs_paths(scc,inputs_scc,len(scc)+1) if path[-1] in outputs_scc]
+	print "Found",len(all_paths),"paths"
+
+	# Replace the SCC with all paths 
+	g_trans.remove_nodes_from(scc)
+	# Two path cannot share a node (if not, we can't guarantee we do not re-introduce shorter cycles)
+	for idx in range(len(all_paths)):
+	# for p in all_paths:
+		if (len(all_paths)>5000) and ((idx%100)==0):
+			print "\tProcessed",idx,"paths"
+		p=all_paths[idx]
+
+		p_renamed= [x+"@"+str(idx) for x in p]
+		g_trans.add_path(p_renamed)
+		# Copy nodes and edges attributes from the original graph 
+		for i in range(0,len(p)-1):
+			src,tgt=p[i],p[i+1]
+			src_r,tgt_r=p_renamed[i],p_renamed[i+1]
+			g_trans[src_r][tgt_r].update(g[src][tgt])
+			g_trans.node[src_r].update(g.node[src])
+			g_trans.node[tgt_r].update(g.node[tgt])
+		# Reconnect the path to the rest of the graph 
+
+		for i in inputs:
+			src,tgt=i
+			if tgt in p:
+				tgt_in_p=tgt+"@"+str(idx)
+				g_trans.add_edge(src,tgt_in_p)
+				g_trans[src][tgt_in_p].update(g[src][tgt])
+		for o in outputs:
+			src,tgt=o
+			if src not in p:
+				continue
+			src_in_p= src+"@"+str(idx)
+			g_trans.add_edge(src_in_p,tgt)
+			g_trans[src_in_p][tgt].update(g[src][tgt])
+	return g_trans
+
+def remove_all_cycles(g):
+	n_scc = [x for x in nx.strongly_connected_component_subgraphs(g) if len(x)>1]
+	if len(n_scc)>0:
+		print "Found",len(n_scc),"cycles, largest one of size",len(n_scc[0])
+	else:
+		print "No cycles"
+		return g
+	# Color them 
+	for ccc_idx  in range(len(n_scc)): 
+		for node in n_scc[ccc_idx].nodes():
+			g.node[node]['in_scc']=ccc_idx
+
+	#sys.exit(0)
+	g_p=g
+	for i in range(1,1000): #Up to a thousand iteration
+
+		g_n= remove_cycle(g_p)
+		if g_n.number_of_edges() == g_p.number_of_edges():
+			break
+	#	assert("10_4" in g_n)
+		g_p=g_n
+		n_scc_i = [x for x in nx.strongly_connected_component_subgraphs(g_p) if len(x)>1]
+		print "Still",len(n_scc_i),"cycles"
+
+	g_trans=g_p
+	# Assert graph is acyclic 
+	assert(max([len(x) for x in nx.strongly_connected_components(g_trans)])==1)
+
+	return g_trans
+
+
+
+def maximal_independant_longest_path_for_acyclic_graph(acyclic_graph,inv_mapping={}):
+	# Compute longest-path-acyclic 
+	g_dir_trans_io = nx.DiGraph(acyclic_graph)
+
+
+	# After the cycle reduction, some nodes might have disappeared : 
+	# This can happen in cases where we had a SCC but without inputs. Once this SCC is removed, some nodes might not have predecessors anymore 
+	# We thus connect these nodes without pred back to the In node
+
+	for inp in [x for x,v in g_dir_trans_io.node.items() if ("In" in v) and (x!="In")]+[x for x,v in g_dir_trans_io.in_degree().items() if (v==0) and (x!="In")]:
+		g_dir_trans_io.add_edge("In",inp,attr_dict={"weight":0})
+
+	for inp in [x for x,v in g_dir_trans_io.node.items() if ("Out" in v) and (x!="Out")]+[x for x,v in g_dir_trans_io.out_degree().items() if (v==0) and (x!="Out")]:
+		g_dir_trans_io.add_edge(inp,"Out",attr_dict={"weight":0})
+
+	nodes_in_order = nx.topological_sort(g_dir_trans_io)
+	# The sort should start and end with resp. In and Out
+	assert(nodes_in_order[0]=="In")
+	assert(nodes_in_order[-1]=="Out")
+
+	# Update each node attributes with the accumulated length from the beginning 
+	# Q? Should we store each path separately or a greedy alg is ok? trying greedy 
+	# Q? How to deal with mulitple equivalent paths ?
+
+	for n in g_dir_trans_io:
+		g_dir_trans_io.node[n]['in_longest']="False"
+	for src,tgt in g_dir_trans_io.edges():
+		g_dir_trans_io[src][tgt]["in_longest"]="False"
+
+	all_longest_path_trans_io = []
+	nodes_in_any_longest_path = set()
+
+	inputs_nodes = [k for k,v in g_dir_trans_io.in_degree().items() if v==0]
+	inputs_nodes.extend([x for x,v in g_dir_trans_io.node.items() if "In" in v])
+	outputs_nodes = [k for k,v in g_dir_trans_io.out_degree().items() if v==0]
+	outputs_nodes.extend([x for x,v in g_dir_trans_io.node.items() if "Out" in v])
+
+
+
+	# Todo: Account for contig ID in longest path
+	for long_path_index in range(0,2000):
+		# Clear all longest path info 
+		print "longest path iteration",long_path_index
+		# print nodes_in_any_longest_path
+
+		for n in g_dir_trans_io.node.keys():
+			if "longest_path" in g_dir_trans_io[n]:
+				del g_dir_trans_io[n]['longest_path']
+
+		#Init
+		g_dir_trans_io.node['In']['longest_path']=[0,[]]
+		for n in nodes_in_order[1:]:
+			contig = g_dir_trans_io.node[n].get("contig",n)
+			if contig in nodes_in_any_longest_path:
+				continue
+
+			pred = [x for x in g_dir_trans_io.predecessors(n) if g_dir_trans_io.node[x].get("contig",x) not in nodes_in_any_longest_path]
+
+			if len(pred)==0: 
+				# This can happen in cases where we had a SCC but without inputs. Once this SCC is removed, some nodes might not have predecessors anymore 
+				longest_path=[0,[]]
+			else:
+				longest_path= [(g_dir_trans_io.node[pred[0]]['longest_path'][0] + g_dir_trans_io[pred[0]][n]['weight']),\
+							pred[0]]
+			for p in pred:
+				if (g_dir_trans_io.node[p]['longest_path'][0]+ g_dir_trans_io[p][n]['weight']) > longest_path[0]:
+					longest_path= [(g_dir_trans_io.node[p]['longest_path'][0]+ g_dir_trans_io[p][n]['weight']),p]
+			g_dir_trans_io.node[n]['longest_path']=longest_path
+
+
+		# Rebuild the longest path, starting from "Out" up to "In" in predecessor order 
+		current_node = "Out"
+		longest_path_trans_io = []
+		while (current_node != "In") and current_node!=[]: 
+			longest_path_trans_io.append((current_node,g_dir_trans_io.node[current_node]["longest_path"][0]))
+			current_node=g_dir_trans_io.node[current_node]['longest_path'][1]
+		if current_node==[]:
+			break
+		longest_path_trans_io.append((current_node,g_dir_trans_io.node[current_node]["longest_path"][0]))
+		longest_path_trans_io.reverse()
+
+		print longest_path_trans_io
+		print [g_dir_trans_io.node[x[0]].get("contig",x[0]) for x in longest_path_trans_io]
+		if len(longest_path_trans_io)<=2: # only in and out?
+			break
+		all_longest_path_trans_io.append(longest_path_trans_io)
+
+		# Mark this path in the graph
+
+		g_dir_trans_io.node['Out']['in_longest']="True"
+
+
+		for i in range(0, len(longest_path_trans_io)-1):
+			n = longest_path_trans_io[i][0]
+			g_dir_trans_io.node[n]['in_longest']=long_path_index
+			g_dir_trans_io[longest_path_trans_io[i][0]][longest_path_trans_io[i+1][0]]['in_longest']=long_path_index
+			# debug_here()
+			if (n not in ["In","Out"]):
+				nodes_in_any_longest_path.add(g_dir_trans_io.node[n]['contig'])
+	# Trasnform the longest path into the original graph IDs
+	original_longest_paths=[]
+	for a_lp in all_longest_path_trans_io:
+		lp = [inv_mapping.get(x[0].split("@")[0],x[0].split("@")[0]) for x in a_lp]
+		original_longest_paths.append(lp)
+	return original_longest_paths

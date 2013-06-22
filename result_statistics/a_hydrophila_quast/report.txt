@@ -1,30 +1,30 @@
 All statistics are based on contigs of size >= 500 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
 
 Assembly                   a_hydrophila_AB_SP_mix  a_hydrophila_AB_MS_mix  a_hydrophila_MS_SP_mix  a_hydrophila_AB_MS_SP_mix  abyss_ctg      soap_ctg       msrca_ctg    
-# contigs (>= 0 bp)        62                      22                      21                      20                         174            216            32           
-# contigs (>= 1000 bp)     29                      20                      19                      18                         52             36             25           
-Total length (>= 0 bp)     4894914                 4984270                 4905542                 4905969                    4985428        4915552        4915618      
-Total length (>= 1000 bp)  4886104                 4983260                 4904532                 4904959                    4967717        4885465        4912397      
-# contigs                  33                      21                      20                      19                         54             41             28           
+# contigs (>= 0 bp)        62                      22                      21                      21                         174            216            32           
+# contigs (>= 1000 bp)     29                      20                      19                      19                         52             36             25           
+Total length (>= 0 bp)     4894865                 5085659                 4905542                 5472299                    4985428        4915552        4915618      
+Total length (>= 1000 bp)  4886055                 5084649                 4904532                 5471289                    4967717        4885465        4912397      
+# contigs                  33                      21                      20                      20                         54             41             28           
 Largest contig             693478                  1124684                 2027059                 2027059                    654090         455879         1124684      
-Total length               4888851                 4983957                 4905229                 4905656                    4969260        4888841        4914380      
+Total length               4888802                 5085346                 4905229                 5471986                    4969260        4888841        4914380      
 Reference length           4744448                 4744448                 4744448                 4744448                    4744448        4744448        4744448      
-GC (%)                     61.61                   61.60                   61.62                   61.62                      61.53          61.61          61.61        
+GC (%)                     61.61                   61.63                   61.62                   61.57                      61.53          61.61          61.61        
 Reference GC (%)           61.55                   61.55                   61.55                   61.55                      61.55          61.55          61.55        
 N50                        289662                  828647                  862315                  1021795                    237457         243851         828647       
 NG50                       301462                  828647                  862315                  1021795                    237457         243851         828647       
-N75                        165019                  245339                  301891                  301891                     121603         136903         235264       
-NG75                       166323                  301891                  301891                  301891                     122207         165019         245339       
-# misassemblies            49                      50                      51                      50                         34             37             50           
-# local misassemblies      33                      29                      25                      25                         26             25             29           
-# unaligned contigs        5 + 10 part             0 + 9 part              0 + 10 part             0 + 10 part                12 + 20 part   6 + 15 part    2 + 12 part  
-Unaligned contigs length   1306559                 1653112                 1790669                 1798360                    2070476        2201724        1592165      
-Genome fraction (%)        14.724                  13.723                  14.037                  14.016                     14.887         14.776         13.685       
-Duplication ratio          5.123                   5.116                   4.677                   4.673                      4.081          3.827          5.114        
+N75                        165019                  245339                  301891                  495503                     121603         136903         235264       
+NG75                       166323                  301891                  301891                  611407                     122207         165019         245339       
+# misassemblies            51                      51                      50                      53                         34             37             50           
+# local misassemblies      32                      29                      27                      30                         26             25             29           
+# unaligned contigs        5 + 10 part             0 + 9 part              0 + 10 part             1 + 10 part                12 + 20 part   6 + 15 part    2 + 12 part  
+Unaligned contigs length   1307327                 1753032                 1790700                 1859591                    2070476        2201858        1592134      
+Genome fraction (%)        14.705                  13.713                  18.401                  13.096                     14.887         14.773         13.686       
+Duplication ratio          5.128                   5.122                   3.568                   5.814                      4.081          3.827          5.114        
 # N's per 100 kbp          1.84                    0.00                    0.00                    0.00                       1.83           0.00           0.00         
-# mismatches per 100 kbp   4179.94                 4169.65                 4181.49                 4187.96                    4137.56        4162.84        4175.35      
-# indels per 100 kbp       187.83                  177.16                  187.86                  186.54                     207.70         190.03         177.68       
-# genes                    603 + 63 part           564 + 63 part           580 + 64 part           578 + 64 part              601 + 67 part  604 + 63 part  564 + 66 part
+# mismatches per 100 kbp   4179.64                 4171.60                 4179.92                 4186.98                    4137.56        4162.84        4175.35      
+# indels per 100 kbp       174.06                  179.19                  170.73                  181.30                     207.70         190.03         177.68       
+# genes                    599 + 64 part           566 + 61 part           772 + 60 part           536 + 61 part              601 + 67 part  602 + 64 part  564 + 66 part
 Largest alignment          52419                   52419                   52419                   52419                      52419          52419          52419        
 NA50                       None                    None                    None                    None                       None           None           None         
 NGA50                      None                    None                    None                    None                       None           None           None         
