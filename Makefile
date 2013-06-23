@@ -136,7 +136,7 @@ result_statistics/a_hydrophila_quast: \
 	$(HYDROPHILA)/mira_ctg.fasta \
 	$(HYDROPHILA)/spades_ctg.fasta
 	rm -rf result_statistics/a_hydrophila_quast
-	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.fastasta  -G datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.gff $^ 
+	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.fasta  -G datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.gff $^ 
 
 
 # Rules for GAGE-B
