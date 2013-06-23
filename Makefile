@@ -24,10 +24,40 @@ clean:
 # Indicate the dependancies for the concatenated files
 # Using these dependancies, the next rule is fired and the files are concatenated 
 
-temp_assemblies/rhodo_AP_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta
-temp_assemblies/rhodo_AP_BB.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/Bambus2/bambus2.ctg.fasta
-temp_assemblies/rhodo_BB_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Bambus2/bambus2.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta
-temp_assemblies/rhodo_AP_BB_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/Bambus2/bambus2.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta
+
+# Rhodbacter sphaeroides GAGE-B 
+RHODO:=datasets/GAGE-B/R_sphaeroides_HiSeq
+RHODOGAM:=datasets/GAM-NGS/GAGE-B/R_sphaeroides_HiSeq/
+temp_assemblies/rhodo_MS_SOAP.fasta: $(RHODO)/msrca_ctg.fasta $(RHODO)/soap_ctg.fasta
+temp_assemblies/rhodo_MI_MS.fasta: $(RHODO)/mira_ctg.fasta $(RHODO)/msrca_ctg.fasta
+temp_assemblies/rhodo_MI_SOAP.fasta: $(RHODO)/mira_ctg.fasta $(RHODO)/soap_ctg.fasta
+temp_assemblies/rhodo_CBG_SOAP.fasta: $(RHODO)/cabog_ctg.fasta $(RHODO)/soap_ctg.fasta
+temp_assemblies/rhodo_MS_MI_SOAP.fasta: $(RHODO)/msrca_ctg.fasta $(RHODO)/mira_ctg.fasta $(RHODO)/soap_ctg.fasta
+temp_assemblies/rhodo_MS_CBG_SOAP.fasta: $(RHODO)/msrca_ctg.fasta $(RHODO)/cabog_ctg.fasta $(RHODO)/soap_ctg.fasta
+
+# temp_assemblies/rhodo_AP_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta
+# temp_assemblies/rhodo_AP_BB.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/Bambus2/bambus2.ctg.fasta
+# temp_assemblies/rhodo_BB_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Bambus2/bambus2.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta
+# temp_assemblies/rhodo_AP_BB_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/Bambus2/bambus2.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta
+
+result_statistics/rhodo_quast: \
+	result_assemblies/rhodo_MS_SOAP_mix.fasta \
+	result_assemblies/rhodo_MI_MS_mix.fasta \
+	result_assemblies/rhodo_MI_SOAP_mix.fasta \
+	result_assemblies/rhodo_CBG_SOAP_mix.fasta \
+	result_assemblies/rhodo_MS_MI_SOAP_mix.fasta \
+	result_assemblies/rhodo_MS_CBG_SOAP_mix.fasta \
+	$(RHODO)/soap_ctg.fasta \
+	$(RHODO)/msrca_ctg.fasta \
+	$(RHODO)/mira_ctg.fasta \
+	$(RHODO)/cabog_ctg.fasta \
+	$(RHODO)/spades_ctg.fasta \
+	$(RHODOGAM)/GAM_mira-msrca.fasta \
+	$(RHODOGAM)/GAM_msrca-soap.fasta \
+	$(RHODOGAM)/GAM_soap-msrca.fasta 
+	rm -rf result_statistics/rhodo_quast
+	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Rhodobacter_sphaeroides/Rhodobacter_sphaeroides_ref.fasta -G datasets/reference/Rhodobacter_sphaeroides/Rhodobacter_sphaeroides_ref.gff  $^ 
+
 
 
 
@@ -44,6 +74,7 @@ temp_assemblies/rhodo_AP_BB_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allp
 # temp_assemblies/aureus_AP_BB_SP.fasta: datasets/GAGE/Staphylococcus_aureus/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Staphylococcus_aureus/Bambus2/bambus2.genome.ctg.fasta datasets/GAGE/Staphylococcus_aureus/SOAPdenovo/SOAP.genome.ctg.fasta
 # temp_assemblies/aureus_AP_BB_MS.fasta: datasets/GAGE/Staphylococcus_aureus/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Staphylococcus_aureus/Bambus2/bambus2.genome.ctg.fasta $(AUREUS)/msrca_ctg.fasta
 AUREUS:=datasets/GAGE-B/S_aureus_HiSeq
+AUREUSGAM:=datasets/GAM-NGS/GAGE-B/S_aureus_HiSeq
 temp_assemblies/aureus_MS_SPD.fasta: $(AUREUS)/msrca_ctg.fasta $(AUREUS)/spades_ctg.fasta
 temp_assemblies/aureus_MS_SOAP.fasta: $(AUREUS)/msrca_ctg.fasta $(AUREUS)/soap_ctg.fasta
 temp_assemblies/aureus_SPD_SOAP.fasta: $(AUREUS)/spades_ctg.fasta $(AUREUS)/soap_ctg.fasta
@@ -63,7 +94,12 @@ result_statistics/aureus_quast: \
 	$(AUREUS)/soap_ctg.fasta \
 	$(AUREUS)/msrca_ctg.fasta \
 	$(AUREUS)/mira_ctg.fasta \
-	$(AUREUS)/spades_ctg.fasta
+	$(AUREUS)/spades_ctg.fasta \
+	$(AUREUSGAM)/GAM_mira-msrca.fasta \
+	$(AUREUSGAM)/GAM_msrca-soap.fasta \
+	$(AUREUSGAM)/GAM_msrca-spades.fasta \
+	$(AUREUSGAM)/GAM_sapdes-soap.fasta \
+	$(AUREUSGAM)/GAM_soap-mira.fasta :
 	rm -rf result_statistics/aureus_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.fasta  -G datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.gff $^ 
 
@@ -196,16 +232,6 @@ result_statistics/%_quast: result_assemblies/%_CLC_MIRA_mix.fasta result_assembl
 	$(pyinterp) $(QUAST) -o $@ $^ 
 
 MolliStats: result_statistics/MOVI_quast result_statistics/MMC_quast result_statistics/MSCe_quast result_statistics/MSCd_quast result_statistics/MSCc_quast result_statistics/MSCb_quast
-
-
-result_statistics/rhodo_quast:result_assemblies/rhodo_AP_SP_mix.fasta \
-	result_assemblies/rhodo_BB_SP_mix.fasta \
-	datasets/GAGE/Rhodobacter_sphaeroides/Bambus2/bambus2.ctg.fasta \
-	datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta \
-	result_assemblies/rhodo_AP_BB_mix.fasta \
-	datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/AP.genome.ctg.fasta \
-	result_assemblies/rhodo_AP_BB_SP_mix.fasta
-	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Rhodobacter_sphaeroides/Rhodobacter_sphaeroides_ref.fasta -G datasets/reference/Rhodobacter_sphaeroides/Rhodobacter_sphaeroides_ref.gff  $^ 
 
 
 
