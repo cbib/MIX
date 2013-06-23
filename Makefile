@@ -10,7 +10,8 @@ pyinterp:=python
 MUMmer:=$(shell pwd)/bin/MUMmer3.23/
 MIXPARAMS:=-A 500 -C 0
 MIXPARAMSFOLDER:=A500_C0
-QUAST:=bin/quast-2.1/quast.py --min-contig 200
+QUAST:=bin/quast-2.1/quast.py --min-contig 200 --threads 2
+# QUAST:=bin/generate_assembly_command.py
 
 export PATH := $(MUMmer):$(PATH)
 
@@ -59,7 +60,7 @@ result_statistics/rhodo_quast: \
 	$(RHODOGAM)/GAM_soap-msrca.fasta \
 	$(RHODOGAM)/GAM_mira-soap.fasta \
 	$(RHODOGAM)/GAM_msrca-spades.fasta
-	# rm -rf result_statistics/rhodo_quast
+	rm -rf result_statistics/rhodo_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Rhodobacter_sphaeroides/Rhodobacter_sphaeroides_ref.fasta -G datasets/reference/Rhodobacter_sphaeroides/Rhodobacter_sphaeroides_ref.gff  $^ 
 
 
@@ -104,7 +105,7 @@ result_statistics/aureus_quast: \
 	$(AUREUSGAM)/GAM_msrca-spades.fasta \
 	$(AUREUSGAM)/GAM_spades-soap.fasta \
 	$(AUREUSGAM)/GAM_soap-mira.fasta
-	# rm -rf result_statistics/aureus_quast
+	rm -rf result_statistics/aureus_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.fasta  -G datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.gff $^ 
 
 
@@ -145,7 +146,7 @@ result_statistics/b_cereus_quast: \
 	$(CEREUSGAM)/GAM_mira-msrca.fasta\
 	$(CEREUSGAM)/GAM_msrca-cabog.fasta\
 	$(CEREUSGAM)/GAM_soap-msrca.fasta
-	# rm -rf result_statistics/b_cereus_quast
+	rm -rf result_statistics/b_cereus_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Bacillus_cereus/Bacillus_cereus_ref.fasta -G datasets/reference/Bacillus_cereus/Bacillus_cereus_ref.gff  $^ 
 
 
@@ -191,7 +192,7 @@ result_statistics/a_hydrophila_quast: \
 	$(HYDROPHILAGAM)/GAM_msrca-cabog.fasta \
 	$(HYDROPHILAGAM)/GAM_msrca-spades.fasta \
 	$(HYDROPHILAGAM)/GAM_soap-cabog.fasta
-	# rm -rf result_statistics/a_hydrophila_quast
+	rm -rf result_statistics/a_hydrophila_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.fasta  -G datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.gff $^ 
 
 
@@ -221,7 +222,7 @@ result_statistics/V_cholerae_quast: \
 	$(VCHOLERAEGAM)/GAM_abyss-msrca.fasta \
 	$(VCHOLERAEGAM)/GAM_mira-msrca.fasta \
 	$(VCHOLERAEGAM)/GAM_msrca-abyss.fasta
-	# rm -rf result_statistics/V_cholerae_quast
+	rm -rf result_statistics/V_cholerae_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Vibrio_cholerae/Vibrio_cholerae_ref.fasta  -G datasets/reference/Vibrio_cholerae/Vibrio_cholerae_ref.gff $^ 
 
 
@@ -246,7 +247,7 @@ result_statistics/M_abscessus_quast: \
 	$(MABSCESSUSGAM)/GAM_abyss-msrca.fasta \
 	$(MABSCESSUSGAM)/GAM_msrca-abyss.fasta \
 	$(MABSCESSUSGAM)/GAM_msrca-spades.fasta 
-	# rm -rf result_statistics/M_abscessus_quast
+	rm -rf result_statistics/M_abscessus_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Mycobacterium_abscessus/Mycobacterium_abscessus_ref.fasta  -G datasets/reference/Mycobacterium_abscessus/Mycobacterium_abscessus_ref.gff $^ 
 
 
@@ -273,7 +274,7 @@ result_statistics/X_axonopodis_quast: \
 	$(XAXONOPODISGAM)/GAM_abyss-soap.fasta \
 	$(XAXONOPODISGAM)/GAM_msrca-abyss.fasta \
 	$(XAXONOPODISGAM)/GAM_msrca-spades.fasta 
-	# rm -rf result_statistics/X_axonopodis_quast
+	rm -rf result_statistics/X_axonopodis_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.fasta  -G datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.gff $^ 
 
 
@@ -304,7 +305,7 @@ result_statistics/B_fragilis_quast: \
 	$(BFRAGILISGAM)/GAM_msrca-spades.fasta \
 	$(BFRAGILISGAM)/GAM_soap-msrca.fasta \
 	$(BFRAGILISGAM)/GAM_spades-msrca.fasta
-	# rm -rf result_statistics/B_fragilis_quast
+	rm -rf result_statistics/B_fragilis_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Bacteroides_fragilis/Bacteroides_fragilis_ref.fasta  -G datasets/reference/Bacteroides_fragilis/Bacteroides_fragilis_ref.gff $^ 
 
 

@@ -54,7 +54,7 @@ prepare.hit.table <- function(an.hit.table){
 all.results <- prepare.hit.table(all.results)
 
 
-ident.thr <- 99.99
+ident.thr <- 100
 all.results[identity>=ident.thr,.N,by=list(cluster,method,assemblies)][N>=1][,.N,by=list(method,assemblies)][order(N)]
 
 ggplot(data=all.method[identity>=50 & method %in% c("MIX","GAM")],aes(x=as.numeric(cluster),y=identity,colour=method))+geom_point(alpha=0.3)+geom_smooth()+facet_wrap(~method)
@@ -64,5 +64,17 @@ ggplot(data=all.results[identity>=99 & method %in% c("MIX","GAM","CLC")],aes(x=a
 
 * Check number of contigs without proteins ?
 ```{r}
-all.results[,length(unique(contig)),by=assemblies]
+all.results[,length(unique(contig)),by=method]
+```
+
+
+* Check against published 
+```{r}
+
+maure.mira <- fread("~/temp/MIX/datasets/Mollicutes/MAUR/MAUR_MIRA_out.unpadded.hits")
+maure.clc <- fread("~/temp/MIX/datasets/Mollicutes/MAUR/MAUR_CLC_contigsCLCTrimmed_0_vs_MAUR_proteome.hits")
+maure.sub <- fread("~/temp/MIX/datasets/Mollicutes/MAUR/MAUR_submitted.hits")
+setnames(maure.clc,c("q", "contig", "identity", "alignment.length", "mismatches", "gap.openings", "q.start", "q.end", "s.start", "s.end", "e.value", "bit.score"))
+setnames(maure.mira,c("q", "contig", "identity", "alignment.length", "mismatches", "gap.openings", "q.start", "q.end", "s.start", "s.end", "e.value", "bit.score"))
+setnames(maure.sub,c("q", "contig", "identity", "alignment.length", "mismatches", "gap.openings", "q.start", "q.end", "s.start", "s.end", "e.value", "bit.score"))
 ```

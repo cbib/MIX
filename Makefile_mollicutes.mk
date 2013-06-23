@@ -21,7 +21,8 @@ MolliMix: \
 	result_assemblies/MSCc_AB_CLC_mix.fasta result_assemblies/MSCc_AB_MIRA_mix.fasta result_assemblies/MSCc_CLC_MIRA_mix.fasta \
 	result_assemblies/MSCb_AB_CLC_mix.fasta result_assemblies/MSCb_AB_MIRA_mix.fasta result_assemblies/MSCb_CLC_MIRA_mix.fasta
 
-
+MolliQuast: result_statistics/MAUR_quast result_statistics/MBOVb_quast result_statistics/MBVG_quast result_statistics/MCCP_quast result_statistics/MOVI_quast result_statistics/MMC_quast result_statistics/MSCe_quast result_statistics/MSCd_quast result_statistics/MSCc_quast result_statistics/MSCb_quast
+	
 temp_assemblies/MAUR_AB_CLC.fasta: $(MOLLI)/MAUR/AIM_ABySS_27-scaffolds.fasta $(MOLLI)/MAUR/AIM_CLC_contigsCLCTrimmed_0.fasta
 temp_assemblies/MAUR_AB_MIRA.fasta: $(MOLLI)/MAUR/AIM_ABySS_27-scaffolds.fasta $(MOLLI)/MAUR/AIM_step2_out.unpadded.fasta
 temp_assemblies/MAUR_CLC_MIRA.fasta: $(MOLLI)/MAUR/AIM_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MAUR/AIM_step2_out.unpadded.fasta

@@ -700,7 +700,7 @@ def main():
 ### Pruning of duplicate contigs 
 ### Works by building a coverage graph: for any path p1,p2 (that can consist of a single contig), p1 -> p2 <=> p1 is covered by p2 at more than cv_thr % (default == 65%)
 
-def lower_duplication(paths,selected_single_contigs,cv_thr=0.65):
+def lower_duplication(paths,selected_single_contigs,cv_thr=0.90):
 	# debug_here()
 	global coverage_scores,coverage_graph,all_alignments
 
@@ -773,7 +773,7 @@ def lower_duplication(paths,selected_single_contigs,cv_thr=0.65):
 				# logger.debug("Considering node %d for contig %s",n,src_ctg)
 				if len(src_ctg)>1: #is a path, either covered by a path or by a contig
 					# print "is path"
-					logger.debug("%s removed: covered by %s (%s)",src_ctg,D[n],[[y['contig'] for y in all_elements[x]] for x in D[n]])
+					logger.debug("Path %s removed: covered by %s (%s)",src_ctg,D[n],[[y['contig'] for y in all_elements[x]] for x in D[n]])
 					paths[n]=[]
 					D.remove_node(n)
 					coverage_graph.node[n]['removed']="True"
@@ -787,13 +787,15 @@ def lower_duplication(paths,selected_single_contigs,cv_thr=0.65):
 						if len(tgt_ctg)>1:
 							covered_by_a_path=True
 						tgt_assemblers.update([x[:2] for x in tgt_ctg])
+					if src_assemblers == tgt_assemblers:
+						continue
 					coverage_graph.node[n]['removed']="True"
 
 					# if  (not covered_by_a_path):
 					# 	continue
 					# if "A2" in tgt_assemblers:
 					# 	continue
-					logger.debug("%s removed: covered by %s (%s)",src_ctg,D[n],[[y['contig'] for y in all_elements[x]] for x in D[n]])
+					logger.debug("Contig %s removed: covered by %s (%s)",src_ctg,D[n],[[y['contig'] for y in all_elements[x]] for x in D[n]])
 
 					# print "removing",src_ctg,"covered by",D[n],"which is",[all_elements[x] for x in D[n]]
 					selected_single_contigs[n-len(paths)]=[]
