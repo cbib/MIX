@@ -1,0 +1,68 @@
+```{r}
+library(data.table)
+library(ggplot2)
+strsplit2 <- function (x, split, ...) 
+{
+    x <- as.character(x)
+    n <- length(x)
+    s <- strsplit(x, split = split, ...)
+    nc <- unlist(lapply(s, length))
+    out <- matrix("", n, max(nc))
+    for (i in 1:n) {
+        if (nc[i]) 
+            out[i, 1:nc[i]] <- s[[i]]
+    }
+    out
+}
+
+
+lengths<-fread("../mollicutes_core_genome_cluster_of_proteins.protein.length.tsv")
+setnames(lengths,c("q","q.length"))
+lengths$cluster<-factor(strsplit2(lengths$q,split="_")[,1])
+
+n.prot.by.clust <- lengths[,.N,by=cluster]
+sorted.clusters <- factor(n.prot.by.clust$q,levels=n.prot.by.clust$cluster[order(n.prot.by.clust$N)])
+
+
+setwd("~/temp/MIX/core_genome/MBVG/")
+
+
+blast.cols <- c("q", "contig", "identity", "alignment.length", "mismatches", "gap.openings", "q.start", "q.end", "s.start", "s.end", "e.value", "bit.score","method")
+
+
+all.results <- data.table()
+for(a.file in list.files(pattern="hits")){
+  cat(a.file,"\n")
+  this.results <- fread(a.file)
+  this.results$method = a.file 
+  all.results<-rbind(all.results,this.results)
+}
+
+prepare.hit.table <- function(an.hit.table){
+  setnames(an.hit.table,colnames(an.hit.table),blast.cols)
+  an.hit.table$cluster<-factor(strsplit2(an.hit.table$q,split="_")[,1])
+  an.hit.table<-merge(an.hit.table,lengths[,list(q,q.length)],by="q")
+  an.hit.table[,protein.found.50:=(alignment.length/q.length)>=0.5]
+  an.hit.table[,protein.found.85:=(alignment.length/q.length)>=0.85]
+  an.hit.table[,protein.found.99:=(alignment.length/q.length)>=0.99]
+  an.hit.table$e.value<-as.numeric(an.hit.table$e.value)
+  an.hit.table$assemblies <- strsplit2(strsplit2(an.hit.table$method,"_")[,2],".",fixed=T)[,1]
+  return(an.hit.table)
+  }
+
+
+all.results <- prepare.hit.table(all.results)
+
+
+ident.thr <- 99.99
+all.results[identity>=ident.thr,.N,by=list(cluster,method,assemblies)][N>=1][,.N,by=list(method,assemblies)][order(N)]
+
+ggplot(data=all.method[identity>=50 & method %in% c("MIX","GAM")],aes(x=as.numeric(cluster),y=identity,colour=method))+geom_point(alpha=0.3)+geom_smooth()+facet_wrap(~method)
+ggplot(data=all.results[identity>=99 & method %in% c("MIX","GAM","CLC")],aes(x=as.numeric(cluster),y=identity,colour=method))+geom_point(alpha=0.3)+geom_smooth()
+```
+
+
+* Check number of contigs without proteins ?
+```{r}
+all.results[,length(unique(contig)),by=assemblies]
+```

@@ -1,0 +1,12 @@
+```{r}
+library(data.table)
+setwd("~/temp/MIX/result_assemblies/")
+m_abs_AB_SP_al <- fread("M_abscessus_AB_MS_mix/Mix_results_A500_C0/all_alignments.csv")
+m_abs_AB_SP_ctg <- fread("M_abscessus_AB_MS_mix/Mix_results_A500_C0/all_contigs.csv")
+```
+
+AB largest contig is not included in the solution
+```{r}
+m_abs_AB_SP_ctg[order(length)]
+```
+Seems like it's not selected at all 

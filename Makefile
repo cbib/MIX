@@ -10,7 +10,7 @@ pyinterp:=python
 MUMmer:=$(shell pwd)/bin/MUMmer3.23/
 MIXPARAMS:=-A 500 -C 0
 MIXPARAMSFOLDER:=A500_C0
-QUAST:=bin/quast-2.1/quast.py
+QUAST:=bin/quast-2.1/quast.py --min-contig 200
 
 export PATH := $(MUMmer):$(PATH)
 
@@ -34,6 +34,7 @@ temp_assemblies/rhodo_MI_SOAP.fasta: $(RHODO)/mira_ctg.fasta $(RHODO)/soap_ctg.f
 temp_assemblies/rhodo_CBG_SOAP.fasta: $(RHODO)/cabog_ctg.fasta $(RHODO)/soap_ctg.fasta
 temp_assemblies/rhodo_MS_MI_SOAP.fasta: $(RHODO)/msrca_ctg.fasta $(RHODO)/mira_ctg.fasta $(RHODO)/soap_ctg.fasta
 temp_assemblies/rhodo_MS_CBG_SOAP.fasta: $(RHODO)/msrca_ctg.fasta $(RHODO)/cabog_ctg.fasta $(RHODO)/soap_ctg.fasta
+temp_assemblies/rhodo_MS_SPD.fasta: $(RHODO)/msrca_ctg.fasta $(RHODO)/spades_ctg.fasta 
 
 # temp_assemblies/rhodo_AP_SP.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/SOAPdenovo/SOAP.genome.ctg.fasta
 # temp_assemblies/rhodo_AP_BB.fasta: datasets/GAGE/Rhodobacter_sphaeroides/Allpaths-LG/ap.genome.ctg.fasta datasets/GAGE/Rhodobacter_sphaeroides/Bambus2/bambus2.ctg.fasta
@@ -46,7 +47,8 @@ result_statistics/rhodo_quast: \
 	result_assemblies/rhodo_MI_SOAP_mix.fasta \
 	result_assemblies/rhodo_CBG_SOAP_mix.fasta \
 	result_assemblies/rhodo_MS_MI_SOAP_mix.fasta \
-	result_assemblies/rhodo_MS_CBG_SOAP_mix.fasta \
+	result_assemblies/rhodo_MS_CBG_SOAP_mix.fasta	 \
+	result_assemblies/rhodo_MS_SPD_mix.fasta	\
 	$(RHODO)/soap_ctg.fasta \
 	$(RHODO)/msrca_ctg.fasta \
 	$(RHODO)/mira_ctg.fasta \
@@ -54,8 +56,10 @@ result_statistics/rhodo_quast: \
 	$(RHODO)/spades_ctg.fasta \
 	$(RHODOGAM)/GAM_mira-msrca.fasta \
 	$(RHODOGAM)/GAM_msrca-soap.fasta \
-	$(RHODOGAM)/GAM_soap-msrca.fasta 
-	rm -rf result_statistics/rhodo_quast
+	$(RHODOGAM)/GAM_soap-msrca.fasta \
+	$(RHODOGAM)/GAM_mira-soap.fasta \
+	$(RHODOGAM)/GAM_msrca-spades.fasta
+	# rm -rf result_statistics/rhodo_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Rhodobacter_sphaeroides/Rhodobacter_sphaeroides_ref.fasta -G datasets/reference/Rhodobacter_sphaeroides/Rhodobacter_sphaeroides_ref.gff  $^ 
 
 
@@ -98,16 +102,17 @@ result_statistics/aureus_quast: \
 	$(AUREUSGAM)/GAM_mira-msrca.fasta \
 	$(AUREUSGAM)/GAM_msrca-soap.fasta \
 	$(AUREUSGAM)/GAM_msrca-spades.fasta \
-	$(AUREUSGAM)/GAM_sapdes-soap.fasta \
-	$(AUREUSGAM)/GAM_soap-mira.fasta :
-	rm -rf result_statistics/aureus_quast
+	$(AUREUSGAM)/GAM_spades-soap.fasta \
+	$(AUREUSGAM)/GAM_soap-mira.fasta
+	# rm -rf result_statistics/aureus_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.fasta  -G datasets/reference/Staphylococcus_aureus/Staphylococcus_aureus_ref.gff $^ 
 
 
 
 
-# Best GAGE are CABOG, MIRA, MASURCA
+# Best GAGE for B. cereus are MaSuRCA CABOG, SOAP  and MIRA 
 CEREUS:=datasets/GAGE-B/B_cereus_MiSeq
+CEREUSGAM:=datasets/GAM-NGS/GAGE-B/B_cereus_MiSeq/
 temp_assemblies/b_cereus_AB_SP.fasta: $(CEREUS)/abyss_ctg.fasta $(CEREUS)/soap_ctg.fasta
 temp_assemblies/b_cereus_AB_MS.fasta: $(CEREUS)/abyss_ctg.fasta $(CEREUS)/msrca_ctg.fasta
 temp_assemblies/b_cereus_MS_SP.fasta: $(CEREUS)/msrca_ctg.fasta $(CEREUS)/soap_ctg.fasta
@@ -135,13 +140,18 @@ result_statistics/b_cereus_quast: \
 	$(CEREUS)/msrca_ctg.fasta \
 	$(CEREUS)/spades_ctg.fasta \
 	$(CEREUS)/cabog_ctg.fasta \
-	$(CEREUS)/mira_ctg.fasta
-	rm -rf result_statistics/b_cereus_quast
+	$(CEREUS)/mira_ctg.fasta \
+	$(CEREUSGAM)/GAM_mira-cabog.fasta\
+	$(CEREUSGAM)/GAM_mira-msrca.fasta\
+	$(CEREUSGAM)/GAM_msrca-cabog.fasta\
+	$(CEREUSGAM)/GAM_soap-msrca.fasta
+	# rm -rf result_statistics/b_cereus_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Bacillus_cereus/Bacillus_cereus_ref.fasta -G datasets/reference/Bacillus_cereus/Bacillus_cereus_ref.gff  $^ 
 
 
 
 HYDROPHILA:=datasets/GAGE-B/A_hydrophila_HiSeq
+HYDROPHILAGAM:=datasets/GAM-NGS/GAGE-B/A_hydrophila_HiSeq/
 temp_assemblies/a_hydrophila_AB_SP.fasta: $(HYDROPHILA)/abyss_ctg.fasta $(HYDROPHILA)/soap_ctg.fasta
 temp_assemblies/a_hydrophila_AB_MS.fasta: $(HYDROPHILA)/abyss_ctg.fasta $(HYDROPHILA)/msrca_ctg.fasta
 temp_assemblies/a_hydrophila_MS_SP.fasta: $(HYDROPHILA)/msrca_ctg.fasta $(HYDROPHILA)/soap_ctg.fasta
@@ -153,6 +163,9 @@ temp_assemblies/a_hydrophila_MS_SPD_SOAP.fasta: $(HYDROPHILA)/msrca_ctg.fasta $(
 temp_assemblies/a_hydrophila_MI_MS.fasta: $(HYDROPHILA)/mira_ctg.fasta $(HYDROPHILA)/msrca_ctg.fasta
 temp_assemblies/a_hydrophila_MI_SOAP.fasta: $(HYDROPHILA)/mira_ctg.fasta $(HYDROPHILA)/soap_ctg.fasta
 temp_assemblies/a_hydrophila_MI_SOAP_SPD_MS.fasta: $(HYDROPHILA)/mira_ctg.fasta $(HYDROPHILA)/soap_ctg.fasta $(HYDROPHILA)/spades_ctg.fasta $(HYDROPHILA)/msrca_ctg.fasta
+temp_assemblies/a_hydrophila_MS_CBG.fasta: $(HYDROPHILA)/msrca_ctg.fasta $(HYDROPHILA)/cabog_ctg.fasta
+temp_assemblies/a_hydrophila_MI_CBG.fasta: $(HYDROPHILA)/mira_ctg.fasta $(HYDROPHILA)/cabog_ctg.fasta
+temp_assemblies/a_hydrophila_CBG_SOAP.fasta: $(HYDROPHILA)/cabog_ctg.fasta $(HYDROPHILA)/soap_ctg.fasta
 
 result_statistics/a_hydrophila_quast: \
 	result_assemblies/a_hydrophila_AB_SP_mix.fasta \
@@ -166,118 +179,213 @@ result_statistics/a_hydrophila_quast: \
 	result_assemblies/a_hydrophila_MI_MS_mix.fasta \
 	result_assemblies/a_hydrophila_MI_SOAP_mix.fasta \
 	result_assemblies/a_hydrophila_MI_SOAP_SPD_MS_mix.fasta \
+	result_assemblies/a_hydrophila_MS_CBG_mix.fasta \
+	result_assemblies/a_hydrophila_MI_CBG_mix.fasta \
+	result_assemblies/a_hydrophila_CBG_SOAP_mix.fasta \
 	$(HYDROPHILA)/abyss_ctg.fasta \
 	$(HYDROPHILA)/soap_ctg.fasta \
 	$(HYDROPHILA)/msrca_ctg.fasta \
 	$(HYDROPHILA)/mira_ctg.fasta \
-	$(HYDROPHILA)/spades_ctg.fasta
-	rm -rf result_statistics/a_hydrophila_quast
+	$(HYDROPHILA)/spades_ctg.fasta \
+	$(HYDROPHILAGAM)/GAM_mira-cabog.fasta \
+	$(HYDROPHILAGAM)/GAM_msrca-cabog.fasta \
+	$(HYDROPHILAGAM)/GAM_msrca-spades.fasta \
+	$(HYDROPHILAGAM)/GAM_soap-cabog.fasta
+	# rm -rf result_statistics/a_hydrophila_quast
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.fasta  -G datasets/reference/Aeromonas_hydrophila/Aeromonas_hydrophila_ref.gff $^ 
 
 
 # Rules for GAGE-B
-temp_assemblies/V_cholerae_AB_SP.fasta: datasets/GAGE-B/V_cholerae_HiSeq/abyss_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/soap_ctg.fasta
-temp_assemblies/V_cholerae_AB_MS.fasta: datasets/GAGE-B/V_cholerae_HiSeq/abyss_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/msrca_ctg.fasta
-temp_assemblies/V_cholerae_MS_SP.fasta: datasets/GAGE-B/V_cholerae_HiSeq/msrca_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/soap_ctg.fasta
-temp_assemblies/V_cholerae_AB_MS_SP.fasta: datasets/GAGE-B/V_cholerae_HiSeq/abyss_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/msrca_ctg.fasta datasets/GAGE-B/V_cholerae_HiSeq/soap_ctg.fasta
+# VCHOLERAE Hiseq best are MIRA, MaSuRCA, ABySS, SOAP 
+VCHOLERAE_HS:=datasets/GAGE-B/V_cholerae_HiSeq/
+VCHOLERAEGAM:=datasets/GAM-NGS/GAGE-B/V_cholerae_HiSeq
+temp_assemblies/V_cholerae_AB_SP.fasta: $(VCHOLERAE_HS)/abyss_ctg.fasta $(VCHOLERAE_HS)/soap_ctg.fasta
+temp_assemblies/V_cholerae_AB_MS.fasta: $(VCHOLERAE_HS)/abyss_ctg.fasta $(VCHOLERAE_HS)/msrca_ctg.fasta
+temp_assemblies/V_cholerae_MS_SP.fasta: $(VCHOLERAE_HS)/msrca_ctg.fasta $(VCHOLERAE_HS)/soap_ctg.fasta
+temp_assemblies/V_cholerae_MS_MI.fasta: $(VCHOLERAE_HS)/msrca_ctg.fasta $(VCHOLERAE_HS)/mira_ctg.fasta
+temp_assemblies/V_cholerae_AB_MS_SP.fasta: $(VCHOLERAE_HS)/abyss_ctg.fasta $(VCHOLERAE_HS)/msrca_ctg.fasta $(VCHOLERAE_HS)/soap_ctg.fasta
+temp_assemblies/V_cholerae_MI_MS_SP.fasta: $(VCHOLERAE_HS)/mira_ctg.fasta $(VCHOLERAE_HS)/msrca_ctg.fasta $(VCHOLERAE_HS)/soap_ctg.fasta
 
 
-temp_assemblies/M_abscessus_AB_SP.fasta: datasets/GAGE-B/M_abscessus_HiSeq/abyss_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/soap_ctg.fasta
-temp_assemblies/M_abscessus_AB_MS.fasta: datasets/GAGE-B/M_abscessus_HiSeq/abyss_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/msrca_ctg.fasta
-temp_assemblies/M_abscessus_MS_SP.fasta: datasets/GAGE-B/M_abscessus_HiSeq/msrca_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/soap_ctg.fasta
-temp_assemblies/M_abscessus_AB_MS_SP.fasta: datasets/GAGE-B/M_abscessus_HiSeq/abyss_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/msrca_ctg.fasta datasets/GAGE-B/M_abscessus_HiSeq/soap_ctg.fasta
-
-temp_assemblies/X_axonopodis_AB_SP.fasta: datasets/GAGE-B/X_axonopodis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/soap_ctg.fasta
-temp_assemblies/X_axonopodis_AB_MS.fasta: datasets/GAGE-B/X_axonopodis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/msrca_ctg.fasta
-temp_assemblies/X_axonopodis_MS_SP.fasta: datasets/GAGE-B/X_axonopodis_HiSeq/msrca_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/soap_ctg.fasta
-temp_assemblies/X_axonopodis_AB_MS_SP.fasta: datasets/GAGE-B/X_axonopodis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/msrca_ctg.fasta datasets/GAGE-B/X_axonopodis_HiSeq/soap_ctg.fasta
-
-
-
-# Generic GAGE-B rules 
-temp_assemblies/B_fragilis_AB_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta
-temp_assemblies/B_fragilis_AB_MS.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta
-temp_assemblies/B_fragilis_MS_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta
-temp_assemblies/B_fragilis_AB_MS_SP.fasta: datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta
-
+result_statistics/V_cholerae_quast: \
+	result_assemblies/V_cholerae_AB_SP_mix.fasta \
+	result_assemblies/V_cholerae_AB_MS_mix.fasta \
+	result_assemblies/V_cholerae_MS_SP_mix.fasta \
+	result_assemblies/V_cholerae_MS_MI_mix.fasta \
+	result_assemblies/V_cholerae_AB_MS_SP_mix.fasta \
+	result_assemblies/V_cholerae_MI_MS_SP_mix.fasta \
+	$(VCHOLERAE_HS)/abyss_ctg.fasta \
+	$(VCHOLERAE_HS)/msrca_ctg.fasta \
+	$(VCHOLERAE_HS)/mira_ctg.fasta \
+	$(VCHOLERAE_HS)/soap_ctg.fasta \
+	$(VCHOLERAEGAM)/GAM_abyss-msrca.fasta \
+	$(VCHOLERAEGAM)/GAM_mira-msrca.fasta \
+	$(VCHOLERAEGAM)/GAM_msrca-abyss.fasta
+	# rm -rf result_statistics/V_cholerae_quast
+	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Vibrio_cholerae/Vibrio_cholerae_ref.fasta  -G datasets/reference/Vibrio_cholerae/Vibrio_cholerae_ref.gff $^ 
 
 
-temp_assemblies/MOVI_AB_CLC.fasta: datasets/Mollicutes/MOVI/AIP_ABySS_32-scaffolds.fasta datasets/Mollicutes/MOVI/AIP_CLC_contigsCLCTrimmed_0.fasta
-temp_assemblies/MOVI_AB_MIRA.fasta: datasets/Mollicutes/MOVI/AIP_ABySS_32-scaffolds.fasta datasets/Mollicutes/MOVI/AIP_step2_out.unpadded.fasta
-temp_assemblies/MOVI_CLC_MIRA.fasta: datasets/Mollicutes/MOVI/AIP_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MOVI/AIP_step2_out.unpadded.fasta
+# M.Abscessus
+MABSCESSUS:=datasets/GAGE-B/M_abscessus_HiSeq/
+MABSCESSUSGAM:=datasets/GAM-NGS/GAGE-B/M_abscessus_HiSeq/
+temp_assemblies/M_abscessus_AB_SP.fasta: $(MABSCESSUS)/abyss_ctg.fasta $(MABSCESSUS)/soap_ctg.fasta
+temp_assemblies/M_abscessus_AB_MS.fasta: $(MABSCESSUS)/abyss_ctg.fasta $(MABSCESSUS)/msrca_ctg.fasta
+temp_assemblies/M_abscessus_MS_SP.fasta: $(MABSCESSUS)/msrca_ctg.fasta $(MABSCESSUS)/soap_ctg.fasta
+temp_assemblies/M_abscessus_SP_SPD.fasta: $(MABSCESSUS)/soap_ctg.fasta $(MABSCESSUS)/spades_ctg.fasta
+temp_assemblies/M_abscessus_AB_MS_SP.fasta: $(MABSCESSUS)/abyss_ctg.fasta $(MABSCESSUS)/msrca_ctg.fasta $(MABSCESSUS)/soap_ctg.fasta
 
-temp_assemblies/MMC_AB_CLC.fasta: datasets/Mollicutes/MMC/AIW_ABySS_30-scaffolds.fasta datasets/Mollicutes/MMC/AIW_CLC_contigsCLCTrimmed_0.fasta
-temp_assemblies/MMC_AB_MIRA.fasta: datasets/Mollicutes/MMC/AIW_ABySS_30-scaffolds.fasta datasets/Mollicutes/MMC/AIW_step2_out.unpadded.fasta
-temp_assemblies/MMC_CLC_MIRA.fasta: datasets/Mollicutes/MMC/AIW_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MMC/AIW_step2_out.unpadded.fasta
+result_statistics/M_abscessus_quast: \
+	result_assemblies/M_abscessus_AB_SP_mix.fasta \
+	result_assemblies/M_abscessus_AB_MS_mix.fasta \
+	result_assemblies/M_abscessus_MS_SP_mix.fasta \
+	result_assemblies/M_abscessus_SP_SPD_mix.fasta \
+	result_assemblies/M_abscessus_AB_MS_SP_mix.fasta \
+	datasets/GAGE-B/M_abscessus_HiSeq/abyss_ctg.fasta \
+	datasets/GAGE-B/M_abscessus_HiSeq/soap_ctg.fasta \
+	datasets/GAGE-B/M_abscessus_HiSeq/msrca_ctg.fasta \
+	$(MABSCESSUSGAM)/GAM_abyss-msrca.fasta \
+	$(MABSCESSUSGAM)/GAM_msrca-abyss.fasta \
+	$(MABSCESSUSGAM)/GAM_msrca-spades.fasta 
+	# rm -rf result_statistics/M_abscessus_quast
+	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Mycobacterium_abscessus/Mycobacterium_abscessus_ref.fasta  -G datasets/reference/Mycobacterium_abscessus/Mycobacterium_abscessus_ref.gff $^ 
 
-temp_assemblies/MSCe_AB_CLC.fasta: datasets/Mollicutes/MSCe/AKC_ABySS_35-scaffolds.fasta datasets/Mollicutes/MSCe/AKC_CLC_contigsCLCTrimmed_0.fasta
-temp_assemblies/MSCe_AB_MIRA.fasta: datasets/Mollicutes/MSCe/AKC_ABySS_35-scaffolds.fasta datasets/Mollicutes/MSCe/AKC_step2_out.unpadded.fasta
-temp_assemblies/MSCe_CLC_MIRA.fasta: datasets/Mollicutes/MSCe/AKC_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MSCe/AKC_step2_out.unpadded.fasta
-temp_assemblies/MSCd_AB_CLC.fasta: datasets/Mollicutes/MSCd/AKE_ABySS_34-scaffolds.fasta datasets/Mollicutes/MSCd/AKE_CLC_contigsCLCTrimmed_0.fasta
-temp_assemblies/MSCd_AB_MIRA.fasta: datasets/Mollicutes/MSCd/AKE_ABySS_34-scaffolds.fasta datasets/Mollicutes/MSCd/AKE_step2_out.unpadded.fasta
-temp_assemblies/MSCd_CLC_MIRA.fasta: datasets/Mollicutes/MSCd/AKE_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MSCd/AKE_step2_out.unpadded.fasta
-temp_assemblies/MSCc_AB_CLC.fasta: datasets/Mollicutes/MSCc/AIZ_ABySS_27-scaffolds.fasta datasets/Mollicutes/MSCc/AIZ_CLC_contigsCLCTrimmed_0.fasta
-temp_assemblies/MSCc_AB_MIRA.fasta: datasets/Mollicutes/MSCc/AIZ_ABySS_27-scaffolds.fasta datasets/Mollicutes/MSCc/AIZ_step2_out.unpadded.fasta
-temp_assemblies/MSCc_CLC_MIRA.fasta: datasets/Mollicutes/MSCc/AIZ_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MSCc/AIZ_step2_out.unpadded.fasta
-temp_assemblies/MSCb_AB_CLC.fasta: datasets/Mollicutes/MSCb/AIY_ABySS_29-scaffolds.fasta datasets/Mollicutes/MSCb/AIY_CLC_contigsCLCTrimmed_0.fasta
-temp_assemblies/MSCb_AB_MIRA.fasta: datasets/Mollicutes/MSCb/AIY_ABySS_29-scaffolds.fasta datasets/Mollicutes/MSCb/AIY_step2_out.unpadded.fasta
-temp_assemblies/MSCb_CLC_MIRA.fasta: datasets/Mollicutes/MSCb/AIY_CLC_contigsCLCTrimmed_0.fasta datasets/Mollicutes/MSCb/AIY_step2_out.unpadded.fasta
 
+
+# X.axonopodis
+XAXONOPODIS:=datasets/GAGE-B/X_axonopodis_HiSeq/
+XAXONOPODISGAM:=datasets/GAM-NGS/GAGE-B/X_axonopodis_HiSeq
+temp_assemblies/X_axonopodis_AB_SP.fasta: $(XAXONOPODIS)/abyss_ctg.fasta $(XAXONOPODIS)/soap_ctg.fasta
+temp_assemblies/X_axonopodis_AB_MS.fasta: $(XAXONOPODIS)/abyss_ctg.fasta $(XAXONOPODIS)/msrca_ctg.fasta
+temp_assemblies/X_axonopodis_MS_SP.fasta: $(XAXONOPODIS)/msrca_ctg.fasta $(XAXONOPODIS)/soap_ctg.fasta
+temp_assemblies/X_axonopodis_MS_SPD.fasta: $(XAXONOPODIS)/msrca_ctg.fasta $(XAXONOPODIS)/spades_ctg.fasta
+temp_assemblies/X_axonopodis_AB_MS_SP.fasta: $(XAXONOPODIS)/abyss_ctg.fasta $(XAXONOPODIS)/msrca_ctg.fasta $(XAXONOPODIS)/soap_ctg.fasta
+
+result_statistics/X_axonopodis_quast: \
+	result_assemblies/X_axonopodis_AB_SP_mix.fasta \
+	result_assemblies/X_axonopodis_AB_MS_mix.fasta \
+	result_assemblies/X_axonopodis_MS_SP_mix.fasta \
+	result_assemblies/X_axonopodis_MS_SPD_mix.fasta \
+	result_assemblies/X_axonopodis_AB_MS_SP_mix.fasta \
+	$(XAXONOPODIS)/abyss_ctg.fasta \
+	$(XAXONOPODIS)/soap_ctg.fasta \
+	$(XAXONOPODIS)/msrca_ctg.fasta \
+	$(XAXONOPODIS)/spades_ctg.fasta \
+	$(XAXONOPODISGAM)/GAM_abyss-soap.fasta \
+	$(XAXONOPODISGAM)/GAM_msrca-abyss.fasta \
+	$(XAXONOPODISGAM)/GAM_msrca-spades.fasta 
+	# rm -rf result_statistics/X_axonopodis_quast
+	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.fasta  -G datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.gff $^ 
+
+
+
+
+# B. Fragilis
+BFRAGILIS:=datasets/GAGE-B/B_fragilis_HiSeq/
+BFRAGILISGAM:=datasets/GAM-NGS/GAGE-B/B_fragilis_HiSeq
+temp_assemblies/B_fragilis_AB_SP.fasta: $(BFRAGILIS)/abyss_ctg.fasta $(BFRAGILIS)/soap_ctg.fasta
+temp_assemblies/B_fragilis_AB_MS.fasta: $(BFRAGILIS)/abyss_ctg.fasta $(BFRAGILIS)/msrca_ctg.fasta
+temp_assemblies/B_fragilis_MS_SP.fasta: $(BFRAGILIS)/msrca_ctg.fasta $(BFRAGILIS)/soap_ctg.fasta
+temp_assemblies/B_fragilis_MS_SPD.fasta: $(BFRAGILIS)/msrca_ctg.fasta $(BFRAGILIS)/spades_ctg.fasta
+temp_assemblies/B_fragilis_AB_MS_SP.fasta: $(BFRAGILIS)/abyss_ctg.fasta $(BFRAGILIS)/msrca_ctg.fasta $(BFRAGILIS)/soap_ctg.fasta
+temp_assemblies/B_fragilis_AB_MS_SPD.fasta: $(BFRAGILIS)/abyss_ctg.fasta $(BFRAGILIS)/msrca_ctg.fasta $(BFRAGILIS)/spades_ctg.fasta
+
+result_statistics/B_fragilis_quast: \
+	result_assemblies/B_fragilis_AB_SP_mix.fasta \
+	result_assemblies/B_fragilis_AB_MS_mix.fasta \
+	result_assemblies/B_fragilis_MS_SP_mix.fasta \
+	result_assemblies/B_fragilis_MS_SPD_mix.fasta \
+	result_assemblies/B_fragilis_AB_MS_SP_mix.fasta \
+	result_assemblies/B_fragilis_AB_MS_SPD_mix.fasta \
+	$(BFRAGILIS)/abyss_ctg.fasta \
+	$(BFRAGILIS)/soap_ctg.fasta \
+	$(BFRAGILIS)/msrca_ctg.fasta \
+	$(BFRAGILIS)/spades_ctg.fasta \
+	$(BFRAGILISGAM)/GAM_abyss-soap.fasta \
+	$(BFRAGILISGAM)/GAM_msrca-spades.fasta \
+	$(BFRAGILISGAM)/GAM_soap-msrca.fasta \
+	$(BFRAGILISGAM)/GAM_spades-msrca.fasta
+	# rm -rf result_statistics/B_fragilis_quast
+	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Bacteroides_fragilis/Bacteroides_fragilis_ref.fasta  -G datasets/reference/Bacteroides_fragilis/Bacteroides_fragilis_ref.gff $^ 
+
+
+
+# Rules for Mollicutes assemblies and statistics 
+# Cf bin/generate_assembly_command.py to generate the rules 
+include Makefile_mollicutes.mk
+# MOLLI:=datasets/Mollicutes/
+# MOLLIGAM:=datasets/GAM-NGS/Mollicutes
+
+
+# temp_assemblies/MOVI_AB_CLC.fasta: $(MOLLI)/MOVI/AIP_ABySS_32-scaffolds.fasta $(MOLLI)/MOVI/AIP_CLC_contigsCLCTrimmed_0.fasta
+# temp_assemblies/MOVI_AB_MIRA.fasta: $(MOLLI)/MOVI/AIP_ABySS_32-scaffolds.fasta $(MOLLI)/MOVI/AIP_step2_out.unpadded.fasta
+# temp_assemblies/MOVI_CLC_MIRA.fasta: $(MOLLI)/MOVI/AIP_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MOVI/AIP_step2_out.unpadded.fasta
+
+# temp_assemblies/MMC_AB_CLC.fasta: $(MOLLI)/MMC/AIW_ABySS_30-scaffolds.fasta $(MOLLI)/MMC/AIW_CLC_contigsCLCTrimmed_0.fasta
+# temp_assemblies/MMC_AB_MIRA.fasta: $(MOLLI)/MMC/AIW_ABySS_30-scaffolds.fasta $(MOLLI)/MMC/AIW_step2_out.unpadded.fasta
+# temp_assemblies/MMC_CLC_MIRA.fasta: $(MOLLI)/MMC/AIW_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MMC/AIW_step2_out.unpadded.fasta
+
+# result_statistics/MMC_quast: \
+# 	$(MOLLI)/MMC/AIW_ABySS_30-scaffolds.fasta $(MOLLI)/MMC/AIW_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MMC/AIW_step2_out.unpadded.fasta\
+# 	$(MOLLIGAM)/MMC/GAM_abyss-CLC.fasta $(MOLLIGAM)/MMC/GAM_CLC-mira.fasta $(MOLLIGAM)/MMC/GAM_mira-abyss.fasta \
+# 	result_assemblies/MMC_AB_CLC_mix.fasta result_assemblies/MMC_AB_MIRA_mix.fasta result_assemblies/MMC_CLC_MIRA_mix.fasta 
+# 	rm -rf result_statistics/MMC_quast
+# 	$(pyinterp) $(QUAST) -o $@ $^ 
+
+# temp_assemblies/MSCe_AB_CLC.fasta: $(MOLLI)/MSCe/AKC_ABySS_35-scaffolds.fasta $(MOLLI)/MSCe/AKC_CLC_contigsCLCTrimmed_0.fasta
+# temp_assemblies/MSCe_AB_MIRA.fasta: $(MOLLI)/MSCe/AKC_ABySS_35-scaffolds.fasta $(MOLLI)/MSCe/AKC_step2_out.unpadded.fasta
+# temp_assemblies/MSCe_CLC_MIRA.fasta: $(MOLLI)/MSCe/AKC_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MSCe/AKC_step2_out.unpadded.fasta
+
+# temp_assemblies/MSCd_AB_CLC.fasta: $(MOLLI)/MSCd/AKE_ABySS_34-scaffolds.fasta $(MOLLI)/MSCd/AKE_CLC_contigsCLCTrimmed_0.fasta
+# temp_assemblies/MSCd_AB_MIRA.fasta: $(MOLLI)/MSCd/AKE_ABySS_34-scaffolds.fasta $(MOLLI)/MSCd/AKE_step2_out.unpadded.fasta
+# temp_assemblies/MSCd_CLC_MIRA.fasta: $(MOLLI)/MSCd/AKE_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MSCd/AKE_step2_out.unpadded.fasta
+
+# temp_assemblies/MSCc_AB_CLC.fasta: $(MOLLI)/MSCc/AIZ_ABySS_27-scaffolds.fasta $(MOLLI)/MSCc/AIZ_CLC_contigsCLCTrimmed_0.fasta
+# temp_assemblies/MSCc_AB_MIRA.fasta: $(MOLLI)/MSCc/AIZ_ABySS_27-scaffolds.fasta $(MOLLI)/MSCc/AIZ_step2_out.unpadded.fasta
+# temp_assemblies/MSCc_CLC_MIRA.fasta: $(MOLLI)/MSCc/AIZ_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MSCc/AIZ_step2_out.unpadded.fasta
+
+# temp_assemblies/MSCb_AB_CLC.fasta: $(MOLLI)/MSCb/AIY_ABySS_29-scaffolds.fasta $(MOLLI)/MSCb/AIY_CLC_contigsCLCTrimmed_0.fasta
+# temp_assemblies/MSCb_AB_MIRA.fasta: $(MOLLI)/MSCb/AIY_ABySS_29-scaffolds.fasta $(MOLLI)/MSCb/AIY_step2_out.unpadded.fasta
+# temp_assemblies/MSCb_CLC_MIRA.fasta: $(MOLLI)/MSCb/AIY_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MSCb/AIY_step2_out.unpadded.fasta
+
+# result_statistics/MSCb_quast: \
+# 	$(MOLLI)/MSCb/AIY_ABySS_29-scaffolds.fasta $(MOLLI)/MSCb/AIY_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MSCb/AIY_step2_out.unpadded.fasta \
+# 	$(MOLLIGAM)/MSCb/GAM_abyss-CLC.fasta $(MOLLIGAM)/MSCb/GAM_CLC-mira.fasta $(MOLLIGAM)/MSCb/GAM_mira-abyss.fasta \
+# 	result_assemblies/MSCb_AB_CLC_mix.fasta result_assemblies/MSCb_AB_MIRA_mix.fasta result_assemblies/MSCb_CLC_MIRA_mix.fasta
+# 	rm -rf result_statistics/MSCb_quast
+# 	$(pyinterp) $(QUAST) -o $@ $^
+
+
+# temp_assemblies/MBVG_AB_CLC.fasta: $(MOLLI)/MBVG/AIN_ABySS_35-scaffolds.fasta $(MOLLI)/MBVG/AIN_CLC_contigsCLCTrimmed_0.fasta
+# temp_assemblies/MBVG_AB_MIRA.fasta: $(MOLLI)/MBVG/AIN_ABySS_35-scaffolds.fasta $(MOLLI)/MBVG/AIN_step2_out.unpadded.fasta
+# temp_assemblies/MBVG_CLC_MIRA.fasta: $(MOLLI)/MBVG/AIN_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MBVG/AIN_step2_out.unpadded.fasta
+
+# result_statistics/MBVG_quast: \
+# 	$(MOLLI)/MMC/AIW_ABySS_30-scaffolds.fasta $(MOLLI)/MMC/AIW_CLC_contigsCLCTrimmed_0.fasta $(MOLLI)/MMC/AIW_step2_out.unpadded.fasta
+# 	$(MOLLIGAM)/MBVG/GAM_abyss-CLC.fasta $(MOLLIGAM)/MBVG/GAM_CLC-mira.fasta $(MOLLIGAM)/MBVG/GAM_mira-abyss.fasta \
+# 	result_assemblies/MBVG_AB_CLC_mix.fasta result_assemblies/MBVG_AB_MIRA_mix.fasta result_assemblies/MBVG_CLC_MIRA_mix.fasta 
+# 	rm -rf result_statistics/MBVG_quast
+# 	$(pyinterp) $(QUAST) -o $@ $^ 
 
 
 #VPATH = src:temp_assemblies:result_assemblies
 
 # GENERIC Rule for mollicutes
+
+
+
+
+
+
+
+
 result_statistics/%_quast: result_assemblies/%_CLC_MIRA_mix.fasta result_assemblies/%_AB_CLC_mix.fasta result_assemblies/%_AB_MIRA_mix.fasta 
 	$(pyinterp) $(QUAST) -o $@ $^ 
 
-MolliStats: result_statistics/MOVI_quast result_statistics/MMC_quast result_statistics/MSCe_quast result_statistics/MSCd_quast result_statistics/MSCc_quast result_statistics/MSCb_quast
+%_assembly: result_assemblies/%_AB_CLC_mix.fasta result_assemblies/%_CLC_MIRA_mix.fasta result_assemblies/%_AB_MIRA_mix.fasta
+MolliStats: result_statistics/MOVI_quast result_statistics/MMC_quast result_statistics/MSCe_quast result_statistics/MSCd_quast result_statistics/MSCc_quast result_statistics/MSCb_quast result_statistics/MBVG_quast
 
 
 
-
-
-result_statistics/V_cholerae_quast: \
-result_assemblies/V_cholerae_AB_SP_mix.fasta \
-result_assemblies/V_cholerae_AB_MS_mix.fasta \
-result_assemblies/V_cholerae_MS_SP_mix.fasta \
-result_assemblies/V_cholerae_AB_MS_SP_mix.fasta \
-datasets/GAGE-B/V_cholerae_HiSeq/abyss_ctg.fasta \
-datasets/GAGE-B/V_cholerae_HiSeq/soap_ctg.fasta \
-datasets/GAGE-B/V_cholerae_HiSeq/msrca_ctg.fasta
-	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Vibrio_cholerae/Vibrio_cholerae_ref.fasta  -G datasets/reference/Vibrio_cholerae/Vibrio_cholerae_ref.gff $^ 
-
-result_statistics/M_abscessus_quast: \
-result_assemblies/M_abscessus_AB_SP_mix.fasta \
-result_assemblies/M_abscessus_AB_MS_mix.fasta \
-result_assemblies/M_abscessus_MS_SP_mix.fasta \
-result_assemblies/M_abscessus_AB_MS_SP_mix.fasta \
-datasets/GAGE-B/M_abscessus_HiSeq/abyss_ctg.fasta \
-datasets/GAGE-B/M_abscessus_HiSeq/soap_ctg.fasta \
-datasets/GAGE-B/M_abscessus_HiSeq/msrca_ctg.fasta
-	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Mycobacterium_abscessus/Mycobacterium_abscessus_ref.fasta  -G datasets/reference/Mycobacterium_abscessus/Mycobacterium_abscessus_ref.gff $^ 
-
-
-result_statistics/X_axonopodis_quast: \
-result_assemblies/X_axonopodis_AB_SP_mix.fasta \
-result_assemblies/X_axonopodis_AB_MS_mix.fasta \
-result_assemblies/X_axonopodis_MS_SP_mix.fasta \
-result_assemblies/X_axonopodis_AB_MS_SP_mix.fasta \
-datasets/GAGE-B/X_axonopodis_HiSeq/abyss_ctg.fasta \
-datasets/GAGE-B/X_axonopodis_HiSeq/soap_ctg.fasta \
-datasets/GAGE-B/X_axonopodis_HiSeq/msrca_ctg.fasta
-	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.fasta  -G datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.gff $^ 
-
-
-result_statistics/B_fragilis_quast: \
-result_assemblies/B_fragilis_AB_SP_mix.fasta \
-result_assemblies/B_fragilis_AB_MS_mix.fasta \
-result_assemblies/B_fragilis_MS_SP_mix.fasta \
-result_assemblies/B_fragilis_AB_MS_SP_mix.fasta \
-datasets/GAGE-B/B_fragilis_HiSeq/abyss_ctg.fasta \
-datasets/GAGE-B/B_fragilis_HiSeq/soap_ctg.fasta \
-datasets/GAGE-B/B_fragilis_HiSeq/msrca_ctg.fasta
-	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Bacteroides_fragilis/Bacteroides_fragilis_ref.fasta  -G datasets/reference/Bacteroides_fragilis/Bacteroides_fragilis_ref.gff $^ 
 
 
 
@@ -323,14 +431,14 @@ temp_assemblies/%.fasta: bin/preprocessing.py
 temp_assemblies/%.coords: temp_assemblies/%.fasta
 	$(eval TAG:= $(basename $(@F))) 
 #	cd temp_assemblies; nucmer -p $(TAG) --maxmatch -l 30 -banded $(TAG).fasta $(TAG).fasta 2>/dev/null; show-coords -l -c $(TAG).delta > $(TAG).coords
-	cd temp_assemblies; nucmer -p $(TAG) --maxmatch -c 30 -l 30 -banded $(TAG).fasta $(TAG).fasta 2>/dev/null; show-coords -l -c $(TAG).delta > $(TAG).coords
+	cd temp_assemblies; nucmer -p $(TAG) --maxmatch -c 30 -l 30 -banded $(TAG).fasta $(TAG).fasta 2>$(TAG).nucmer.log.txt; show-coords -l -c $(TAG).delta > $(TAG).coords
 
 #	rm temp_assemblies/$(TAG).delta
 
 # Given a fasta file and a coord file of alignments, run Mix and move the resulting assembly to the result folder
 result_assemblies/%_mix.fasta: temp_assemblies/%.coords temp_assemblies/%.fasta bin/Mix.py bin/graph.py bin/integer_set.py
 	$(eval TAG:= $(basename $(@F))) 
-	$(pyinterp) bin/Mix.py $(MIXPARAMS) -o result_assemblies/$(TAG)  -a $(filter %.coords,$^) -c $(filter %.fasta,$^)
+	$(pyinterp) bin/Mix.py $(MIXPARAMS) -o result_assemblies/$(TAG)  -a $(filter %.coords,$^) -c $(filter %.fasta,$^) 2> temp_assemblies/$(TAG).mix.log.txt
 	mv result_assemblies/$(TAG)/Mix_results_$(MIXPARAMSFOLDER)/Mix_assembly.fasta result_assemblies/$(TAG).fasta
 
 

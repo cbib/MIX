@@ -1,14 +1,14 @@
-All statistics are based on contigs of size >= 500 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
+All statistics are based on contigs of size >= 200 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
 
-Assembly                   MSCb_CLC_MIRA_mix  MSCb_AB_CLC_mix  MSCb_AB_MIRA_mix
-# contigs (>= 0 bp)        75                 258              104             
-# contigs (>= 1000 bp)     68                 173              94              
-Total length (>= 0 bp)     1049659            971202           1055645         
-Total length (>= 1000 bp)  1046239            930247           1050285         
-# contigs                  72                 207              101             
-Largest contig             120189             26414            72249           
-Total length               1049119            955425           1055105         
-GC (%)                     23.73              23.64            23.77           
-N50                        23889              8334             21513           
-N75                        15161              4226             9751            
-# N's per 100 kbp          3.24               12.87            2.94            
+Assembly                   AIY_ABySS_29-scaffolds  AIY_CLC_contigsCLCTrimmed_0  AIY_step2_out.unpadded  GAM_abyss-CLC  GAM_CLC-mira  GAM_mira-abyss  MSCb_AB_CLC_mix  MSCb_AB_MIRA_mix  MSCb_CLC_MIRA_mix
+# contigs (>= 0 bp)        3213                    274                          450                     3211           269           450             181              79                74               
+# contigs (>= 1000 bp)     160                     173                          117                     158            171           117             115              73                69               
+Total length (>= 0 bp)     1080552                 976414                       1210220                 1082643        982942        1210220         975366           1052843           1049800          
+Total length (>= 1000 bp)  888050                  930247                       1086275                 890141         939189        1086275         944300           1049293           1046874          
+# contigs                  292                     274                          346                     290            269           346             181              78                73               
+Largest contig             44225                   26414                        72249                   44225          26414         72249           52689            103106            120189           
+Total length               946484                  976414                       1197033                 948575         982942        1197033         975366           1052797           1049754          
+GC (%)                     23.60                   23.63                        24.05                   23.60          23.64         24.05           23.61            23.81             23.75            
+N50                        9202                    8121                         17823                   9397           8438          17823           15477            23298             23889            
+N75                        3790                    3935                         6783                    3790           4124          6783            5916             12823             15161            
+# N's per 100 kbp          0.00                    37.38                        7.02                    0.00           37.13         7.02            31.78            2.85              3.24             

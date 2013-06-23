@@ -10,7 +10,16 @@ template="""
 	mv %(mollicute)s_%(assemblies)s/Mix_results_A125_C0/Mix_assembly.fasta ../%(mollicute)s/MIX_%(mollicute)s_%(assemblies)s.fasta
 """
 
-template="""temp_assemblies/%(mollicute)s_%(assemblies)s.fasta: datasets/Mollicutes/%(mollicute)s/%(assemblyAfname)s datasets/Mollicutes/%(mollicute)s/%(assemblyBfname)s"""
+template="""temp_assemblies/%(mollicute)s_%(assemblies)s.fasta: $(MOLLI)/%(mollicute)s/%(assemblyAfname)s $(MOLLI)/%(mollicute)s/%(assemblyBfname)s"""
+
+template_quast="""
+result_statistics/%(mollicute)s_quast: \\
+	$(MOLLI)/%(mollicute)s/%(monoassembleA)s $(MOLLI)/%(mollicute)s/%(monoassembleB)s $(MOLLI)/%(mollicute)s/%(monoassembleC)s \\
+	$(MOLLIGAM)/%(mollicute)s/GAM_abyss-CLC.fasta $(MOLLIGAM)/%(mollicute)s/GAM_CLC-mira.fasta $(MOLLIGAM)/%(mollicute)s/GAM_mira-abyss.fasta \\
+	result_assemblies/%(mollicute)s_AB_CLC_mix.fasta result_assemblies/%(mollicute)s_AB_MIRA_mix.fasta result_assemblies/%(mollicute)s_CLC_MIRA_mix.fasta 
+	rm -rf result_statistics/%(mollicute)s_quast
+	$(pyinterp) $(QUAST) -o $@ $^ 
+"""
 
 all_targets=[]
 for mollicute in targets:
@@ -42,5 +51,5 @@ for mollicute in targets:
 			print template%{'mollicute':mollicute,'assemblies':assemblies,'assemblyAfname':a1,'assemblyBfname':a2}
 			all_targets.append(mollicute+"_"+assemblies)
 			these_targets.append(mollicute+"_"+assemblies)
-	# print "%s:%s"%(mollicute," ".join(these_targets))
+	print template_quast%{'mollicute':mollicute,'monoassembleA':avail_assemblies[0],'monoassembleB':avail_assemblies[1],'monoassembleC':avail_assemblies[2]}
 # print "Allmolli:%s"%(" ".join(all_targets))
