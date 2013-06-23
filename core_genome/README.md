@@ -1,7 +1,7 @@
 Computation of the core genome conservation for MMC
 ======================================================
-* Based on orthology cluster defining the core Mollicute genome
-The core mollicute genome consist of the proteins found in the clade. These proteins are clustered by similarity.
+* Based on orthology clusters defining the core Mollicute genome
+The core mollicute genome consists of ortologous conserved proteins found in the clade. These proteins are clustered by similarity.
  
 * 1169_Mcapa_s03_5480 indicate that the MCAPA protein is in cluster 1169
 
