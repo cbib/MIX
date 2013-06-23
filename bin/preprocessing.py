@@ -14,10 +14,12 @@ def process_contig_renaming(ass_adr, i, output_file):
 			# identifiant= line.replace(" ","_") # DEBUG SAM: SOAP don't have unique ID without spaces
 			identifiant = identifiant.split(" ")[0]
 			if identifiant in all_ident:
-				identifiant=identifiant.strip()+".2"
+				out_identifiant=identifiant.strip()+"."+str(len([x for x in all_ident if x==identifiant]))
+			else:
+				out_identifiant=identifiant
 			all_ident.append(identifiant)
 			line = ass_file.readline()
-			output_file.write(identifiant+"\n")
+			output_file.write(out_identifiant+"\n")
 			while line and not re.match("^>", line) :
 				output_file.write(line)
 				line = ass_file.readline()
