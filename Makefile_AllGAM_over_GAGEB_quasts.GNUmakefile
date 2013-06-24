@@ -3,7 +3,7 @@ pyinterp:=python
 MUMmer:=$(shell pwd)/bin/MUMmer3.23/
 MIXPARAMS:=-A 500 -C 0
 MIXPARAMSFOLDER:=A500_C0
-QUAST:=bin/quast-2.1/quast.py --min-contig 200 --threads 8
+QUAST:=bin/quast-2.1/quast.py --min-contig 200 --threads 64
 GAGEBREF:=datasets/GAGE-B
 GAMNGS:=datasets/GAM-NGS/GAGE-B
 
