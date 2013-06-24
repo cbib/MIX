@@ -30,3 +30,13 @@ result_statistics/gage-b-mono/V_cholerae_HiSeq: $(GAGEBREF)/V_cholerae_HiSeq/mir
 
 result_statistics/gage-b-mono/X_axonopodis_HiSeq: $(GAGEBREF)/X_axonopodis_HiSeq/mira_ctg.fasta $(GAGEBREF)/X_axonopodis_HiSeq/msrca_ctg.fasta $(GAGEBREF)/X_axonopodis_HiSeq/sga_ctg.fasta $(GAGEBREF)/X_axonopodis_HiSeq/soap_ctg.fasta $(GAGEBREF)/X_axonopodis_HiSeq/spades_ctg.fasta $(GAGEBREF)/X_axonopodis_HiSeq/velvet_ctg.fasta
 	$(pyinterp) $(QUAST) -o $@ -R datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.fasta  -G datasets/reference/Xanthomonas_axonopodis/Xanthomonas_axonopodis_ref.gff $^ 
+
+
+ALLGAGEBQUASTS:result_statistics/gage-b-mono/R_sphaeroides_HiSeq \
+result_statistics/gage-b-mono/A_hydrophila_HiSeq \
+result_statistics/gage-b-mono/B_cereus_MiSeq \
+result_statistics/gage-b-mono/B_fragilis_HiSeq \
+result_statistics/gage-b-mono/M_abscessus_HiSeq \
+result_statistics/gage-b-mono/S_aureus_HiSeq \
+result_statistics/gage-b-mono/V_cholerae_HiSeq \
+result_statistics/gage-b-mono/X_axonopodis_HiSeq 
