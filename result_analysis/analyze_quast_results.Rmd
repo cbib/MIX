@@ -29,6 +29,11 @@ for(file in all.gage.b.reports){
   this.report$file=file
   all.quasts<-rbind(all.quasts,this.report)
 }
+all.quasts$NA50<-as.numeric(all.quasts$NA50)
+all.quasts$NGA50<-as.numeric(all.quasts$NGA50)
+all.quasts$NA75<-as.numeric(all.quasts$NA75)
+all.quasts$NGA75<-as.numeric(all.quasts$NGA75)
+
 all.quasts$specie <- strsplit2(all.quasts$file,"/")[,2]
 all.quasts$specie <- sub("_quast","",all.quasts$specie)
 all.quasts$merger <- "NA"
@@ -52,5 +57,129 @@ setnames(all.quasts,colnames(all.quasts),make.names(colnames(all.quasts)))
 ```{r}
 all.quasts[,max(N50),by=list(specie,merger)]
 all.quasts[,max(NA50),by=list(specie,merger)]
+ggplot(all.quasts[,max(NA50),by=list(specie,merger)],aes(x=interaction(specie,merger),y=V1))+geom_point()
+ggplot(all.quasts[,max(NA50),by=list(specie,merger)],aes(x=interaction(merger,specie),y=V1,colour=merger))+geom_point()
+
+ggplot(all.quasts[,list(specie,merger,NGA50)],aes(x=interaction(merger,specie),y=NGA50,fill=merger))+geom_point()+geom_boxplot(alpha=0.2)
+ggplot(na.omit(all.quasts[,list(specie,merger,NGA50)]),aes(x=merger,y=NGA50,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie,scale="free")
+
+ggplot(na.omit(all.quasts[,list(specie,merger,NGA50)]),aes(x=specie,y=NGA50,fill=merger))+geom_bar(stat="identity",position="dodge")
+
+ggplot(na.omit(all.quasts[,list(specie,merger,NA50)]),aes(x=merger,y=NA50,colour=merger))+geom_point()+geom_jitter(width=0.01)+ stat_summary(fun.data = "mean_cl_boot", colour = "red",alpha=1,size=0.2)+facet_wrap(~specie,scale="free")
+
+
+ggplot(na.omit(all.quasts[,list(specie,merger,NA50)]),aes(x=merger,y=NA50,colour=merger))+geom_point()+geom_jitter(width=0.01)+ stat_summary(fun.data = "mean_cl_boot", colour = "red",alpha=1,size=0.2)+facet_wrap(~specie,scale="free")
+
+ggplot(na.omit(all.quasts[,list(specie,merger,X..mismatches.per.100.kbp)]),aes(x=merger,y=X..mismatches.per.100.kbp,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie)
+
+ggplot(na.omit(all.quasts[,list(specie,merger,Duplication.ratio)]),aes(x=merger,y=Duplication.ratio,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie)
+
+ggplot(na.omit(all.quasts[,list(specie,merger,Duplication.ratio)]),aes(x=merger,y=Duplication.ratio,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie,scale="free")
+
+ggplot(na.omit(all.quasts[,list(specie,merger,Genome.fraction....)]),aes(x=merger,y=Genome.fraction....,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie)
+
 ```
 
+
+* GAA data 
+```{r}
+
+all.gaa.quasts<-data.table()
+all.gaa.gage.b.reports <- list.files("~/temp/MIX/datasets/GAA/GAGE-B/",pattern="*.tsv")
+for(file in all.gaa.gage.b.reports){
+  cat(file,"\n")
+  this.report <- fread(paste0("~/temp/MIX/datasets/GAA/GAGE-B/",file))
+  this.report$specie <- strsplit(file,"-")[[1]][1]
+  this.report$merger="GAA"
+  this.report$n.assembler<-2
+  this.report$assembler.1 <- strsplit(strsplit(file,"-")[[1]][2],"_")[[1]][1]
+  this.report$assembler.2<- strsplit(strsplit(file,"-")[[1]][3],"_")[[1]][1]
+#  this.report$specie=this.specie
+  this.report$file=file
+  this.report$Assembly<-with(this.report,paste(specie,assembler.1,assembler.2,sep="_"))
+  all.gaa.quasts<-rbind(all.gaa.quasts,this.report)
+}
+
+all.gaa.quasts$NA50<-as.numeric(all.gaa.quasts$NA50)
+all.gaa.quasts$NGA50<-as.numeric(all.gaa.quasts$NGA50)
+all.gaa.quasts$NA75<-as.numeric(all.gaa.quasts$NA75)
+all.gaa.quasts$NGA75<-as.numeric(all.gaa.quasts$NGA75)
+setnames(all.gaa.quasts,colnames(all.gaa.quasts),make.names(colnames(all.gaa.quasts)))
+
+all.gaa.quasts[specie=="S_aureus",specie:="aureus"]
+all.gaa.quasts[specie=="B_cereus",specie:="b_cereus"]
+all.gaa.quasts[specie=="R_sphaeroides",specie:="rhodo"]
+all.gaa.quasts[specie=="A_hydrophila",specie:="a_hydrophila"]
+
+all.combined.quasts <- rbind(all.quasts,all.gaa.quasts)
+
+```
+
+
+```{r}
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie,scale="free")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,NGA50)]),aes(x=merger,y=NGA50,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie,scale="free")
+
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,X..mismatches.per.100.kbp)]),aes(x=merger,y=X..mismatches.per.100.kbp,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie)
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,Duplication.ratio)]),aes(x=merger,y=Duplication.ratio,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie)
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,Duplication.ratio)]),aes(x=merger,y=Duplication.ratio,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie,scale="free")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,Genome.fraction....)]),aes(x=merger,y=Genome.fraction....,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie)
+
+
+```
+
+# Loading all pairwise GAGE-B mix results
+```{r}
+mix.pairwise.gage.b.files<-c("result_statistics/pairwise-gageb/A_hydrophila_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/B_cereus_MiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/B_fragilis_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/M_abscessus_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/R_sphaeroides_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/S_aureus_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/V_cholerae_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/X_axonopodis_HiSeq_quast/transposed_report.tsv")
+
+all.mix.pairwise.quasts<-data.table()
+for(file in mix.pairwise.gage.b.files){
+  cat(file,"\n")
+  this.report <- fread(file)
+  this.specie <- strsplit(file,"/")[[1]][3]
+  this.specie <- paste(unlist(strsplit(this.specie,"_"))[1:2],collapse="_")
+  this.report$Assembly <- matrix(unlist(strsplit(this.report$Assembly,"_")),ncol=5,byrow=T)[,4]
+  this.report$assembler.1 <- matrix(unlist(strsplit(this.report$Assembly,"-")),ncol=2,byrow=T)[,1]
+  this.report$assembler.2 <- matrix(unlist(strsplit(this.report$Assembly,"-")),ncol=2,byrow=T)[,2]
+  this.report$n.assembler <- 2
+  this.report$merger <- "MIX"
+  this.report$specie=this.specie
+  this.report$file=file
+  all.mix.pairwise.quasts<-rbind(all.mix.pairwise.quasts,this.report)
+}
+all.mix.pairwise.quasts$NA50<-as.numeric(all.mix.pairwise.quasts$NA50)
+all.mix.pairwise.quasts$NGA50<-as.numeric(all.mix.pairwise.quasts$NGA50)
+all.mix.pairwise.quasts$NA75<-as.numeric(all.mix.pairwise.quasts$NA75)
+all.mix.pairwise.quasts$NGA75<-as.numeric(all.mix.pairwise.quasts$NGA75)
+
+setnames(all.mix.pairwise.quasts,colnames(all.mix.pairwise.quasts),make.names(colnames(all.mix.pairwise.quasts)))
+
+all.mix.pairwise.quasts[specie=="S_aureus",specie:="aureus"]
+all.mix.pairwise.quasts[specie=="B_cereus",specie:="b_cereus"]
+all.mix.pairwise.quasts[specie=="R_sphaeroides",specie:="rhodo"]
+all.mix.pairwise.quasts[specie=="A_hydrophila",specie:="a_hydrophila"]
+
+all.combined.quasts<-rbind(all.combined.quasts,all.mix.pairwise.quasts)
+```
+
+```{r}
+all.combined.quasts[merger=="MIX",merger:=paste(merger,n.assembler,sep=".")]
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.4),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie,scale="free")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,NA50)]),aes(x=merger,y=NA50,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
+
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,round(Duplication.ratio,digits=1))]),aes(x=merger,y=V3,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
+
+```
