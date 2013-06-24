@@ -312,7 +312,8 @@ result_statistics/B_fragilis_quast: \
 
 # Rules for Mollicutes assemblies and statistics 
 # Cf bin/generate_assembly_command.py to generate the rules 
-include Makefile_mollicutes.mk
+include Makefile_mollicutes.GNUmakefile
+include Makefile_MixGAGEB.GNUmakefile
 # MOLLI:=datasets/Mollicutes/
 # MOLLIGAM:=datasets/GAM-NGS/Mollicutes
 

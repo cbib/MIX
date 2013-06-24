@@ -1,0 +1,16 @@
+```{r}
+library(data.table)
+setwd("~/temp/MIX/")
+all.gage.b.reports <- c("result_statistics/a_hydrophila_quast/transposed_report.tsv", "result_statistics/V_cholerae_quast/transposed_report.tsv", "result_statistics/B_fragilis_quast/transposed_report.tsv", "result_statistics/X_axonopodis_quast/transposed_report.tsv", "result_statistics/M_abscessus_quast/transposed_report.tsv", "result_statistics/b_cereus_quast/transposed_report.tsv", "result_statistics/aureus_quast/transposed_report.tsv", "result_statistics/rhodo_quast/transposed_report.tsv")
+
+all.quasts<-data.table()
+for(file in all.gage.b.reports){
+  cat(file,"\n")
+  this.report <- fread(file)
+  this.specie <- strsplit(file,"/")[[1]][2]
+  this.specie <- strsplit(this.specie,"_quast")[[1]][1]
+  this.report$specie=this.specie
+  this.report$file=file
+  all.quasts<-rbind(all.quasts,this.report)
+}
+```

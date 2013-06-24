@@ -1,0 +1,10 @@
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MAUR/*.fa -o quast_results/MAUR
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MBOVb/*.fa -o quast_results/MBOVb
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MBVG/*.fa -o quast_results/MBVG
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MCCP/*.fa -o quast_results/MCCP
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MMC/*.fa -o quast_results/MMC
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MOVI/*.fa -o quast_results/MOVI
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MSCb/*.fa -o quast_results/MSCb
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MSCc/*.fa -o quast_results/MSCc
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MSCd/*.fa -o quast_results/MSCd
+python ../../../bin/quast-2.1/quast.py --min-contig 200 --threads 2 --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000  MSCe/*.fa -o quast_results/MSCe
