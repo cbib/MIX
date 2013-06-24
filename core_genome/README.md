@@ -23,7 +23,7 @@ The core mollicute genome consists of ortologous conserved proteins found in the
 
 # To generate the *.hits files 
 
-    /usr/share/Modules/apps/blast/2.2.25/bin/blastall -p tblastn -m 8 -d ./MOVI  -i ../CorePep.fasta -o MOVI.hits -e 0.1
+    /usr/share/Modules/apps/blast/2.2.25/bin/blastall -p tblastn -m 8 -dbgcode4 -d ./MOVI  -i ../CorePep.fasta -o MOVI.hits -e 0.1
 
 # To generate the *.hits.core files 
 
