@@ -78,3 +78,21 @@ setnames(maure.clc,c("q", "contig", "identity", "alignment.length", "mismatches"
 setnames(maure.mira,c("q", "contig", "identity", "alignment.length", "mismatches", "gap.openings", "q.start", "q.end", "s.start", "s.end", "e.value", "bit.score"))
 setnames(maure.sub,c("q", "contig", "identity", "alignment.length", "mismatches", "gap.openings", "q.start", "q.end", "s.start", "s.end", "e.value", "bit.score"))
 ```
+
+
+
+New computation with corrected genetic code for Mycoplasmas 
+============================================================
+```{r}
+core <- fread("core_genome/Core_all.0.tsv")
+core[,rankP99:=rank(-p99.99,ties="first"),by=list(Specie,Merger)]
+core[,meanP99:=mean(p99.99),by=list(Specie,Merger)]
+core$medianP99<-median(core$p99.99)
+core.m <- data.table(melt(core[rankP99==1,]))[variable!="rankP99"]
+
+ggplot(core.m,aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+facet_wrap(~variable)
+ggplot(core.m[variable=="p99.99"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(100,150))
+ggplot(core.m[variable=="meanP99"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(50,150))
+ggplot(core.m[variable=="medianP99"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(50,150))
+ggsave("core.genome.pdf",w=12,h=8)
+```

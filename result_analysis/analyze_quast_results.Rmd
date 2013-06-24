@@ -270,7 +270,7 @@ all.combined.quasts[,.N,by=list(specie,merger)]
 ```
 # Cleaning up GAM and GAA accidents
 ```{r}
-all.combined.quasts[is.na(Genome.fraction....)]
+all.combined.quasts<-all.combined.quasts[!is.na(Genome.fraction....)]
 all.combined.quasts[order(Genome.fraction....)]
 ```
 # Ranking each assemblies per species using the N50 
@@ -286,32 +286,35 @@ all.combined.quasts[N50.rank<=5,]
 # 
 # ggplot(na.omit(all.combined.quasts[,list(specie,merger,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie,scale="free")
 
-pdf("all.quasts.measures.pdf",w=24,h=12)
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NA50)]),aes(x=merger,y=NA50,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NA50")+scale_size_discrete(range=c(1,3))
+small.size=2
+large.size=4
+rank.thr = 5
+pdf("all.quasts.measures.pdf",w=18,h=9)
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NA50)]),aes(x=merger,y=NA50,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NA50")+scale_size_discrete(range=c(small.size,large.size))
 
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NGA50")+scale_size_discrete(range=c(1,3))
-
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA75)]),aes(x=merger,y=NGA75,size=N50.rank<=5,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NGA75")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,size=N50.rank<=5,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Largest alignment (kb)")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,round(Duplication.ratio,digits=1))]),aes(x=merger,y=V4,colour=merger,size=N50.rank<=5,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=1,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")+ggtitle("Duplication ratio")
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NGA50")+scale_size_discrete(range=c(small.size,large.size))
 
 
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..mismatches.per.100.kbp)]),aes(x=merger,y=X..mismatches.per.100.kbp,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Mismatches per 100kb")
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA75)]),aes(x=merger,y=NGA75,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NGA75")+scale_size_discrete(range=c(small.size,large.size))
 
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..contigs)]),aes(x=merger,y=X..contigs,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("N contigs")
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Largest alignment (kb)")+scale_size_discrete(range=c(small.size,large.size))
 
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..indels.per.100.kbp,N50)]),aes(x=merger,y=X..indels.per.100.kbp,colour=merger,group=merger,size=N50.rank<=5,))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Indels per 100kb")
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,round(Duplication.ratio,digits=2))]),aes(x=merger,y=V4,colour=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr,group=merger))+geom_point(position=position_jitter(width=0.1,height=0),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=1,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")+ggtitle("Duplication ratio")+scale_size_discrete(range=c(small.size,large.size))
 
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,Genome.fraction....)]),aes(x=merger,y=Genome.fraction....,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=100,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")+ggtitle("Genome fraction recovered")
 
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..misassemblies)]),aes(x=merger,y=X..misassemblies,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Misassemblies")
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..mismatches.per.100.kbp)]),aes(x=merger,y=X..mismatches.per.100.kbp,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Mismatches per 100kb")+scale_size_discrete(range=c(small.size,large.size))
 
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,n.genes,N50)]),aes(x=merger,y=n.genes,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("N genes")
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..contigs)]),aes(x=merger,y=X..contigs,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("N contigs")+scale_size_discrete(range=c(small.size,large.size))
 
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,unaligned.contigs,N50)]),aes(x=merger,y=unaligned.contigs,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Unaligned contigs")
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..indels.per.100.kbp,N50)]),aes(x=merger,y=X..indels.per.100.kbp,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.1,height=0),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Indels per 100kb")+scale_size_discrete(range=c(small.size,large.size))
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,Genome.fraction....)]),aes(x=merger,y=Genome.fraction....,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.1,height=0),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=100,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")+ggtitle("Genome fraction recovered")+scale_size_discrete(range=c(small.size,large.size))
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..misassemblies)]),aes(x=merger,y=X..misassemblies,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.1,height=0),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Misassemblies")+scale_size_discrete(range=c(small.size,large.size))
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,n.genes,N50)]),aes(x=merger,y=n.genes,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.1,height=0),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("N genes")+scale_size_discrete(range=c(small.size,large.size))
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,unaligned.contigs,N50)]),aes(x=merger,y=unaligned.contigs,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.1,height=0),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Unaligned contigs")+scale_size_discrete(range=c(small.size,large.size))
 
 dev.off()
 ```
