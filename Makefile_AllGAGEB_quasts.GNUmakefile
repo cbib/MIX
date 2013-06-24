@@ -3,7 +3,7 @@ pyinterp:=python
 MUMmer:=$(shell pwd)/bin/MUMmer3.23/
 MIXPARAMS:=-A 500 -C 0
 MIXPARAMSFOLDER:=A500_C0
-QUAST:=bin/quast-2.1/quast.py --min-contig 200 --threads 2
+QUAST:=bin/quast-2.1/quast.py --min-contig 200 --threads 8
 GAGEBREF:=datasets/GAGE-B
 
 result_statistics/gage-b-mono/R_sphaeroides_HiSeq: $(GAGEBREF)/R_sphaeroides_HiSeq/abyss_ctg.fasta $(GAGEBREF)/R_sphaeroides_HiSeq/cabog_ctg.fasta $(GAGEBREF)/R_sphaeroides_HiSeq/mira_ctg.fasta $(GAGEBREF)/R_sphaeroides_HiSeq/msrca_ctg.fasta $(GAGEBREF)/R_sphaeroides_HiSeq/sga_ctg.fasta $(GAGEBREF)/R_sphaeroides_HiSeq/soap_ctg.fasta $(GAGEBREF)/R_sphaeroides_HiSeq/spades_ctg.fasta $(GAGEBREF)/R_sphaeroides_HiSeq/velvet_ctg.fasta
