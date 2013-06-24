@@ -1,6 +1,7 @@
 ```{r}
 library(data.table)
 library(ggplot2)
+library(reshape2)
 setwd("~/temp/MIX/")
 strsplit2 <- function (x, split, ...) 
 {
@@ -15,14 +16,18 @@ strsplit2 <- function (x, split, ...)
     }
     out
 }
+all.quasts<-data.table()
 
+```
+
+# Reading presvious results
+```{r}
 
 all.gage.b.reports <- c("result_statistics/a_hydrophila_quast/transposed_report.tsv", "result_statistics/V_cholerae_quast/transposed_report.tsv", "result_statistics/B_fragilis_quast/transposed_report.tsv", "result_statistics/X_axonopodis_quast/transposed_report.tsv", "result_statistics/M_abscessus_quast/transposed_report.tsv", "result_statistics/b_cereus_quast/transposed_report.tsv", "result_statistics/aureus_quast/transposed_report.tsv", "result_statistics/rhodo_quast/transposed_report.tsv")
 
-all.quasts<-data.table()
 for(file in all.gage.b.reports){
   cat(file,"\n")
-  this.report <- fread(file)
+  this.report <- fread(file,na.strings=c("None","NA"))
   this.specie <- strsplit(file,"/")[[1]][2]
   this.specie <- strsplit(this.specie,"_quast")[[1]][1]
   this.report$specie=this.specie
@@ -39,16 +44,20 @@ all.quasts$specie <- sub("_quast","",all.quasts$specie)
 all.quasts$merger <- "NA"
 all.quasts[grep("mix",Assembly),merger:="MIX",by=Assembly]
 all.quasts[grep("GAM",Assembly),merger:="GAM"]
-
+all.quasts$assembler.1 <- "NA" 
+all.quasts$assembler.2 <- "NA"
 all.quasts[merger=="GAM",assembler.1:=unlist(strsplit(unlist(strsplit(Assembly,"_"))[2],"-"))[1],by=Assembly]
 all.quasts[merger=="GAM",assembler.2:=unlist(strsplit(unlist(strsplit(Assembly,"_"))[2],"-"))[2],by=Assembly]
-all.quasts[is.na(merger),assembler.1:=unlist(strsplit(Assembly,"_"))[1],by=Assembly]
+all.quasts[merger=="NA",assembler.1:=unlist(strsplit(Assembly,"_"))[1],by=Assembly]
 
 extract_mix_assembler <- function(s){
   elements <- unlist(strsplit(s,"_"))
   return(elements[elements==toupper(elements)])
 }
 all.quasts[merger=="MIX",n.assembler:=length(extract_mix_assembler(Assembly)),by=Assembly]
+all.quasts[merger=="NA",n.assembler:=1L]
+all.quasts[merger=="GAM",n.assembler:=2L]
+
 all.quasts.orginal.names <- colnames(all.quasts)
 setnames(all.quasts,colnames(all.quasts),make.names(colnames(all.quasts)))
 ```
@@ -86,10 +95,19 @@ ggplot(na.omit(all.quasts[,list(specie,merger,Genome.fraction....)]),aes(x=merge
 
 all.gaa.quasts<-data.table()
 all.gaa.gage.b.reports <- list.files("~/temp/MIX/datasets/GAA/GAGE-B/",pattern="*.tsv")
+
+all.gaa.gage.b.reports<-  all.gaa.gage.b.reports[grep("B_cereus.*HiSeq",all.gaa.gage.b.reports,perl=T,invert=T)]
+
 for(file in all.gaa.gage.b.reports){
   cat(file,"\n")
-  this.report <- fread(paste0("~/temp/MIX/datasets/GAA/GAGE-B/",file))
+  this.report <- fread(paste0("~/temp/MIX/datasets/GAA/GAGE-B/",file),na.strings=c("None","NA"))
   this.report$specie <- strsplit(file,"-")[[1]][1]
+  if (this.specie != "B_cereus"){
+    this.report<-this.report[!grep("MiSeq",Assembly)]
+    }else{
+      this.report<-this.report[grep("MiSeq",Assembly)]
+      }
+  
   this.report$merger="GAA"
   this.report$n.assembler<-2
   this.report$assembler.1 <- strsplit(strsplit(file,"-")[[1]][2],"_")[[1]][1]
@@ -111,8 +129,191 @@ all.gaa.quasts[specie=="B_cereus",specie:="b_cereus"]
 all.gaa.quasts[specie=="R_sphaeroides",specie:="rhodo"]
 all.gaa.quasts[specie=="A_hydrophila",specie:="a_hydrophila"]
 
-all.combined.quasts <- rbind(all.quasts,all.gaa.quasts)
+all.gaa.quasts[,.N,by=list(specie,assembler.1,assembler.2)][order(N)]
+all.combined.quasts <- rbind(all.quasts,all.gaa.quasts,use.names=T)
 
+```
+
+
+
+
+# Loading all pairwise MIX GAGE-B mix results
+```{r}
+mix.pairwise.gage.b.files<-c("result_statistics/mix-all-pairwise-gageb/A_hydrophila_HiSeq_quast/transposed_report.tsv", "result_statistics/mix-all-pairwise-gageb/B_cereus_MiSeq_quast/transposed_report.tsv", "result_statistics/mix-all-pairwise-gageb/B_fragilis_HiSeq_quast/transposed_report.tsv", "result_statistics/mix-all-pairwise-gageb/M_abscessus_HiSeq_quast/transposed_report.tsv", "result_statistics/mix-all-pairwise-gageb/R_sphaeroides_HiSeq_quast/transposed_report.tsv", "result_statistics/mix-all-pairwise-gageb/S_aureus_HiSeq_quast/transposed_report.tsv", "result_statistics/mix-all-pairwise-gageb/V_cholerae_HiSeq_quast/transposed_report.tsv", "result_statistics/mix-all-pairwise-gageb/X_axonopodis_HiSeq_quast/transposed_report.tsv")
+
+all.mix.pairwise.quasts<-data.table()
+for(file in mix.pairwise.gage.b.files){
+  cat(file,"\n")
+  this.report <- fread(file,na.strings=c("None","NA"))
+  this.specie <- strsplit(file,"/")[[1]][3]
+  this.specie <- paste(unlist(strsplit(this.specie,"_"))[1:2],collapse="_")
+  this.report$Assembly <- matrix(unlist(strsplit(this.report$Assembly,"_")),ncol=5,byrow=T)[,4]
+  this.report$assembler.1 <- matrix(unlist(strsplit(this.report$Assembly,"-")),ncol=2,byrow=T)[,1]
+  this.report$assembler.2 <- matrix(unlist(strsplit(this.report$Assembly,"-")),ncol=2,byrow=T)[,2]
+  this.report$n.assembler <- 2L
+  this.report$merger <- "MIX"
+  this.report$specie=this.specie
+  this.report$file=file
+  all.mix.pairwise.quasts<-rbind(all.mix.pairwise.quasts,this.report)
+}
+all.mix.pairwise.quasts$NA50<-as.numeric(all.mix.pairwise.quasts$NA50)
+all.mix.pairwise.quasts$NGA50<-as.numeric(all.mix.pairwise.quasts$NGA50)
+all.mix.pairwise.quasts$NA75<-as.numeric(all.mix.pairwise.quasts$NA75)
+all.mix.pairwise.quasts$NGA75<-as.numeric(all.mix.pairwise.quasts$NGA75)
+
+setnames(all.mix.pairwise.quasts,colnames(all.mix.pairwise.quasts),make.names(colnames(all.mix.pairwise.quasts)))
+
+all.mix.pairwise.quasts[specie=="S_aureus",specie:="aureus"]
+all.mix.pairwise.quasts[specie=="B_cereus",specie:="b_cereus"]
+all.mix.pairwise.quasts[specie=="R_sphaeroides",specie:="rhodo"]
+all.mix.pairwise.quasts[specie=="A_hydrophila",specie:="a_hydrophila"]
+all.mix.pairwise.quasts[merger=="MIX",merger:=paste(merger,n.assembler,sep=".")]
+
+tail(all.mix.pairwise.quasts[,.N,by=list(specie,assembler.1,assembler.2)][order(N)])
+all.combined.quasts<-  rbind(all.combined.quasts,all.mix.pairwise.quasts,use.names=T)
+
+```
+
+# Loading all GAGE-B mono assemblies 
+```{r}
+gage.b.mono.assemblies.files <- c("result_statistics/gage-b-mono/A_hydrophila_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/B_cereus_MiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/B_fragilis_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/M_abscessus_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/R_sphaeroides_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/S_aureus_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/V_cholerae_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/X_axonopodis_HiSeq/transposed_report.tsv")
+
+gage.b.mono.assemblies.quasts<-data.table()
+for(file in gage.b.mono.assemblies.files){
+  cat(file,"\n")
+  this.report <- fread(file,na.strings=c("None","NA"))
+  
+  this.specie <- strsplit(file,"/")[[1]][3]
+  this.specie <- paste(unlist(strsplit(this.specie,"_"))[1:2],collapse="_")
+#   if (this.specie != "B_cereus"){
+#     this.report<-this.report[!grep("MiSeq",Assembly)]
+#     }else{
+#       this.report<-this.report[grep("MiSeq",Assembly)]
+#       }
+#  this.report$Assembly <- 
+  this.report$assembler.1 <- matrix(unlist(strsplit(this.report$Assembly,"_")),ncol=2,byrow=T)[,1]
+  this.report$assembler.2 <- "NA"
+  this.report$n.assembler <- 1L
+  this.report$merger <-"NA"
+  this.report$specie=this.specie
+  this.report$file=file
+  gage.b.mono.assemblies.quasts<-rbind(gage.b.mono.assemblies.quasts,this.report)
+}
+gage.b.mono.assemblies.quasts$NA50<-as.numeric(gage.b.mono.assemblies.quasts$NA50)
+gage.b.mono.assemblies.quasts$NGA50<-as.numeric(gage.b.mono.assemblies.quasts$NGA50)
+gage.b.mono.assemblies.quasts$NA75<-as.numeric(gage.b.mono.assemblies.quasts$NA75)
+gage.b.mono.assemblies.quasts$NGA75<-as.numeric(gage.b.mono.assemblies.quasts$NGA75)
+
+gage.b.mono.assemblies.quasts[specie=="S_aureus",specie:="aureus"]
+gage.b.mono.assemblies.quasts[specie=="B_cereus",specie:="b_cereus"]
+gage.b.mono.assemblies.quasts[specie=="R_sphaeroides",specie:="rhodo"]
+gage.b.mono.assemblies.quasts[specie=="A_hydrophila",specie:="a_hydrophila"]
+
+setnames(gage.b.mono.assemblies.quasts,colnames(gage.b.mono.assemblies.quasts),make.names(colnames(gage.b.mono.assemblies.quasts)))
+tail(gage.b.mono.assemblies.quasts[,.N,by=list(specie,assembler.1)][order(N)])
+all.combined.quasts<-rbind(gage.b.mono.assemblies.quasts,all.combined.quasts,use.names=T)
+
+```
+
+# Loading all GAGE-B GAM-NGS pairwise combinations
+```{r}
+gage.b.gam.pairwise.files <- c("result_statistics/gam_ngs_gage-b/A_hydrophila/transposed_report.tsv", "result_statistics/gam_ngs_gage-b/B_cereus/transposed_report.tsv", "result_statistics/gam_ngs_gage-b/B_fragilis/transposed_report.tsv", "result_statistics/gam_ngs_gage-b/M_abscessus/transposed_report.tsv", "result_statistics/gam_ngs_gage-b/R_sphaeroides/transposed_report.tsv", "result_statistics/gam_ngs_gage-b/S_aureus/transposed_report.tsv", "result_statistics/gam_ngs_gage-b/V_cholerae/transposed_report.tsv", "result_statistics/gam_ngs_gage-b/X_axonopodis/transposed_report.tsv")
+
+
+gage.b.gam.pairwise.quasts<-data.table()
+for(file in gage.b.gam.pairwise.files){
+  cat(file,"\n")
+  this.report <- fread(file,na.strings=c("None","NA"))
+  this.specie <- strsplit(file,"/")[[1]][3]
+#   this.specie <- paste(unlist(strsplit(this.specie,"_"))[1:2],collapse="_")
+  if (this.specie != "B_cereus"){
+    this.report<-this.report[!grep("MiSeq",Assembly)]
+  }else{
+    this.report<-this.report[grep("MiSeq",Assembly)]
+  }
+  this.report$Assembly <- gsub("_MiSeq_","_",this.report$Assembly)
+  this.report$Assembly <- strsplit2(this.report$Assembly,"_")[,2]
+  this.report$assembler.1 <- strsplit2(strsplit2(this.report$Assembly,".",fixed=T)[,1],"-")[,1]
+  this.report$assembler.2 <- strsplit2(strsplit2(this.report$Assembly,".",fixed=T)[,1],"-")[,2]
+  this.report$n.assembler <- 2L
+  this.report$merger <-"GAM"
+  this.report$specie=this.specie
+  this.report$file=file
+  gage.b.gam.pairwise.quasts<-rbind(gage.b.gam.pairwise.quasts,this.report)
+}
+gage.b.gam.pairwise.quasts$NA50<-as.numeric(gage.b.gam.pairwise.quasts$NA50)
+gage.b.gam.pairwise.quasts$NGA50<-as.numeric(gage.b.gam.pairwise.quasts$NGA50)
+gage.b.gam.pairwise.quasts$NA75<-as.numeric(gage.b.gam.pairwise.quasts$NA75)
+gage.b.gam.pairwise.quasts$NGA75<-as.numeric(gage.b.gam.pairwise.quasts$NGA75)
+
+gage.b.gam.pairwise.quasts[specie=="S_aureus",specie:="aureus"]
+gage.b.gam.pairwise.quasts[specie=="B_cereus",specie:="b_cereus"]
+gage.b.gam.pairwise.quasts[specie=="R_sphaeroides",specie:="rhodo"]
+gage.b.gam.pairwise.quasts[specie=="A_hydrophila",specie:="a_hydrophila"]
+
+setnames(gage.b.gam.pairwise.quasts,colnames(gage.b.gam.pairwise.quasts),make.names(colnames(gage.b.gam.pairwise.quasts)))
+gage.b.gam.pairwise.quasts[,.N,by=list(specie,assembler.1,assembler.2)][order(N)]
+gage.b.gam.pairwise.quasts[,.N,by=list(specie)][order(N)]
+all.combined.quasts<- rbind(all.combined.quasts,gage.b.gam.pairwise.quasts,use.names=T)
+
+```
+
+# Interpreting part data
+```{r}
+all.combined.quasts[,unaligned.contigs:=as.integer(strsplit2(X..unaligned.contigs," + ",fixed=T)[,1])]
+all.combined.quasts[,n.genes:=as.integer(strsplit2(X..genes," + ",fixed=T)[,1])]
+```
+
+# Checking group sizes
+```{r}
+all.combined.quasts[,.N,by=list(specie,merger)]
+```
+# Cleaning up GAM and GAA accidents
+```{r}
+all.combined.quasts[is.na(Genome.fraction....)]
+all.combined.quasts[order(Genome.fraction....)]
+```
+# Ranking each assemblies per species using the N50 
+```{r}
+all.combined.quasts[,N50.rank:=rank(-N50,ties.method="first"),by=list(merger,specie)]
+all.combined.quasts[N50.rank==1,]
+all.combined.quasts[N50.rank<=5,]
+```
+# Plots
+```{r}
+
+# ggplot(na.omit(all.combined.quasts[,list(specie,merger,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.4),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
+# 
+# ggplot(na.omit(all.combined.quasts[,list(specie,merger,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie,scale="free")
+
+pdf("all.quasts.measures.pdf",w=24,h=12)
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NA50)]),aes(x=merger,y=NA50,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NA50")+scale_size_discrete(range=c(1,3))
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NGA50")+scale_size_discrete(range=c(1,3))
+
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA75)]),aes(x=merger,y=NGA75,size=N50.rank<=5,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NGA75")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,size=N50.rank<=5,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Largest alignment (kb)")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,round(Duplication.ratio,digits=1))]),aes(x=merger,y=V4,colour=merger,size=N50.rank<=5,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=1,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")+ggtitle("Duplication ratio")
+
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..mismatches.per.100.kbp)]),aes(x=merger,y=X..mismatches.per.100.kbp,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Mismatches per 100kb")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..contigs)]),aes(x=merger,y=X..contigs,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("N contigs")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..indels.per.100.kbp,N50)]),aes(x=merger,y=X..indels.per.100.kbp,colour=merger,group=merger,size=N50.rank<=5,))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Indels per 100kb")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,Genome.fraction....)]),aes(x=merger,y=Genome.fraction....,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=100,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")+ggtitle("Genome fraction recovered")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..misassemblies)]),aes(x=merger,y=X..misassemblies,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Misassemblies")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,n.genes,N50)]),aes(x=merger,y=n.genes,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("N genes")
+
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,unaligned.contigs,N50)]),aes(x=merger,y=unaligned.contigs,colour=merger,group=merger,size=N50.rank<=5))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Unaligned contigs")
+
+dev.off()
 ```
 
 
@@ -132,96 +333,10 @@ ggplot(na.omit(all.combined.quasts[,list(specie,merger,Genome.fraction....)]),ae
 
 
 ```
-
-# Loading all pairwise GAGE-B mix results
+# Check that number of point per setup is roughly equivalent 
 ```{r}
-mix.pairwise.gage.b.files<-c("result_statistics/pairwise-gageb/A_hydrophila_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/B_cereus_MiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/B_fragilis_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/M_abscessus_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/R_sphaeroides_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/S_aureus_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/V_cholerae_HiSeq_quast/transposed_report.tsv", "result_statistics/pairwise-gageb/X_axonopodis_HiSeq_quast/transposed_report.tsv")
-
-all.mix.pairwise.quasts<-data.table()
-for(file in mix.pairwise.gage.b.files){
-  cat(file,"\n")
-  this.report <- fread(file)
-  this.specie <- strsplit(file,"/")[[1]][3]
-  this.specie <- paste(unlist(strsplit(this.specie,"_"))[1:2],collapse="_")
-  this.report$Assembly <- matrix(unlist(strsplit(this.report$Assembly,"_")),ncol=5,byrow=T)[,4]
-  this.report$assembler.1 <- matrix(unlist(strsplit(this.report$Assembly,"-")),ncol=2,byrow=T)[,1]
-  this.report$assembler.2 <- matrix(unlist(strsplit(this.report$Assembly,"-")),ncol=2,byrow=T)[,2]
-  this.report$n.assembler <- 2
-  this.report$merger <- "MIX"
-  this.report$specie=this.specie
-  this.report$file=file
-  all.mix.pairwise.quasts<-rbind(all.mix.pairwise.quasts,this.report)
-}
-all.mix.pairwise.quasts$NA50<-as.numeric(all.mix.pairwise.quasts$NA50)
-all.mix.pairwise.quasts$NGA50<-as.numeric(all.mix.pairwise.quasts$NGA50)
-all.mix.pairwise.quasts$NA75<-as.numeric(all.mix.pairwise.quasts$NA75)
-all.mix.pairwise.quasts$NGA75<-as.numeric(all.mix.pairwise.quasts$NGA75)
-
-setnames(all.mix.pairwise.quasts,colnames(all.mix.pairwise.quasts),make.names(colnames(all.mix.pairwise.quasts)))
-
-all.mix.pairwise.quasts[specie=="S_aureus",specie:="aureus"]
-all.mix.pairwise.quasts[specie=="B_cereus",specie:="b_cereus"]
-all.mix.pairwise.quasts[specie=="R_sphaeroides",specie:="rhodo"]
-all.mix.pairwise.quasts[specie=="A_hydrophila",specie:="a_hydrophila"]
-
-all.combined.quasts<-rbind(all.combined.quasts,all.mix.pairwise.quasts)
+all.combined.quasts[,.N,by=list(specie,merger,assembler.1,assembler.2)][N>1]
 ```
-
-# Loading all GAGE-B mono assemblies 
-```{r}
-gage.b.mono.assemblies.files <- c("result_statistics/gage-b-mono/A_hydrophila_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/B_cereus_MiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/B_fragilis_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/M_abscessus_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/R_sphaeroides_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/S_aureus_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/V_cholerae_HiSeq/transposed_report.tsv", "result_statistics/gage-b-mono/X_axonopodis_HiSeq/transposed_report.tsv")
-
-gage.b.mono.assemblies.quasts<-data.table()
-for(file in gage.b.mono.assemblies.files){
-  cat(file,"\n")
-  this.report <- fread(file,na.strings=c("None"))
-  this.specie <- strsplit(file,"/")[[1]][3]
-  this.specie <- paste(unlist(strsplit(this.specie,"_"))[1:2],collapse="_")
-#  this.report$Assembly <- 
-  this.report$assembler.1 <- matrix(unlist(strsplit(this.report$Assembly,"_")),ncol=2,byrow=T)[,1]
-  this.report$assembler.2 <- NA
-  this.report$n.assembler <- 1
-  this.report$merger <- NA
-  this.report$specie=this.specie
-  this.report$file=file
-  gage.b.mono.assemblies.quasts<-rbind(gage.b.mono.assemblies.quasts,this.report)
-}
-gage.b.mono.assemblies.quasts$NA50<-as.numeric(gage.b.mono.assemblies.quasts$NA50)
-gage.b.mono.assemblies.quasts$NGA50<-as.numeric(gage.b.mono.assemblies.quasts$NGA50)
-gage.b.mono.assemblies.quasts$NA75<-as.numeric(gage.b.mono.assemblies.quasts$NA75)
-gage.b.mono.assemblies.quasts$NGA75<-as.numeric(gage.b.mono.assemblies.quasts$NGA75)
-
-setnames(gage.b.mono.assemblies.quasts,colnames(gage.b.mono.assemblies.quasts),make.names(colnames(gage.b.mono.assemblies.quasts)))
-
-
-```
-# Plots
-```{r}
-all.combined.quasts[merger=="MIX",merger:=paste(merger,n.assembler,sep=".")]
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.4),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,fill=merger))+geom_point(position="jitter")+geom_boxplot(alpha=0.2)+facet_wrap(~specie,scale="free")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,NA50)]),aes(x=merger,y=NA50,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
-
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,NGA75)]),aes(x=merger,y=NGA75,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,round(Duplication.ratio,digits=1))]),aes(x=merger,y=V3,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=1,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")
-
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,X..mismatches.per.100.kbp)]),aes(x=merger,y=X..mismatches.per.100.kbp,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,X..contigs)]),aes(x=merger,y=X..contigs,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,X..indels.per.100.kbp)]),aes(x=merger,y=X..indels.per.100.kbp,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")
-
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,Genome.fraction....)]),aes(x=merger,y=Genome.fraction....,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.01),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=100,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")
-
-
-
-```
+# Unbiased selection based on the best N50 
+(Similar to selection without reference genome)
+could be added as a point on the plot
