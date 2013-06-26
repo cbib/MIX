@@ -27,7 +27,7 @@ The core mollicute genome consists of ortologous conserved proteins found in the
 
 # To generate the *.hits.core files 
 
-    for f in *hits; do perl ./clusters.perl --blast   > .hits.core; done
+    for f in *hits; do perl ./clusters.perl --blast MOVI.hits --prots CoreGenome_170.fasta  > .hits.core; done
 
 
 # *.hits.core 
