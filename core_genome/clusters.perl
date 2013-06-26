@@ -12,13 +12,11 @@ my $do_help = 0;
 
 my $blast_file = "";
 my $prot_file = "";
-my $id_threshold = 50; #defualt
 
 GetOptions('help!'    => \$do_help,
            'prots=s'  => \$prot_file,
            'blast=s'  => \$blast_file,
-	   'id=i'     => \$id_threshold,
-    );
+           );
  
 if ( $do_help or $blast_file eq "" or $prot_file eq "" ) {
     print "usage: ",$0," --blast FILE --prots FILE [--id <int>] [--help]\n";
@@ -83,7 +81,6 @@ print STDERR " processed $total alignements for ", scalar(keys %alignements), " 
 
 foreach my $cluster (keys %alignements) {
     my ($id, $aln_len, $gaps, $q_start, $q_end, $eval, $len) = @{$alignements{$cluster}} ;
-    if ($id < $id_threshold) { next; }
     my $t = $aln_len/$len; 
 
     if ($t > 0.5)  { $n50{$cluster} = $n50{$cluster} + 1; }
