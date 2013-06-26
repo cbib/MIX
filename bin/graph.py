@@ -539,7 +539,7 @@ def prepare_mix_graph(g_dir):
 
 
 def remove_cycle(g):
-	# Determine if there are cycles (none for seed 1235)
+	# Determine if there are cycles 
 	n_scc = [x for x in nx.strongly_connected_component_subgraphs(g) if len(x)>1]
 	if len(n_scc)==0:
 		return g

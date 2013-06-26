@@ -317,6 +317,7 @@ include Makefile_mollicutes.GNUmakefile
 include Makefile_MixGAGEB.GNUmakefile
 include Makefile_AllGAGEB_quasts.GNUmakefile
 include Makefile_AllGAM_over_GAGEB_quasts.GNUmakefile
+include Makefile_mollicutesQuasts.GNUmakefile
 # MOLLI:=datasets/Mollicutes/
 # MOLLIGAM:=datasets/GAM-NGS/Mollicutes
 

@@ -1,6 +1,7 @@
 ```{r}
 library(data.table)
 library(ggplot2)
+library(reshape2)
 strsplit2 <- function (x, split, ...) 
 {
     x <- as.character(x)
@@ -14,7 +15,12 @@ strsplit2 <- function (x, split, ...)
     }
     out
 }
+setwd("~/temp/MIX/")
 
+```
+
+
+```{r}
 
 lengths<-fread("../mollicutes_core_genome_cluster_of_proteins.protein.length.tsv")
 setnames(lengths,c("q","q.length"))
@@ -88,12 +94,30 @@ core <- fread("core_genome/Core_all.0.tsv")
 core[,rankP99:=rank(-p99.99,ties="first"),by=list(Specie,Merger)]
 core[,meanP99:=mean(p99.99),by=list(Specie,Merger)]
 core[,maxP99:=max(p99.99),by=list(Specie,Merger)]
+core[,minP99:=min(p99.99),by=list(Specie,Merger)]
 core$medianP99<-median(core$p99.99)
 core.m <- data.table(melt(core[rankP99==1,]))[variable!="rankP99"]
 
 ggplot(core.m,aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+facet_wrap(~variable)
+ggplot(core.m[variable=="p85"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(100,170))
 ggplot(core.m[variable=="p99.99"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(100,150))
-ggplot(core.m[variable=="meanP99"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(50,150))
+ggplot(core.m[variable=="meanP99"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(50,150))+ylab("Mean number of proteins recovered with 99% identity")
+ggsave("figures/core.genome_core0_mean.pdf",w=12,h=8)
 ggplot(core.m[variable=="medianP99"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(50,150))
-ggsave("core.genome.pdf",w=12,h=8)
+ggplot(core.m[variable=="maxP99"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(50,150))
+ggplot(core.m[variable=="minP99"],aes(x=Specie,y=value,fill=Merger))+geom_bar(stat="identity",pos="dodge")+coord_cartesian(ylim=c(50,150))+ylab("Min number of proteins with 99% identity")
+ggsave("figures/core.genome_core0_min.pdf",w=12,h=8)
+
+```
+```{r}
+ggplot(core,aes(x=Specie,fill=Merger,y=p99.99))+ stat_boxplot(geom ='errorbar')+geom_boxplot(alpha=0.5,outlier.size=0)+coord_cartesian(ylim=c(80,150))+ylab("Number of clusters with a conserved representative(Identity>=99.99%)")+scale_fill_manual(values=c("#7FC97F","#E69F00", "#56B4E9","#999999"))
+#+scale_fill_manual(values=brewer.pal("Accent",n=4))
+
+ggplot(core,aes(x=Specie,fill=Merger,y=p99.99))+ stat_boxplot(geom ='errorbar')+geom_boxplot(alpha=0.5,outlier.size=0)+coord_cartesian(ylim=c(80,150))+ylab("Number of clusters with a conserved representative(Identity>=99.99%)")+scale_fill_manual(values=c("#7FC97F","#E69F00", "#56B4E9","#999999"))
+#+scale_fill_manual(values=brewer.pal("Accent",n=4))
+
+
+ggsave("figures/core.genome_core0_boxes_v2.pdf",w=10,h=7)
+library(RColorBrewer)
+
 ```

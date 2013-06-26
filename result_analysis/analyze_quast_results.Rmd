@@ -1,8 +1,56 @@
 ```{r}
 library(data.table)
 library(ggplot2)
+library(grid)
 library(reshape2)
 setwd("~/temp/MIX/")
+
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  require(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
 strsplit2 <- function (x, split, ...) 
 {
     x <- as.character(x)
@@ -279,6 +327,20 @@ all.combined.quasts[,N50.rank:=rank(-N50,ties.method="first"),by=list(merger,spe
 all.combined.quasts[N50.rank==1,]
 all.combined.quasts[N50.rank<=5,]
 ```
+# Prepare labels for plotting
+```{r}
+all.combined.quasts[specie=="rhodo",specie:="R. sphaeroides"]
+all.combined.quasts[specie=="aureus",specie:="S. aureus"]
+all.combined.quasts[specie=="b_cereus",specie:="B. cereus"]
+all.combined.quasts[specie=="B_fragilis",specie:="B. fragilis"]
+all.combined.quasts[specie=="M_abscessus",specie:="M. abscessus"]
+all.combined.quasts[specie=="V_cholerae",specie:="V. cholera"]
+all.combined.quasts[specie=="X_axonopodis",specie:="X. axonopodis"]
+all.combined.quasts[specie=="a_hydrophila",specie:="A.hydrophila"]
+all.combined.quasts[merger=="NA",merger:="Single assembly"]
+all.combined.quasts[merger=="MIX.2",merger:="MIX"]
+
+```
 # Plots
 ```{r}
 
@@ -290,7 +352,8 @@ small.size=2
 large.size=4
 rank.thr = 5
 pdf("all.quasts.measures.pdf",w=18,h=9)
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NA50)]),aes(x=merger,y=NA50,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NA50")+scale_size_discrete(range=c(small.size,large.size))
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NA50)]),aes(x=merger,y=NA50/1000,colour=merger,group=merger))+geom_point(aes(size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr),position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NA50(kb)")+scale_size_discrete(range=c(small.size,large.size),name="Top 5 by N50")+scale_fill_discrete(name="Assembler type")+scale_shape_discrete(name="Top 5 by N50")+xlab("Assembler type")
+ggsave("figures/GAGE_B_NA50.pdf",w=12,h=6)
 
 ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NGA50")+scale_size_discrete(range=c(small.size,large.size))
 
@@ -299,7 +362,8 @@ ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA75)]),aes(x=m
 
 ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Largest alignment (kb)")+scale_size_discrete(range=c(small.size,large.size))
 
-ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,round(Duplication.ratio,digits=2))]),aes(x=merger,y=V4,colour=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr,group=merger))+geom_point(position=position_jitter(width=0.1,height=0),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=1,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")+ggtitle("Duplication ratio")+scale_size_discrete(range=c(small.size,large.size))
+ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,round(Duplication.ratio,digits=2))]),aes(x=merger,y=V4,colour=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr,group=merger))+geom_point(position=position_jitter(width=0.1,height=0),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=1,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")+ggtitle("Duplication ratio")+scale_size_discrete(range=c(small.size,large.size))+scale_size_discrete(range=c(small.size,large.size),name="Top 5 by N50")+scale_fill_discrete(name="Assembler type")+scale_shape_discrete(name="Top 5 by N50")+xlab("Assembler type")+ylab("Duplication Ratio")
+ggsave("figures/GAGE_B_DUP.pdf",w=12,h=6)
 
 
 ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..mismatches.per.100.kbp)]),aes(x=merger,y=X..mismatches.per.100.kbp,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Mismatches per 100kb")+scale_size_discrete(range=c(small.size,large.size))
@@ -343,3 +407,89 @@ all.combined.quasts[,.N,by=list(specie,merger,assembler.1,assembler.2)][N>1]
 # Unbiased selection based on the best N50 
 (Similar to selection without reference genome)
 could be added as a point on the plot
+
+
+
+# Mycoplasma quasts
+```{r}
+mycoplasma.quasts.files <- c("result_statistics/MAUR_quast/transposed_report.tsv",
+"result_statistics/MBOVb_quast/transposed_report.tsv",
+"result_statistics/MBVG_quast/transposed_report.tsv",
+"result_statistics/MCCP_quast/transposed_report.tsv",
+"result_statistics/MMC_quast/transposed_report.tsv",
+"result_statistics/MOVI_quast/transposed_report.tsv",
+"result_statistics/MSCb_quast/transposed_report.tsv",
+"result_statistics/MSCc_quast/transposed_report.tsv",
+"result_statistics/MSCd_quast/transposed_report.tsv",
+"result_statistics/MSCe_quast/transposed_report.tsv")
+all.myco.reports<-data.table()
+for(myco in mycoplasma.quasts.files){
+  cat(myco,"\n")
+  this.report <- fread(myco,na.strings="None")
+  this.report$species<-strsplit2(strsplit2(myco,"/")[,2],"_")[,1]
+  this.report$merger<-"Single"
+  this.report[grep("mix",Assembly),merger:="MIX"]
+  this.report[grep("GAM",Assembly),merger:="GAM"]
+  this.report<-this.report[!grep("naive",Assembly)]
+  all.myco.reports<-rbind(all.myco.reports, this.report)
+}
+setnames(all.myco.reports,colnames(all.myco.reports),make.names(colnames(all.myco.reports)))
+
+setnames(all.myco.reports,colnames(all.myco.reports),c("Assembly", "ncontigs_0.bp", "ncontigs_1000.bp", "Total.length_0.bp", "Total.length_1000.bp", "ncontigs", "Largest.contig", "Total.length", "GC", "N50", "N75", "nN.s.per.100.kbp", "npredicted.genes.unique.", "npredicted.genes_0.bp", "npredicted.genes_100.bp", "npredicted.genes_300.bp", "npredicted.genes_500.bp", "npredicted.genes_1000.bp", "npredicted.genes_1500.bp", "npredicted.genes_3000.bp", "species", "merger"))
+
+```
+
+```{r}
+ggplot(all.myco.reports,aes(x=merger,y=N50/1000,colour=merger,group=merger))+geom_point(,position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~species,scale="free")+ggtitle("N50(kb)")+scale_fill_discrete(name="Assembler type")+scale_shape_discrete(name="Top 5 by N50")+xlab("Assembler type")
+
+ggplot(all.myco.reports,aes(x=merger,y=Largest.contig/1000,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~species,scale="free")+ggtitle("Largest contig(kb)")+scale_fill_discrete(name="Assembler type")+scale_shape_discrete(name="Top 5 by N50")+xlab("Assembler type")
+
+ggplot(all.myco.reports,aes(x=merger,y=npredicted.genes_500.bp,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~species,scale="free")+ggtitle("N50(kb)")+scale_fill_discrete(name="Assembler type")+scale_shape_discrete(name="Top 5 by N50")+xlab("Assembler type")
+
+```
+```{r}
+
+myco.m<-data.table(melt(all.myco.reports))
+
+ggplot(myco.m[variable %in% c("N50","npredicted.genes_300.bp","ncontigs","Largest.contig")],aes(x=merger,y=value,colour=merger,group=merger))+geom_point(,position=position_jitter(width=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_grid(variable~species,scale="free")+ggtitle("Mycoplasmas Assemblies")+scale_fill_discrete(name="Assembler type")+xlab("Assembler type")+theme_bw()+ylab("")+theme(axis.text.x = element_text(angle = +45, hjust = 1.1))+scale_colour_manual(values=c("#E69F00", "#56B4E9","#999999"))
+ggsave("figures/mycoplasmas_QUAST.pdf",w=12,h=8)
+```
+
+
+# All combinations mycoplasmas
+```{r}
+mycoplasma.quasts.files <- c("result_statistics/all_myco/MAUR_QUAST/transposed_report.tsv",
+"result_statistics/all_myco/MBOVb_QUAST/transposed_report.tsv",
+"result_statistics/all_myco/MBVG_QUAST/transposed_report.tsv",
+"result_statistics/all_myco/MCCP_QUAST/transposed_report.tsv",
+"result_statistics/all_myco/MMC_QUAST/transposed_report.tsv",
+"result_statistics/all_myco/MOVI_QUAST/transposed_report.tsv",
+"result_statistics/all_myco/MSCB_QUAST/transposed_report.tsv",
+"result_statistics/all_myco/MSCC_QUAST/transposed_report.tsv",
+"result_statistics/all_myco/MSCD_QUAST/transposed_report.tsv",
+"result_statistics/all_myco/MSCE_QUAST/transposed_report.tsv")
+all.myco.reports<-data.table()
+for(myco in mycoplasma.quasts.files){
+  cat(myco,"\n")
+  this.report <- fread(myco,na.strings="None")
+  this.report$species<-strsplit2(strsplit2(myco,"/")[,3],"_")[,1]
+  this.report$merger<-"Single"
+  this.report[grep("mix",Assembly),merger:="MIX"]
+  this.report[grep("GAM",Assembly),merger:="GAM"]
+  this.report[grep("GAA",Assembly),merger:="GAA"]
+  this.report<-this.report[!grep("naive",Assembly)]
+  all.myco.reports<-rbind(all.myco.reports, this.report)
+}
+setnames(all.myco.reports,colnames(all.myco.reports),c("Assembly", "ncontigs_0.bp", "ncontigs_1000.bp", "Total.length_0.bp", "Total.length_1000.bp", "ncontigs", "Largest.contig", "Total.length", "GC", "N50", "N75", "nN.s.per.100.kbp", "npredicted.genes.unique.", "npredicted.genes_0.bp", "npredicted.genes_100.bp", "npredicted.genes_300.bp", "npredicted.genes_500.bp", "npredicted.genes_1000.bp", "npredicted.genes_1500.bp", "npredicted.genes_3000.bp", "species", "merger"))
+
+
+```
+```{r}
+myco.m<-data.table(melt(all.myco.reports))
+
+g<-ggplot(myco.m[variable %in% c("N50","npredicted.genes_300.bp","ncontigs","Largest.contig")],aes(x=merger,y=value,colour=merger,group=merger))+geom_point(,position=position_jitter(width=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_grid(variable~species,scale="free")+ggtitle("Mycoplasmas Assemblies")+xlab("Assembler type")+theme_bw()+ylab("")+theme(axis.text.x = element_text(angle = +45, hjust = 1.1))
+g+scale_fill_manual(values=c("#7FC97F","#E69F00", "#56B4E9","#999999"),name="Assembler type")
+#+scale_colour_manual(values=c("#E69F00", "#56B4E9","#999999"))
+ggsave("figures/mycoplasmas_QUAST_all.pdf",w=12,h=8)
+
+```
