@@ -9,30 +9,7 @@ Mix is a tool to combine multiple assemblies for NGS data. Its algorithm takes t
 It builds an assembly graph in which all of the contigs are vertices and edges represent the best possible alignments between two contigs that have the potential of being used as basis for contig extension.
 The resulting output assembly corresponds to a set of paths in this assembly graph.
 
-Datasets corresponding to the benchmarks analyzed in the manuscript are available at the [accompanying website](http://services.cbib.u-bordeaux2.fr/mix/)
-
-
-# LICENSE: 
-
-    Copyright (c) 2013 Hayssam Soueidan (1) (massyah@gmail.com) 
-             	Florence Maurier (2) (florence.maurier@u-bordeaux2.fr)
-    			Alexis Groppi (2) (alexis.groppi@u-bordeaux2.fr)
-    			Macha Nikolski (3) (macha@labri.fr)
-    (1) NKI-AVL, Plesmanlaan 121,
-    1066 CX Amsterdam, Netherlands
-    
-    (2) CBiB - Universite Victor Segalen Bordeaux,
-    146, rue Leo Saignat, 33076 Bordeaux, France
-
-    (3) CNRS / LaBRI, Universite Bordeaux 1, 351 cours de la Liberation,
-    33405 Talence Cedex, France 
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+Datasets corresponding to the benchmarks analyzed in the manuscript as well as [supplemenatary figures](http://services.cbib.u-bordeaux2.fr/mix/RECOMBCG_supp_figures/) are available at the [accompanying website](http://services.cbib.u-bordeaux2.fr/mix/)
 
 
 # Installation
@@ -98,4 +75,26 @@ The statistics about the final assembly will be in the file:
     nucmer -prefix=alignments contigs.fa contigs.fa
     show-coords -rcl alignments.delta > alignments.coords
     <your_path_to_Mix>/Mix-<version>/bin/Mix.py -a alignments.coords -c contigs.fa -o output_dir/ -C 300 -A 200 
+
+
+# LICENSE: 
+
+    Copyright (c) 2013 Hayssam Soueidan (1) (massyah@gmail.com) 
+                Florence Maurier (2) (florence.maurier@u-bordeaux2.fr)
+                Alexis Groppi (2) (alexis.groppi@u-bordeaux2.fr)
+                Macha Nikolski (3) (macha@labri.fr)
+    (1) NKI-AVL, Plesmanlaan 121,
+    1066 CX Amsterdam, Netherlands
+    
+    (2) CBiB - Universite Victor Segalen Bordeaux,
+    146, rue Leo Saignat, 33076 Bordeaux, France
+
+    (3) CNRS / LaBRI, Universite Bordeaux 1, 351 cours de la Liberation,
+    33405 Talence Cedex, France 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
