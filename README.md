@@ -32,9 +32,9 @@ Mix can be downloaded at :
 You can get the latest version of the development [via this github link.](https://github.com/massyah/MIX/archive/master.zip)
 	
 ## Installing Mix :
-To install the software, the user must download the file [Master.zip](https://github.com/massyah/MIX/archive/master.zip) (see previous section) and extract it
+To install the software, the user must download the file [Mix-master.zip](https://github.com/massyah/MIX/archive/master.zip) (see previous section) and extract it
 
-    tar -xzf Master.zip
+    tar -xzf Mix-master.zip
 
 # Usage
 
