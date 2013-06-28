@@ -23,13 +23,18 @@ Mix was implemented in Python and tested under Linux environment. It has the fol
 * MUMmer 3.22 (http://mummer.sourceforge.net/).  
          
 ## Obtaining Mix :
+
 Mix can be downloaded at :
+
 * https://github.com/massyah/MIX
 * http://www.cbib.u-bordeaux2.fr/fr/content/logiciels-cbib
+
+You can get the latest version of the development [via this github link.](https://github.com/massyah/MIX/archive/master.zip)
 	
 ## Installing Mix :
-To install the software, the user must download the file Mix-<version>.tar.gz (see Section 3.2) and extract it :
-   $ tar -xzf Mix-<version>.tar.gz
+To install the software, the user must download the file [Master.zip](https://github.com/massyah/MIX/archive/master.zip) (see previous section) and extract it
+
+    tar -xzf Master.zip
 
 # Usage
 

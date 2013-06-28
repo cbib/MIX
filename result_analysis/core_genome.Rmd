@@ -110,10 +110,10 @@ ggsave("figures/core.genome_core0_min.pdf",w=12,h=8)
 
 ```
 ```{r}
-ggplot(core,aes(x=Specie,fill=Merger,y=p99.99))+ stat_boxplot(geom ='errorbar')+geom_boxplot(alpha=0.5,outlier.size=0)+coord_cartesian(ylim=c(80,150))+ylab("Number of clusters with a conserved representative(Identity>=99.99%)")+scale_fill_manual(values=c("#7FC97F","#E69F00", "#56B4E9","#999999"))
+ggplot(core,aes(x=Specie,fill=Merger,y=p99.99))+geom_boxplot(alpha=0.5,outlier.size=0)+coord_cartesian(ylim=c(80,150))+ylab("Number of clusters with a conserved representative(Identity>=99.99%)")+scale_fill_manual(values=c("#7FC97F","#E69F00", "#56B4E9","#999999"))
 #+scale_fill_manual(values=brewer.pal("Accent",n=4))
 
-ggplot(core,aes(x=Specie,fill=Merger,y=p99.99))+ stat_boxplot(geom ='errorbar')+geom_boxplot(alpha=0.5,outlier.size=0)+coord_cartesian(ylim=c(80,150))+ylab("Number of clusters with a conserved representative(Identity>=99.99%)")+scale_fill_manual(values=c("#7FC97F","#E69F00", "#56B4E9","#999999"))
+ggplot(core,aes(x=Specie,fill=Merger,y=p99.99,colour=Merger))+ stat_boxplot(geom ='errorbar')+geom_point(position=position_jitter(width=0.2))+coord_cartesian(ylim=c(80,150))
 #+scale_fill_manual(values=brewer.pal("Accent",n=4))
 
 
