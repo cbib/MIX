@@ -30,13 +30,23 @@ http://services.cbib.u-bordeaux2.fr/mix/MSCe/single-assemblies/MSCe_CLC.fasta \
 http://services.cbib.u-bordeaux2.fr/mix/MSCe/single-assemblies/MSCe_MIRA.fasta \
 http://services.cbib.u-bordeaux2.fr/mix/MSCe/single-assemblies/MSCe_ABySS_35.fasta 
 
-mv ./MAUR/single-assemblies/*.fasta ./MAUR/
-mv ./MBOVb/single-assemblies/*.fasta ./MBOVb/
-mv ./MBVG/single-assemblies/*.fasta ./MBVG/
-mv ./MCCP/single-assemblies/*.fasta ./MCCP/
-mv ./MMC/single-assemblies/*.fasta ./MMC/
-mv ./MOVI/single-assemblies/*.fasta ./MOVI/
-mv ./MSCb/single-assemblies/*.fasta ./MSCb/
-mv ./MSCc/single-assemblies/*.fasta ./MSCc/
-mv ./MSCd/single-assemblies/*.fasta ./MSCd/
-mv ./MSCe/single-assemblies/*.fasta ./MSCe/
+mkdir MAUR
+mv ./MAUR*.fasta ./MAUR/
+mkdir MBOVb
+mv ./MBOVb*.fasta ./MBOVb/
+mkdir MBVG
+mv ./MBVG*.fasta ./MBVG/
+mkdir MCCP
+mv ./MCCP*.fasta ./MCCP/
+mkdir MMC
+mv ./MMC*.fasta ./MMC/
+mkdir MOVI
+mv ./MOVI*.fasta ./MOVI/
+mkdir MSCb
+mv ./MSCb*.fasta ./MSCb/
+mkdir MSCc
+mv ./MSCc*.fasta ./MSCc/
+mkdir MSCd
+mv ./MSCd*.fasta ./MSCd/
+mkdir MSCe
+mv ./MSCe*.fasta ./MSCe/
