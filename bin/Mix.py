@@ -1,4 +1,15 @@
 #! /usr/bin/python
+
+__author__ = "Hayssam Soueidan, Florence Maurier and Macha Nikolski"
+__copyright__  = ["Copyright 2013, Centre de BioInformatique de Bordeaux","Copyright 2013, NKI-AVL"]
+__license__  = "MIT"
+__version__  = "1.0."
+
+__maintainer__ = "Hayssam Soueidan"
+__email__ = "massyah@gmail.com"
+__status__ = "Prototype"
+
+
 import sys
 from operator import itemgetter
 import copy
