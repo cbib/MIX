@@ -22,7 +22,7 @@ Mix was implemented in Python and tested under Linux environment. It has the fol
 * Biopython (http://biopython.org/wiki/Main_Page)
 * MUMmer 3.22 (http://mummer.sourceforge.net/).  
          
-## Obtaining Mix :
+## Obtaining Mix 
 
 Mix can be downloaded at :
 
@@ -31,7 +31,8 @@ Mix can be downloaded at :
 
 You can get the latest version of the development [via this github link.](https://github.com/massyah/MIX/archive/master.zip)
 	
-## Installing Mix :
+## Installing Mix
+
 To install the software, the user must download the file [Mix-master.zip](https://github.com/massyah/MIX/archive/master.zip) (see previous section) and extract it
 
     tar -xzf Mix-master.zip
