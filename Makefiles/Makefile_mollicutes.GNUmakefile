@@ -1,12 +1,12 @@
-MOLLI:=datasets/Mollicutes/
-MOLLIGAM:=datasets/GAM-NGS/Mollicutes
+MOLLI:=datasets/Mycoplasmas/
+MOLLIGAM:=datasets/GAM-NGS/Mycoplasmas
 
 # The smallest mollicute protein has 36 aa, 108 bp. Anything below should be considered as noise
 QUASTMOLLI:= $(QUAST) --gene-finding --gene-thresholds 0,100,300,500,1000,1500,3000
 
-# python bin/assembly_by_naive_concatenation.py datasets/Mollicutes/MBVG/MBVG_CLC.fasta -o result_assemblies/MBVG_CLC_naive_concatenation.fasta
-# python bin/assembly_by_naive_concatenation.py datasets/Mollicutes/MAUR/MAUR_CLC.fasta -o result_assemblies/MAUR_CLC_naive_concatenation.fasta
-# python bin/assembly_by_naive_concatenation.py datasets/Mollicutes/MBOVb/MBOVb_CLC.fasta -o result_assemblies/MBOVb_CLC_naive_concatenation.fasta
+# python bin/assembly_by_naive_concatenation.py datasets/Mycoplasmas/MBVG/MBVG_CLC.fasta -o result_assemblies/MBVG_CLC_naive_concatenation.fasta
+# python bin/assembly_by_naive_concatenation.py datasets/Mycoplasmas/MAUR/MAUR_CLC.fasta -o result_assemblies/MAUR_CLC_naive_concatenation.fasta
+# python bin/assembly_by_naive_concatenation.py datasets/Mycoplasmas/MBOVb/MBOVb_CLC.fasta -o result_assemblies/MBOVb_CLC_naive_concatenation.fasta
 
 
 MolliMix: \
