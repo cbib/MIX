@@ -93,11 +93,11 @@ The statistics about the final assembly will be in the file:
 * Datasets for Mycoplasmas studies are available on the [accompanying website](http://services.cbib.u-bordeaux2.fr/mix/). We provide a script batch download tool in ``datasets/Mycoplasmas/get_mycoplasmas.sh'' . 
 * Once QUAST, MUMmer and the datasets have been obtained, one can generate all the quasts reports for the 10 mycoplasmas by running ``make ALLMYCOQUASTS'' in the root Mix folder. This will generate and populate the following files and folders :
 
-** temp_assemblies/*.fasta: Concatenated fasta files of the input assemblies 
-** temp_assemblies/*.coords *.delta: MUMmer results for self-alignement of FASTA files 
-** temp_assemblies/*.mix.log.txt: Log of Mix execution
-** result_assemblies/*.fasta: Resulting merged after executing Mix 
-** result_statistics/all_myco/*_QUAST: QUAST report for each species, where the 19 resulting assemblies (for single-assemblies, GAA, GAM-NGS and mix) are compared 
+ * temp_assemblies/*.fasta: Concatenated fasta files of the input assemblies 
+ * temp_assemblies/*.coords *.delta: MUMmer results for self-alignement of FASTA files 
+ * temp_assemblies/*.mix.log.txt: Log of Mix execution
+ * result_assemblies/*.fasta: Resulting merged after executing Mix 
+ * result_statistics/all_myco/*_QUAST: QUAST report for each species, where the 19 resulting assemblies (for single-assemblies, GAA, GAM-NGS and mix) are compared 
 
 
 
