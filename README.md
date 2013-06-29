@@ -92,7 +92,7 @@ The statistics about the final assembly will be in the file:
 * The provided Makefiles rules to regenerate results presented in the RECOMB-CG paper expect QUAST to be installed in bin/quast2-1. Please update the headers in all Makefile to point to any other QUAST installation.
 * The script expect MUMmer in bin/MUMmer. We recommend to create a symlink from quast-2.1/libs/MUMmer3.23-ARC to bin/MUMmer 
 * Datasets for Mycoplasmas studies are available on the [accompanying website](http://services.cbib.u-bordeaux2.fr/mix/). We provide a script batch download tool in ``datasets/Mycoplasmas/get_mycoplasmas.sh'' . 
-* Once QUAST, MUMmer and the datasets have been obtained, one can generate all the quasts reports for the 10 mycoplasmas by running ``make ALLMYCOQUASTS'' in the root Mix folder. This will generate and populate the following files and folders :
+* Once QUAST, MUMmer and the datasets have been obtained, one can generate all the quasts reports for the 10 mycoplasmas by running ``make ALLMYCOQUASTS'' in the root Mix folder. This will take some time (~10 min on MacBook Pro i5) and will generate and populate the following files and folders :
 
  * temp_assemblies/*.fasta: Concatenated fasta files of the input assemblies 
  * temp_assemblies/*.coords *.delta: MUMmer results for self-alignement of FASTA files 
