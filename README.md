@@ -96,7 +96,7 @@ The statistics about the final assembly will be in the file:
  * temp_assemblies/*.fasta: Concatenated fasta files of the input assemblies 
  * temp_assemblies/*.coords *.delta: MUMmer results for self-alignement of FASTA files 
  * temp_assemblies/*.mix.log.txt: Log of Mix execution
- * result_assemblies/*.fasta: Resulting merged after executing Mix 
+ * result_assemblies/*_mix.fasta: Resulting merged after execution of Mix 
  * result_statistics/all_myco/*_QUAST: QUAST report for each species, where the 19 resulting assemblies (for single-assemblies, GAA, GAM-NGS and mix) are compared 
 
 
@@ -104,7 +104,7 @@ The statistics about the final assembly will be in the file:
 
 
 
-# LICENSE: 
+# LICENSE
 
     Copyright (c) 2013 Hayssam Soueidan (1) (massyah@gmail.com) 
                 Florence Maurier (2) (florence.maurier@u-bordeaux2.fr)
