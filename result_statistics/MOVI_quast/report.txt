@@ -1,22 +1,22 @@
 All statistics are based on contigs of size >= 200 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
 
-Assembly                        AIP_ABySS_32-scaffolds  AIP_CLC_contigsCLCTrimmed_0  AIP_step2_out.unpadded  GAM_abyss-CLC  GAM_CLC-mira  GAM_mira-abyss  MOVI_AB_CLC_mix  MOVI_AB_MIRA_mix  MOVI_CLC_MIRA_mix
-# contigs (>= 0 bp)             2681                    255                          81                      2663           234           81              190              48                49               
-# contigs (>= 1000 bp)          202                     157                          64                      186            138           64              130              46                47               
-Total length (>= 0 bp)          1105704                 1047317                      1094771                 1129482        1076667       1094771         1025437          1068130           1107687          
-Total length (>= 1000 bp)       840329                  1007416                      1088556                 865589         1038269       1088556         1001019          1067820           1107377          
-# contigs                       512                     255                          76                      494            234           76              190              47                48               
-Largest contig                  17175                   37376                        72523                   20432          37376         72523           37376            98914             84766            
-Total length                    954632                  1047317                      1094160                 978410         1076667       1094160         1025437          1068091           1107648          
-GC (%)                          29.50                   29.28                        29.12                   29.42          29.19         29.12           29.29            29.08             29.11            
-N50                             4937                    9789                         34407                   5799           10611         34407           11584            41998             42644            
-N75                             2420                    4546                         16195                   2759           5944          16195           5944             20706             24521            
-# N's per 100 kbp               0.00                    21.87                        4.11                    0.00           21.92         4.11            21.75            3.74              5.78             
-# predicted genes (unique)      1575                    1566                         1521                    1596           1590          1521            1526             1499              1516             
-# predicted genes (>= 0 bp)     1575                    1566                         1521                    1601           1595          1521            1526             1500              1540             
-# predicted genes (>= 100 bp)   1533                    1543                         1502                    1559           1572          1502            1503             1482              1519             
-# predicted genes (>= 300 bp)   796                     824                          846                     808            832           846             820              835               854              
-# predicted genes (>= 500 bp)   395                     419                          433                     397            423           433             412              426               438              
-# predicted genes (>= 1000 bp)  81                      90                           101                     83             92            101             87               99                103              
-# predicted genes (>= 1500 bp)  25                      31                           39                      27             31            39              31               36                40               
-# predicted genes (>= 3000 bp)  0                       0                            3                       0              0             3               0                2                 3                
+Assembly                        MOVI_ABySS_32  MOVI_CLC  MOVI_MIRA  MOVI_ABySS-CLC_gam  MOVI_CLC-mira_gam  MOVI_mira-ABySS_gam  MOVI_AB_CLC_mix  MOVI_AB_MIRA_mix  MOVI_CLC_MIRA_mix
+# contigs (>= 0 bp)             2681           255       81         2663                234                81                   190              48                49               
+# contigs (>= 1000 bp)          202            157       64         186                 138                64                   130              46                47               
+Total length (>= 0 bp)          1105704        1047317   1094771    1129482             1076667            1094771              1025437          1068130           1107687          
+Total length (>= 1000 bp)       840329         1007416   1088556    865589              1038269            1088556              1001019          1067820           1107377          
+# contigs                       512            255       76         494                 234                76                   190              47                48               
+Largest contig                  17175          37376     72523      20432               37376              72523                37376            98914             84766            
+Total length                    954632         1047317   1094160    978410              1076667            1094160              1025437          1068091           1107648          
+GC (%)                          29.50          29.28     29.12      29.42               29.19              29.12                29.29            29.08             29.11            
+N50                             4937           9789      34407      5799                10611              34407                11584            41998             42644            
+N75                             2420           4546      16195      2759                5944               16195                5944             20706             24521            
+# N's per 100 kbp               0.00           21.87     4.11       0.00                21.92              4.11                 21.75            3.74              5.78             
+# predicted genes (unique)      1575           1566      1521       1596                1590               1521                 1526             1499              1516             
+# predicted genes (>= 0 bp)     1575           1566      1521       1601                1595               1521                 1526             1500              1540             
+# predicted genes (>= 100 bp)   1533           1543      1502       1559                1572               1502                 1503             1482              1519             
+# predicted genes (>= 300 bp)   796            824       846        808                 832                846                  820              835               854              
+# predicted genes (>= 500 bp)   395            419       433        397                 423                433                  412              426               438              
+# predicted genes (>= 1000 bp)  81             90        101        83                  92                 101                  87               99                103              
+# predicted genes (>= 1500 bp)  25             31        39         27                  31                 39                   31               36                40               
+# predicted genes (>= 3000 bp)  0              0         3          0                   0                  3                    0                2                 3                

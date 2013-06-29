@@ -84,6 +84,26 @@ The statistics about the final assembly will be in the file:
     <your_path_to_Mix>/Mix-<version>/bin/Mix.py -a alignments.coords -c contigs.fa -o output_dir/ -C 300 -A 200 
 
 
+
+# Evaluations over Mycoplasmas and GAGE-B 
+
+* This requires QUAST (>= 2.1) in addition to MIX requirements. [QUAST can be downloaded on the SF website](http://sourceforge.net/projects/quast/files/). 
+* The provided Makefiles rules to regenerate results presented in the RECOMB-CG paper expect QUAST to be installed in bin/quast2-1. Please update the headers in all Makefile to point to any other QUAST installation.
+* The script expect MUMmer in bin/MUMmer. We recommend to create a symlink from quast-2.1/libs/MUMmer3.23-ARC to bin/MUMmer 
+* Datasets for Mycoplasmas studies are available on the [accompanying website](http://services.cbib.u-bordeaux2.fr/mix/). We provide a script batch download tool in ``datasets/Mycoplasmas/get_mycoplasmas.sh'' . 
+* Once QUAST, MUMmer and the datasets have been obtained, one can generate all the quasts reports for the 10 mycoplasmas by running ``make ALLMYCOQUASTS'' in the root Mix folder. This will generate and populate the following files and folders :
+
+** temp_assemblies/*.fasta: Concatenated fasta files of the input assemblies 
+** temp_assemblies/*.coords *.delta: MUMmer results for self-alignement of FASTA files 
+** temp_assemblies/*.mix.log.txt: Log of Mix execution
+** result_assemblies/*.fasta: Resulting merged after executing Mix 
+** result_statistics/all_myco/*_QUAST: QUAST report for each species, where the 19 resulting assemblies (for single-assemblies, GAA, GAM-NGS and mix) are compared 
+
+
+
+
+
+
 # LICENSE: 
 
     Copyright (c) 2013 Hayssam Soueidan (1) (massyah@gmail.com) 
