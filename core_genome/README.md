@@ -29,10 +29,11 @@ For each of these, if the coverage is present we put 1 in the corresponding colu
 
 # Example session 
 
+    # [Generate results for one assembly....]
     makeblastdb -dbtype 'nucl' -in ../result_assemblies/MMC_CLC_MIRA_mix.fasta -out MMC_CLC-MIRA -parse_seqids
     blastall -p tblastn -m 8 -d ./MMC_CLC-MIRA -i CoreGenome_Mycoplasmas.fasta -o MMC_CLC-MIRA.hits -e 0.1
     perl clusters.perl --blast MMC_CLC-MIRA.hits -prots CoreGenome_Mycoplasmas.fasta > MMC_CLC-MIRA.core
-    # [Generate results for all genomes....]
+    # [Generate results for all assemblies....]
 	for f in *core; do n5=`cut -f 2 $f | grep 1 |wc -l`; n8=`cut -f 3 $f | grep 1 |wc -l`; n9=`cut -f 4 $f | grep 1 | wc -l`; echo "$f $n5 $n8 $n9"  >> Core_all; done;
 	
 
