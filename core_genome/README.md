@@ -34,6 +34,5 @@ For each of these, if the coverage is present we put 1 in the corresponding colu
     perl clusters.perl --blast MMC_CLC-MIRA.hits -prots CoreGenome_Mycoplasmas.fasta > MMC_CLC-MIRA.core
     # [Generate results for all genomes....]
 	for f in *core; do n5=`cut -f 2 $f | grep 1 |wc -l`; n8=`cut -f 3 $f | grep 1 |wc -l`; n9=`cut -f 4 $f | grep 1 | wc -l`; echo "$f $n5 $n8 $n9"  >> Core_all; done;
-
-	rm Core_all ; here=`pwd`; for dir in M*; do echo $dir >> Core_all; cat $dir/Core_all >> Core_all; echo >> Core_all; done
+	
 
