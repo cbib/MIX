@@ -5,9 +5,6 @@ Mix
 
 
 Mix is a tool that combines two or more draft assemblies, without relying on a reference genome and has the goal to reduce contig fragmentation and thus speed-up genome finishing. The proposed algorithm builds an extension graph where vertices represent extremities of contigs and edges represent existing alignments between these extremities. These alignment edges are used for contig extension. The resulting output assembly corresponds to a path in the extension graph that maximizes the cumulative contig length. 
-Mix is a tool to combine multiple assemblies for NGS data. Its algorithm takes two or more assemblies and generates another one that mixes them in order to extend the length of resulting contigs. 
-It builds an assembly graph in which all of the contigs are vertices and edges represent the best possible alignments between two contigs that have the potential of being used as basis for contig extension.
-The resulting output assembly corresponds to a set of paths in this assembly graph.
 
 Datasets corresponding to the benchmarks analyzed in the manuscript as well as [supplemenatary figures](http://services.cbib.u-bordeaux2.fr/mix/RECOMBCG_supp_figures/) are available at the [accompanying website](http://services.cbib.u-bordeaux2.fr/mix/)
 
