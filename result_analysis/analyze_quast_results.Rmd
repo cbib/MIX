@@ -499,7 +499,7 @@ all.myco.reports<-rbind(all.myco.reports,myco.triple.assemblies)
 ```{r}
 myco.m<-data.table(melt(all.myco.reports))
 
-g<-ggplot(myco.m[variable %in% c("N50","npredicted.genes_300.bp","ncontigs","Largest.contig","Total.length","npredicted.genes.unique.")],aes(x=merger,y=value,colour=merger,group=merger))+geom_point(,position=position_jitter(width=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_grid(variable~species,scale="free")+ggtitle("Mycoplasmas Assemblies")+xlab("Assembler type")+theme_bw()+ylab("")+theme(axis.text.x = element_text(angle = +45, hjust = 1.1))
+g<-ggplot(myco.m[variable %in% c("N50","npredicted.genes_300.bp","ncontigs","Largest.contig","Total.length")],aes(x=merger,y=value,colour=merger,group=merger))+geom_point(,position=position_jitter(width=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_grid(variable~species,scale="free")+ggtitle("Mycoplasmas Assemblies")+xlab("Assembler type")+theme_bw()+ylab("")+theme(axis.text.x = element_text(angle = +45, hjust = 1.1))
 g+scale_fill_manual(values=c("#7FC97F","#E69F00", "#56B4E9","#999999"),name="Assembler type")
 #+scale_colour_manual(values=c("#E69F00", "#56B4E9","#999999"))
 ggsave("figures/mycoplasmas_QUAST_all.pdf",w=12,h=8)

@@ -90,7 +90,8 @@ setnames(maure.sub,c("q", "contig", "identity", "alignment.length", "mismatches"
 New computation with corrected genetic code for Mycoplasmas 
 ============================================================
 ```{r}
-core <- fread("core_genome/Core_all.0.tsv")
+# core <- fread("core_genome/Core_all.0.tsv")
+core <- fread("core_genome/mycoplasmas_all_core_conservation.tsv")
 core[,rankP99:=rank(-p99.99,ties="first"),by=list(Specie,Merger)]
 core[,meanP99:=mean(p99.99),by=list(Specie,Merger)]
 core[,maxP99:=max(p99.99),by=list(Specie,Merger)]
