@@ -7,7 +7,7 @@ import networkx as nx
 #import pygraph, pydot
 #import pygraphviz
 
-from IPython.core.debugger import Tracer; debug_here = Tracer()
+# from IPython.core.debugger import Tracer; debug_here = Tracer()
 
 
 import logging

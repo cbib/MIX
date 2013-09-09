@@ -30,7 +30,7 @@ from Bio import SeqIO
 
 from Bio.Alphabet import generic_dna
 
-from IPython.core.debugger import Tracer; debug_here = Tracer()
+# from IPython.core.debugger import Tracer; debug_here = Tracer()
 
 import graph as graph 
 
