@@ -181,7 +181,7 @@ class graph ():
 				nodes_by_contig[contig] = [n]
 		for c in nodes_by_contig.keys() :
 			nb_aln = len(nodes_by_contig[c])/4
-			print "Nb aln tot pour le contig", c, ":", nb_aln
+			logger.debug("Number of alignments for contig %s : %d"%(c,nb_aln))
 			if nb_aln > 1 : 
 				#compter les forward
 				forward = []
@@ -189,7 +189,9 @@ class graph ():
 					if self.GRAPH.node[node]["sens"] == "f" : 
 						forward.append(node)
 				#si plusieurs aln forward
-				print "\tNb aln forward pour le contig", c, ":", len(forward)/2
+				logger.info("Number of forward alignments for contig %s : %d"%(c,len(forward)/2))
+
+				# print "\tNb aln forward pour le contig", c, ":", len(forward)/2
 				if len(forward)/2 > 1 : 
 					#alors on lie les 5 aux 3
 					IB = []
@@ -218,7 +220,8 @@ class graph ():
 				nodes_by_contig[contig] = [n]
 		for c in nodes_by_contig.keys() :
 			nb_aln = len(nodes_by_contig[c])/4
-			print "Nb aln tot pour le contig", c, ":", nb_aln
+			logger.info("Number of alignments for contig %s : %d"%(c,nb_aln))
+
 			if nb_aln > 1 : 
 				for n1 in nodes_by_contig[c] :
 					for n2 in nodes_by_contig[c] :
@@ -631,7 +634,8 @@ def remove_all_cycles(g):
 	for i in range(1,1000): #Up to a thousand iteration
 
 		g_n= remove_cycle(g_p)
-		if g_n.number_of_edges() == g_p.number_of_edges():
+		# Compare before and after
+		if set(g_n.nodes()) == set(g_p.nodes()):
 			break
 	#	assert("10_4" in g_n)
 		g_p=g_n

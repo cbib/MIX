@@ -1,4 +1,31 @@
 import sys
+
+import logging
+if "logger" not in globals():
+	logger = logging.getLogger('mix_logger')
+	logger.setLevel(logging.DEBUG)
+
+	# while len(logger.handlers()) > 0:
+	#  	logger.pop()
+
+	# create console handler and set level to debug
+	ch = logging.StreamHandler()
+	ch.setLevel(logging.DEBUG)
+
+	# create formatter
+	formatter = logging.Formatter('%(asctime)s - %(filename)s - %(message)s',"%Y-%m-%d %H:%M:%S")
+	# formatter = logging.Formatter('%(asctime)s - %(message)s')
+	# add formatter to ch
+	ch.setFormatter(formatter)
+
+	# add ch to logger
+	logger.addHandler(ch)
+
+
+logger = logging.getLogger('mix_logger')
+
+
+
 def parse_field(field, nb_arg):
 	##
 	# @return the value(s) contained in the MUMmer cell
@@ -26,7 +53,7 @@ def parse_line (line):
 		sys.exit(1)
 	return tab 
 
-def parse_mummerFile (file_adr):
+def parse_mummerFile (file_adr,skip_self=True):
 	##
 	# @brief Read the COORD file 'file_adr' to fill and return a table containing all the alignments between two different contigs.
 	# @param file_adr file containing the alignments between two assemblies (MUMmer COORD file)
@@ -42,6 +69,12 @@ def parse_mummerFile (file_adr):
 		line=results_file.readline()
 
 	while line :
+		if(len(alignments) % 1000)==0:
+			logger.debug("Parsed %d alignments"%(len(alignments)))
+		# if ((len(line.strip())==0) or not line.split()[0].isdigit()):
+		# 	line = results_file.readline()
+		# 	continue
+
 		aln={}
 		try:
 			aln["S1"],aln["E1"],aln["S2"],aln["E2"],aln["LEN1"],aln["LEN2"],aln["IDY"],aln["LENR"],aln["LENQ"],aln["COVR"],aln["COVQ"],aln["TAGR"],aln["TAGQ"]=parse_line(line)
@@ -49,6 +82,8 @@ def parse_mummerFile (file_adr):
 			print "Unexpected number(",len(parse_line(line)),"/11 of elements in line",line
 			print "Ensure nucmer output was processed with show-coords -l -c DELTAFILE"
 			sys.exit(1)
+		if skip_self and (aln["TAGQ"]==aln['TAGR']):
+			line = results_file.readline()
 		for k,v in aln.items():
 			if k.startswith("TAG"):
 				continue

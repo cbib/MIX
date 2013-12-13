@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 __author__ = "Hayssam Soueidan, Florence Maurier and Macha Nikolski"
 __copyright__  = ["Copyright 2013, Centre de BioInformatique de Bordeaux","Copyright 2013, NKI-AVL"]
@@ -50,7 +50,7 @@ if "logger" not in globals():
 	ch.setLevel(logging.DEBUG)
 
 	# create formatter
-	formatter = logging.Formatter('%(asctime)s - %(filename)s - %(funcName)s - %(message)s',"%Y-%m-%d %H:%M:%S")
+	formatter = logging.Formatter('%(asctime)s - %(filename)s - %(message)s',"%Y-%m-%d %H:%M:%S")
 	# formatter = logging.Formatter('%(asctime)s - %(message)s')
 	# add formatter to ch
 	ch.setFormatter(formatter)
@@ -224,7 +224,7 @@ def parse_alignments (file_adr):
 	# @return a table containing all the alignments between two different contigs
 	global all_alignments,aln_threshold,ctg_threshold,ctg_threshold,cov_threshold
 
-	all_alignments = [x for x in mummerParser.parse_mummerFile(file_adr) if x['TAGQ']!=x['TAGR']]
+	all_alignments = [x for x in mummerParser.parse_mummerFile(file_adr,skip_self=True) if x['TAGQ']!=x['TAGR']]
 	alignments=[]
 	contigs = {}
 	contigs_included_in_other = []
@@ -686,6 +686,7 @@ def main():
 
 
 	# Add contigs without any alignement 
+	# Todo: Optimize by building a set of all contigs admitting an alignement
 
 	if not restrict_aligned:
 		handle = open(ctg_adr, "rU")

@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 # encoding: utf-8
 
 
@@ -75,13 +75,13 @@ def main(argv=None):
 	for s in all_records:
 		sequences_per_files[s.file].append(s)
 	if args.pretty:
-		table=prettytable.PrettyTable(["File","#Seqs","Avg GC","Avg Length(kb)", "Quant","Sum Length(kb)","N50(kb)","L50"])
+		table=prettytable.PrettyTable(["File","#Seqs","Avg GC","Avg Length(kb)", "Quant","min","max",  "Sum Length(kb)","N50(kb)","L50"])
 		table.align["File"] = "l" 
 
 		for file,seqs in sequences_per_files.items():
 			lengths=[x.length for x in seqs]
 			table.add_row([file,len(seqs),round(scipy.average([x.gc for x in seqs]),2),\
-				round(scipy.average(lengths)/1000,2),mquantiles(lengths),round(sum(lengths)/1000,2),round(N50.N50(lengths)/1000,2),N50.L50(lengths)])
+				round(scipy.average(lengths)/1000,2),mquantiles(lengths),min(lengths),max(lengths),round(sum(lengths)/1000,2),round(N50.N50(lengths)/1000,2),N50.L50(lengths)])
 		print >>args.outfile,table.get_string(sortby="N50(kb)")
 
 	else:
