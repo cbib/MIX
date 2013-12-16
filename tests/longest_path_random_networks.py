@@ -178,42 +178,46 @@ def make_random_directed_grid(dim=[12,12]):
 	return g_dir,max_path,best_length
 
 
-#g_dir,max_path,best_length=make_random_directed_grid()
+## Select example 
 
 
+## Random 
+# g_dir,max_path,best_length=make_random_directed_grid([5,5])
 
-# Reading a MIX example 
-g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/aureus_AP_BB_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
-g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/b_cereus_AB_MS_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
-g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/rhodo_AP_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
 
-for src,tgt,mdata in g_dir.edges(data=True):
-	g_dir[src][tgt]['weight']=mdata.get("length")
+## OR :Reading a MIX example 
+
+# g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/aureus_AP_BB_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
+# g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/b_cereus_AB_MS_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
+# g_dir=nx.read_gml("/Users/hayssam/temp/MIX/result_assemblies/rhodo_AP_SP_mix/Mix_results_A500_C0/initial_assembly_graph.gml")
+# assert(len(inputs_nodes) ==1)
+# assert(len(outputs_nodes) ==1)
+# for src,tgt,mdata in g_dir.edges(data=True):
+# 	g_dir[src][tgt]['weight']=mdata.get("length")
 
 
 # Build mapping to rename nodes
-mapping = {}
-for k in g_dir.node.keys():
-	if type(k)==type((1,)): # If tuples are used to label nodes:
-		mapping[k]="_".join(map(str,k))
-	else:
-		mapping[k]=str(k)
+# mapping = {}
+# for k in g_dir.node.keys():
+# 	if type(k)==type((1,)): # If tuples are used to label nodes:
+# 		mapping[k]="_".join(map(str,k))
+# 	else:
+# 		mapping[k]=str(k)
 
-inputs_nodes = [k for k,v in g_dir.in_degree().items() if v==0]
-outputs_nodes = [k for k,v in g_dir.out_degree().items() if v==0]
-assert(len(inputs_nodes) ==1)
-assert(len(outputs_nodes) ==1)
+# inputs_nodes = [k for k,v in g_dir.in_degree().items() if v==0]
+# outputs_nodes = [k for k,v in g_dir.out_degree().items() if v==0]
 
-for an_in in inputs_nodes:
-	g_dir.node[an_in]['In']=True
-for an_out in outputs_nodes:
-	g_dir.node[an_out]['Out']=True
+# for an_in in inputs_nodes:
+# 	g_dir.node[an_in]['In']=True
+# for an_out in outputs_nodes:
+# 	g_dir.node[an_out]['Out']=True
 
-mapping[inputs_nodes[0]]="In"
-mapping[outputs_nodes[0]]="Out"
+# mapping[inputs_nodes[0]]="In"
+# mapping[outputs_nodes[0]]="Out"
 
-g_dir=nx.relabel_nodes(g_dir,mapping)
+# g_dir=nx.relabel_nodes(g_dir,mapping)
 
+### End reading MIX input 
 
 # for an_in in inputs_nodes:
 # 	for succ in g_dir[an_in]:
@@ -456,15 +460,16 @@ for long_path_index in range(0,2000):
 		g_dir_trans_io[longest_path_trans_io[i][0]][longest_path_trans_io[i+1][0]]['in_longest']=long_path_index
 		# debug_here()
 		if (n not in ["In","Out"]):
-			nodes_in_any_longest_path.add(g_dir_trans_io.node[n]['contig'])
+			nodes_in_any_longest_path.add(g_dir_trans_io.node[n].get('contig',n))
 
 
 
 
+# the longest path is the one we got at the first iteration
 
 longest_path=[(x[0].split("@")[0],x[1]) for x in all_longest_path_trans_io[0]][1:-1]
-print longest_path
-
+print "Longest path found:",longest_path
+assert (longest_path[-1][1])>=best_length
 
 
 # Prepare for GML output 
@@ -474,12 +479,15 @@ for lpi in range(0,len(all_longest_path_trans_io)):
 	for i in range(1, len(longest_path)-2):
 		n = longest_path[i][0].split("@")[0]
 		p = longest_path[i+1][0].split("@")[0]
+		print "in longest",n,p,lpi
 		g_dir.node[n]['in_longest']=lpi
+		g_dir.node[p]['in_longest']=lpi
 		g_dir[n][p]['in_longest']=lpi
 	# Add the last item
 	last_element = longest_path[-2][0].split("@")[0]
 	g_dir.node[last_element]['in_longest']=lpi
 
+1/0
 
 
 
@@ -523,4 +531,3 @@ nx.write_gml(g_dir_trans_io_gml,"grid_trans_long_path.gml")
 
 
 
-assert (longest_path[-1][1])>=best_length

@@ -397,7 +397,7 @@ def select_single_contigs_of_one_assembly_byL50 (paths, single_contigs, contigs)
 	return selected_single_contigs
 
 def output_fasta (contigs_adr, paths, single_contigs, contigs, output_dir, alignments) : 
-	print len(single_contigs)
+	logger.info("Will write FASTA output file in %s with %d contigs"%(output_dir,len(single_contigs)))
 	contigs_list = []
 	for path in paths : 
 		for n in path : 
@@ -508,14 +508,14 @@ def processing (alignments, contigs_file, output_repository, ctg_threshold, aln_
 	single_contigs = assembly_graph.get_single_contigs(contigs)
 
 	if display_dot and output_dir : 
-		assembly_graph.write_dot_graph(output_dir+"/graph1.dot")
+		assembly_graph.write_dot_graph(output_dir+"/initial_assembly_graph.dot")
 
 	# Make the extensions
 	paths = assembly_graph.select_extensions(contigs)
 #	debug_here()
 
 	if display_dot and output_dir  : 
-		assembly_graph.write_dot_graph(output_dir+"/graph2.dot")
+		assembly_graph.write_dot_graph(output_dir+"/extended_assembly_graph.dot")
 	if display_cytoscape  and output_dir : 
 		assembly_graph.write_cytoscape_graph(output_dir+"/")
 
@@ -641,9 +641,9 @@ def main():
 	parser = OptionParser()
 	parser.add_option("-a", "--aln", dest="aln", help ="the file containing the alignments (.coords)")
 	parser.add_option("-o", "--out", dest="out", help ="the output directory where the scaffolds will be written (it must already exist)",default=None) 
-	parser.add_option("-c", "--ctg", dest="ctg", help ="the file containing all the contigs that were used in the alignment") 
-	parser.add_option("-A", "--ath", dest="ath", help ="minimum length of alignment (optionnal)")
-	parser.add_option("-C", "--cth", dest="cth", help ="minimum length of contig (optionnal)")
+	parser.add_option("-c", "--ctg", dest="ctg", help ="the multi FASTA file containing all the contigs that were used in the alignment") 
+	parser.add_option("-A", "--ath", dest="ath", help ="minimum length of alignment (default:0)",default=0)
+	parser.add_option("-C", "--cth", dest="cth", help ="minimum length of contig (default:500)",default=500)
 	parser.add_option("-d", "--dot", dest="dot", help ="write the graphs in dot format", default=False, action='store_true')
 	parser.add_option("-g", "--graph", dest="graph", help ="write the graphs in cytoscape format", default=False, action='store_true')
 	parser.add_option("-r", "--restrict-to-aligned", dest="restrict_aligned", help ="If on, restrict output to aligned coords",default=False,action="store_true")
@@ -680,7 +680,7 @@ def main():
 	sigma=scipy.std(contig_tally.values())
 	contigs_with_too_many_alignments = [k for k,v in contig_tally.items() if v>=3*mu]
 	if len(contigs_with_too_many_alignments):
-		print "Removed contigs with too many alignments:",[contig_tally[k] for k in contigs_with_too_many_alignments]
+		logger.info("Removed contigs with too many alignments: %s"%([contig_tally[k] for k in contigs_with_too_many_alignments]))
 	cleaned_alignments=[x for x in cleaned_alignments if ((x['TAGQ'] not in contigs_with_too_many_alignments)and(x['TAGR'] not in contigs_with_too_many_alignments))]
 	contigs_included_in_other=list(set(contigs_included_in_other).union(contigs_with_too_many_alignments))
 

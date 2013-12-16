@@ -179,7 +179,8 @@ all.gaa.quasts[specie=="R_sphaeroides",specie:="rhodo"]
 all.gaa.quasts[specie=="A_hydrophila",specie:="a_hydrophila"]
 
 all.gaa.quasts[,.N,by=list(specie,assembler.1,assembler.2)][order(N)]
-all.combined.quasts <- rbind(all.quasts,all.gaa.quasts,use.names=T)
+#all.combined.quasts <- rbind(all.quasts,all.gaa.quasts,use.names=T)
+all.combined.quasts <- all.gaa.quasts
 
 ```
 
@@ -352,9 +353,9 @@ all.combined.quasts[merger=="MIX.2",merger:="MIX"]
 small.size=2
 large.size=4
 rank.thr = 5
-pdf("all.quasts.measures.pdf",w=18,h=9)
+#pdf("all.quasts.measures.pdf",w=18,h=9)
 ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NA50)]),aes(x=merger,y=NA50/1000,colour=merger,group=merger))+geom_point(aes(size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr),position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NA50(kb)")+scale_size_discrete(range=c(small.size,large.size),name="Top 5 by N50")+scale_fill_discrete(name="Assembler type")+scale_shape_discrete(name="Top 5 by N50")+xlab("Assembler type")
-ggsave("figures/GAGE_B_NA50.pdf",w=12,h=6)
+#ggsave("figures/GAGE_B_NA50.pdf",w=12,h=6)
 
 ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA50)]),aes(x=merger,y=NGA50,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("NGA50")+scale_size_discrete(range=c(small.size,large.size))
 
@@ -364,7 +365,7 @@ ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,NGA75)]),aes(x=m
 ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,Largest.alignment)]),aes(x=merger,y=Largest.alignment/1000,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr,colour=merger,group=merger))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Largest alignment (kb)")+scale_size_discrete(range=c(small.size,large.size))
 
 ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,round(Duplication.ratio,digits=2))]),aes(x=merger,y=V4,colour=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr,group=merger))+geom_point(position=position_jitter(width=0.1,height=0),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+geom_hline(y=1,colour="firebrick",linetype="dashed")+facet_wrap(~specie,scale="free")+ggtitle("Duplication ratio")+scale_size_discrete(range=c(small.size,large.size))+scale_size_discrete(range=c(small.size,large.size),name="Top 5 by N50")+scale_fill_discrete(name="Assembler type")+scale_shape_discrete(name="Top 5 by N50")+xlab("Assembler type")+ylab("Duplication Ratio")
-ggsave("figures/GAGE_B_DUP.pdf",w=12,h=6)
+#ggsave("figures/GAGE_B_DUP.pdf",w=12,h=6)
 
 
 ggplot(na.omit(all.combined.quasts[,list(specie,merger,N50.rank,X..mismatches.per.100.kbp)]),aes(x=merger,y=X..mismatches.per.100.kbp,colour=merger,group=merger,size=N50.rank<=rank.thr,shape=N50.rank<=rank.thr))+geom_point(position=position_jitter(width=0.2,height=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_wrap(~specie,scale="free")+ggtitle("Mismatches per 100kb")+scale_size_discrete(range=c(small.size,large.size))
@@ -456,7 +457,7 @@ Summarizing grid
 myco.m<-data.table(melt(all.myco.reports))
 
 ggplot(myco.m[variable %in% c("N50","npredicted.genes_300.bp","ncontigs","Largest.contig")],aes(x=merger,y=value,colour=merger,group=merger))+geom_point(,position=position_jitter(width=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_grid(variable~species,scale="free")+ggtitle("Mycoplasmas Assemblies")+scale_fill_discrete(name="Assembler type")+xlab("Assembler type")+theme_bw()+ylab("")+theme(axis.text.x = element_text(angle = +45, hjust = 1.1))+scale_colour_manual(values=c("#E69F00", "#56B4E9","#999999"))
-ggsave("figures/mycoplasmas_QUAST.pdf",w=12,h=8)
+#ggsave("figures/mycoplasmas_QUAST.pdf",w=12,h=8)
 ```
 
 
@@ -511,6 +512,32 @@ myco.m$variable <- factor(myco.m$variable,levels=c("N contigs","Largest contig",
 g<-ggplot(myco.m,aes(x=merger,y=value,colour=merger,group=merger))+geom_point(,position=position_jitter(width=0.05),alpha=0.9)+geom_boxplot(alpha=0.5,size=0.4,outlier.size=0)+facet_grid(variable~species,scale="free")+ggtitle("Mycoplasmas Assemblies")+xlab("Assembler type")+theme_bw()+ylab("")+theme(axis.text.x = element_text(angle = +45, hjust = 1.1))
 g+scale_fill_manual(values=c("#7FC97F","#E69F00", "#56B4E9","#999999"),name="Assembler type")
 #+scale_colour_manual(values=c("#E69F00", "#56B4E9","#999999"))
-ggsave("figures/mycoplasmas_QUAST_all_final.pdf",w=12,h=8,plot=g)
+#ggsave("figures/mycoplasmas_QUAST_all_final.pdf",w=12,h=8,plot=g)
+
+```
+
+
+# Statistics table
+```{r}
+all.combined.quasts.filt <- all.combined.quasts[merger!="Single assembly"]
+all.combined.quasts.filt$file<-NULL
+
+# How many for mix, which comb ? 
+(8*choose(8,2)) - nrow(all.combined.quasts.filt[merger=="MIX"])
+mix.comb = table(paste(all.combined.quasts.filt[merger=="MIX",assembler.1],all.combined.quasts.filt[merger=="MIX",assembler.2]))
+gaa.comb = table(paste(all.combined.quasts.filt[merger=="GAA",assembler.1],all.combined.quasts.filt[merger=="GAA",assembler.2]))
+gam.comb = table(paste(all.combined.quasts.filt[merger=="GAM",assembler.1],all.combined.quasts.filt[merger=="GAM",assembler.2]))
+dim(mix.comb)
+sum(mix.comb!=8)
+```
+
+# What are the best combination of assemblers ? 
+```{r}
+# Rank assemblies by species based on NA50 
+all.combined.quasts.filt[assembler.1!=assembler.2,NA50.rank:=rank(-NA50,ties.method="first"),by=list(merger,specie)]
+all.combined.quasts.filt[assembler.1!=assembler.2,mean(NA50.rank,na.rm=T),by=list(assembler.1,assembler.2)][order(V1)]
+all.combined.quasts.filt[(assembler.1!=assembler.2 | merger=="MIX").2,mean(NA50.rank,na.rm=T),by=list(merger,assembler.1,assembler.2)][order(V1)]
+
+head(all.combined.quasts.filt[assembler.1!=assembler.2,mean(NA50.rank,na.rm=T),by=list(merger,assembler.1,assembler.2)][order(V1)],n=20)
 
 ```
