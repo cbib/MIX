@@ -18,6 +18,12 @@ The Mix algorithm, approach and results were published in BMC bioinformatics : [
     Year = {2013}}
     
     
+# Getting help
+
+For any information or help running mix, you can get in touch with: 
+* [Hayssam Soueidan](mailto:massyah[AT]gmail.com)
+* [Alexis Groppi](mailto:alexis.groppi[AT]u-bordeaux.fr)
+* [Macha Nikolski](mailto:macha[AT]labri.fr)
 
 
 # Datasets for the Mix publication
