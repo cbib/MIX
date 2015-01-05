@@ -6,6 +6,21 @@ Mix
 
 Mix is a tool that combines two or more draft assemblies, without relying on a reference genome and has the goal to reduce contig fragmentation and thus speed-up genome finishing. The proposed algorithm builds an extension graph where vertices represent extremities of contigs and edges represent existing alignments between these extremities. These alignment edges are used for contig extension. The resulting output assembly corresponds to a path in the extension graph that maximizes the cumulative contig length. 
 
+The Mix algorithm, approach and results were published in BMC bioinformatics : [http://www.biomedcentral.com/1471-2105/14/S15/S16](http://www.biomedcentral.com/1471-2105/14/S15/S16). If you use Mix, please cite the following paper : 
+
+    @article{24564706,
+    Author = {Soueidan, Hayssam and Maurier, Florence and Groppi, Alexis and Sirand-Pugnet, Pascal and Tardy, Florence and Citti, Christine and Dupuy, Virginie and Nikolski, Macha},
+    Journal = {BMC Bioinformatics},
+    Number = {Suppl 15},
+    Pages = {S16},
+    Title = {Finishing bacterial genome assemblies with Mix},
+    Volume = {14},
+    Year = {2013}}
+    
+    
+
+
+# Datasets for the Mix publication
 Datasets corresponding to the benchmarks analyzed in the manuscript as well as [supplemenatary figures](http://services.cbib.u-bordeaux2.fr/mix/RECOMBCG_supp_figures/) are available at the [accompanying website](http://services.cbib.u-bordeaux2.fr/mix/)
 
 
