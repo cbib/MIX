@@ -53,7 +53,7 @@ You can get the latest version of the development [via this github link.](https:
 
 To install the software, the user must download the file [Mix-master.zip](https://github.com/cbib/MIX/archive/master.zip) (see previous section) and extract it
 
-    tar -xzf Mix-master.zip
+    unzip Mix-master.zip
 
 # Usage
 
